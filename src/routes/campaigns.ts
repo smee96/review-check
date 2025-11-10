@@ -11,11 +11,8 @@ type Bindings = {
 
 const campaigns = new Hono<{ Bindings: Bindings }>();
 
-// All routes require authentication
-campaigns.use('*', authMiddleware);
-
 // 캠페인 등록 (광고주)
-campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
+campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
     const user = c.get('user');
     const data = await c.req.json();
@@ -86,7 +83,7 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
 });
 
 // 내 캠페인 목록 조회 (광고주)
-campaigns.get('/my', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
+campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
     const user = c.get('user');
     const { env } = c;
@@ -139,7 +136,7 @@ campaigns.get('/', async (c) => {
 });
 
 // 캠페인 상세 조회
-campaigns.get('/:id', async (c) => {
+campaigns.get('/:id', authMiddleware, async (c) => {
   try {
     const campaignId = c.req.param('id');
     const user = c.get('user');
@@ -170,7 +167,7 @@ campaigns.get('/:id', async (c) => {
 });
 
 // 캠페인 수정
-campaigns.put('/:id', async (c) => {
+campaigns.put('/:id', authMiddleware, async (c) => {
   try {
     const campaignId = c.req.param('id');
     const user = c.get('user');
@@ -280,7 +277,7 @@ campaigns.put('/:id', async (c) => {
 });
 
 // 캠페인 지원하기 (인플루언서)
-campaigns.post('/:id/apply', requireRole('influencer'), async (c) => {
+campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c) => {
   try {
     const campaignId = c.req.param('id');
     const user = c.get('user');
@@ -341,7 +338,7 @@ campaigns.post('/:id/apply', requireRole('influencer'), async (c) => {
 });
 
 // 캠페인 지원자 목록 조회 (광고주)
-campaigns.get('/:id/applications', async (c) => {
+campaigns.get('/:id/applications', authMiddleware, async (c) => {
   try {
     const campaignId = c.req.param('id');
     const user = c.get('user');
