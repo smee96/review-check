@@ -748,7 +748,7 @@ class ReviewSphere {
                     ` : ''}
                   </div>
                   <div class="mt-4 flex space-x-2">
-                    <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm">
+                    <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm" id="editBtn${c.id}">
                       <i class="fas fa-edit mr-1"></i>수정
                     </button>
                     ${c.status === 'approved' ? `
@@ -1454,9 +1454,17 @@ class ReviewSphere {
       const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
       const campaign = response.data;
       
-      // 수정 불가능한 상태 체크
-      if (campaign.status === 'active') {
-        if (!confirm('진행 중인 캠페인입니다. 일부 항목만 수정 가능합니다. 계속하시겠습니까?')) {
+      // 광고주 권한 체크: 신청 시작일 이후 또는 승인된 캠페인은 수정 불가
+      if (this.user.role !== 'admin') {
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (campaign.status === 'approved' || campaign.status === 'active' || campaign.status === 'suspended') {
+          alert('승인된 캠페인은 수정할 수 없습니다.\n수정이 필요한 경우 관리자에게 문의해주세요.');
+          return;
+        }
+        
+        if (campaign.application_start_date && campaign.application_start_date <= today) {
+          alert('신청 시작일 이후에는 캠페인을 수정할 수 없습니다.\n수정이 필요한 경우 관리자에게 문의해주세요.');
           return;
         }
       }
@@ -1657,6 +1665,14 @@ class ReviewSphere {
         keywords: document.getElementById('campaignKeywords').value,
         notes: document.getElementById('campaignNotes').value,
       };
+      
+      // 관리자인 경우 결제 상태도 함께 전송
+      if (this.user.role === 'admin') {
+        const paymentStatusSelect = document.getElementById('campaignPaymentStatus');
+        if (paymentStatusSelect) {
+          data.payment_status = paymentStatusSelect.value;
+        }
+      }
 
       if (!confirm('캠페인을 수정하시겠습니까?')) {
         return;
@@ -1664,10 +1680,173 @@ class ReviewSphere {
 
       const response = await axios.put(`/api/campaigns/${campaignId}`, data, this.getAuthHeaders());
       alert('캠페인이 수정되었습니다.');
-      this.showMyCampaigns();
+      
+      // 관리자는 관리자 대시보드로, 광고주는 내 캠페인으로
+      if (this.user.role === 'admin') {
+        this.showAdminDashboard();
+      } else {
+        this.showMyCampaigns();
+      }
     } catch (error) {
       console.error('Update campaign error:', error);
       alert(error.response?.data?.error || '캠페인 수정에 실패했습니다');
+    }
+  }
+  
+  // 관리자 전용 캠페인 수정 함수
+  async editCampaignAsAdmin(campaignId) {
+    try {
+      // 캠페인 데이터 가져오기
+      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      const campaign = response.data;
+      
+      // showCreateCampaign과 동일한 폼 표시
+      await this.showCreateCampaign();
+      
+      // 폼 제목 변경
+      setTimeout(() => {
+        const formTitle = document.querySelector('h2');
+        if (formTitle && formTitle.textContent.includes('캠페인 등록')) {
+          formTitle.innerHTML = '<i class="fas fa-edit text-purple-600 mr-2"></i>캠페인 수정 (관리자)';
+        }
+        
+        // 기존 데이터 채우기
+        document.getElementById('campaignTitle').value = campaign.title || '';
+        document.getElementById('campaignDescription').value = campaign.description || '';
+        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        
+        // 채널 타입 선택
+        const channelTypeSelect = document.getElementById('campaignChannelType');
+        if (channelTypeSelect && campaign.channel_type) {
+          channelTypeSelect.value = campaign.channel_type;
+          this.handleChannelChange(); // 채널별 필드 표시
+        }
+        
+        // 채널별 필드 채우기
+        setTimeout(() => {
+          if (campaign.channel_type === 'instagram' && campaign.instagram_mention_account) {
+            const instagramField = document.getElementById('instagramMentionAccount');
+            if (instagramField) instagramField.value = campaign.instagram_mention_account;
+          } else if (campaign.channel_type === 'blog' && campaign.blog_product_url) {
+            const blogField = document.getElementById('blogProductUrl');
+            if (blogField) blogField.value = campaign.blog_product_url;
+          } else if (campaign.channel_type === 'youtube' && campaign.youtube_purchase_link) {
+            const youtubeField = document.getElementById('youtubePurchaseLink');
+            if (youtubeField) youtubeField.value = campaign.youtube_purchase_link;
+          }
+        }, 100);
+        
+        // 날짜 필드 채우기
+        if (this.campaignDatePickers) {
+          if (campaign.application_start_date) {
+            this.campaignDatePickers.applicationStart.setDate(campaign.application_start_date);
+          }
+          if (campaign.application_end_date) {
+            this.campaignDatePickers.applicationEnd.setDate(campaign.application_end_date);
+          }
+          if (campaign.announcement_date) {
+            this.campaignDatePickers.announcement.setDate(campaign.announcement_date);
+          }
+          if (campaign.content_start_date) {
+            this.campaignDatePickers.contentStart.setDate(campaign.content_start_date);
+          }
+          if (campaign.content_end_date) {
+            this.campaignDatePickers.contentEnd.setDate(campaign.content_end_date);
+          }
+          if (campaign.result_announcement_date) {
+            this.campaignDatePickers.resultAnnouncement.setDate(campaign.result_announcement_date);
+          }
+        }
+        
+        // 제공 내역
+        document.getElementById('campaignProvidedItems').value = campaign.provided_items || '';
+        document.getElementById('campaignProductName').value = campaign.product_name || '';
+        document.getElementById('campaignProductUrl').value = campaign.product_url || '';
+        
+        // 예상 가액 (숫자 포맷)
+        const budgetField = document.getElementById('campaignBudget');
+        if (budgetField && campaign.budget) {
+          budgetField.value = campaign.budget.toLocaleString();
+        }
+        
+        // 미션 필드 초기화 및 채우기
+        const missionContainer = document.getElementById('missionContainer');
+        if (missionContainer && campaign.mission) {
+          missionContainer.innerHTML = ''; // 기존 필드 제거
+          const missions = campaign.mission.split('\n').filter(m => m.trim());
+          missions.forEach((mission, index) => {
+            this.addMissionField();
+            const missionInput = document.getElementById(`mission${index + 1}`);
+            if (missionInput) missionInput.value = mission.trim();
+          });
+          // 최소 5개 필드 유지
+          while (missionContainer.children.length < 5) {
+            this.addMissionField();
+          }
+        }
+        
+        // 요구사항
+        document.getElementById('campaignRequirements').value = campaign.requirements || '';
+        
+        // 키워드 (해시태그)
+        if (campaign.keywords) {
+          this.keywords = []; // 초기화
+          const keywords = campaign.keywords.split(',').map(k => k.trim()).filter(k => k);
+          keywords.forEach(keyword => {
+            this.addKeyword(keyword);
+          });
+        }
+        
+        // 유의사항
+        document.getElementById('campaignNotes').value = campaign.notes || '';
+        
+        // 포인트 리워드 (숫자 포맷)
+        const pointRewardField = document.getElementById('campaignPointReward');
+        if (pointRewardField && campaign.point_reward) {
+          pointRewardField.value = campaign.point_reward.toLocaleString();
+        }
+        
+        // 비용 재계산
+        this.calculateCampaignCost();
+        
+        // 관리자 전용: 결제 상태 선택 필드 추가
+        const pointSection = document.querySelector('.bg-purple-50');
+        if (pointSection && campaign.point_reward > 0) {
+          const paymentStatusHtml = `
+            <div class="mt-4 p-3 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+              <h4 class="font-bold text-yellow-900 mb-2">
+                <i class="fas fa-crown mr-1"></i>관리자 전용 - 결제 상태 변경
+              </h4>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">결제 상태</label>
+                <select id="campaignPaymentStatus" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                  <option value="unpaid" ${campaign.payment_status === 'unpaid' ? 'selected' : ''}>⏳ 결제 대기</option>
+                  <option value="paid" ${campaign.payment_status === 'paid' ? 'selected' : ''}>✓ 결제 완료</option>
+                </select>
+                <p class="text-xs text-gray-600 mt-1">결제 상태를 변경하면 광고주가 캠페인을 활성화할 수 있습니다</p>
+              </div>
+            </div>
+          `;
+          pointSection.insertAdjacentHTML('beforeend', paymentStatusHtml);
+        }
+        
+        // 제출 버튼 변경
+        const form = document.getElementById('createCampaignForm');
+        if (form) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.textContent = '캠페인 수정 (관리자)';
+            submitBtn.onclick = (e) => {
+              e.preventDefault();
+              this.handleUpdateCampaign(campaignId);
+            };
+          }
+        }
+      }, 200);
+      
+    } catch (error) {
+      console.error('Edit campaign as admin error:', error);
+      alert(error.response?.data?.error || '캠페인 정보를 불러오는데 실패했습니다');
     }
   }
 
@@ -2418,7 +2597,9 @@ class ReviewSphere {
             <div class="border rounded-lg p-4">
               <div class="flex justify-between items-start mb-2">
                 <div>
-                  <h3 class="font-bold text-lg">${c.title}</h3>
+                  <h3 class="font-bold text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
+                    <i class="fas fa-edit mr-1"></i>${c.title}
+                  </h3>
                   <p class="text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
                 </div>
                 <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
@@ -2429,13 +2610,29 @@ class ReviewSphere {
               <p class="text-gray-600 mb-2">${c.description || ''}</p>
               
               ${c.point_reward > 0 ? `
-                <div class="bg-blue-50 border border-blue-200 rounded p-2 mb-2 text-sm">
-                  <p><strong>포인트:</strong> ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)</p>
-                  <p><strong>결제 상태:</strong> 
-                    <span class="px-2 py-1 rounded text-xs ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                      ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
-                    </span>
-                  </p>
+                <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-2 text-sm">
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <p class="text-gray-600">인당 포인트</p>
+                      <p class="font-semibold text-lg">${c.point_reward.toLocaleString()}P</p>
+                    </div>
+                    <div>
+                      <p class="text-gray-600">총 포인트</p>
+                      <p class="font-semibold text-lg">${(c.point_reward * c.slots).toLocaleString()}P</p>
+                    </div>
+                    <div>
+                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
+                      <p class="font-semibold text-lg text-green-600">${Math.floor(c.point_reward * c.slots * 0.20).toLocaleString()}원</p>
+                    </div>
+                    <div>
+                      <p class="text-gray-600">결제 상태</p>
+                      <p>
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                          ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ` : ''}
               

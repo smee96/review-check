@@ -156,10 +156,10 @@ campaigns.put('/:id', async (c) => {
     const user = c.get('user');
     const { env } = c;
     
-    // Check ownership
+    // Check ownership and permissions
     const campaign = await env.DB.prepare(
-      'SELECT advertiser_id FROM campaigns WHERE id = ?'
-    ).bind(campaignId).first();
+      'SELECT advertiser_id, status, application_start_date FROM campaigns WHERE id = ?'
+    ).bind(campaignId).first() as any;
     
     if (!campaign) {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
@@ -169,13 +169,25 @@ campaigns.put('/:id', async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
+    // 광고주 권한 체크: 승인된 캠페인이거나 신청 시작일 이후면 수정 불가
+    if (user.role !== 'admin') {
+      if (campaign.status === 'approved' || campaign.status === 'active' || campaign.status === 'suspended') {
+        return c.json({ error: '승인된 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      if (campaign.application_start_date && campaign.application_start_date <= today) {
+        return c.json({ error: '신청 시작일 이후에는 캠페인을 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
+      }
+    }
+    
     const data = await c.req.json();
     const { 
       title, description, product_name, product_url, requirements, budget, slots,
       point_reward, thumbnail_image, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
-      provided_items, mission, keywords, notes
+      provided_items, mission, keywords, notes, payment_status
     } = data;
     
     if (!title) {
@@ -224,6 +236,15 @@ campaigns.put('/:id', async (c) => {
     if (thumbnail_image) {
       updateQuery += ', thumbnail_image = ?';
       params.push(thumbnail_image);
+    }
+    
+    // 관리자인 경우에만 결제 상태 업데이트 가능
+    if (user.role === 'admin' && payment_status) {
+      if (!['unpaid', 'paid'].includes(payment_status)) {
+        return c.json({ error: '유효하지 않은 결제 상태입니다' }, 400);
+      }
+      updateQuery += ', payment_status = ?';
+      params.push(payment_status);
     }
     
     updateQuery += ' WHERE id = ?';
