@@ -271,7 +271,8 @@ class ReviewSphere {
                       </div>
                     </div>
                   </div>
-                `).join('') : `
+                  `;
+                }).join('') : `
                   <div class="w-full text-center py-16">
                     <i class="fas fa-star text-6xl text-gray-300 mb-4"></i>
                     <p class="text-xl text-gray-500 mb-2">선정된 베스트 캠페인이 아직 없어요</p>
