@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mspheres",
+  "name": "m-spheres",
   "compatibility_date": "2025-11-10",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
@@ -9,7 +9,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "mspheres-production",
+      "database_name": "m-spheres-production",
       "database_id": "to-be-created"
     }
   ]
