@@ -1457,6 +1457,243 @@ class ReviewSphere {
     const email = document.getElementById('forgotEmail').value;
     this.forgotPassword(email);
   }
+
+  showTerms() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.token && this.user ? this.renderNav() : `
+          <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+              <div class="flex justify-between items-center h-14 sm:h-16">
+                <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showHome()">
+                  <i class="fas fa-globe mr-1 sm:mr-2"></i>ReviewSphere
+                </h1>
+              </div>
+            </div>
+          </nav>
+        `}
+        
+        <div class="flex-grow">
+          <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <button onclick="${this.token ? 'app.showDashboard()' : 'app.showHome()'}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+              <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            </button>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+              <h1 class="text-3xl font-bold text-gray-800 mb-6">이용약관</h1>
+              
+              <div class="prose max-w-none space-y-6 text-sm">
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제1조 (목적)</h2>
+                  <p>본 약관은 리뷰스피어(이하 "회사")가 제공하는 인플루언서 마케팅 플랫폼 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제2조 (정의)</h2>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>"서비스"란 회사가 제공하는 인플루언서 마케팅 플랫폼 및 관련 제반 서비스를 의미합니다.</li>
+                    <li>"회원"이란 서비스에 접속하여 본 약관에 따라 회사와 이용계약을 체결하고 서비스를 이용하는 자를 말합니다.</li>
+                    <li>"광고주"란 캠페인을 등록하고 인플루언서를 모집하는 회원을 말합니다.</li>
+                    <li>"인플루언서"란 캠페인에 지원하여 리뷰 등의 콘텐츠를 작성하는 회원을 말합니다.</li>
+                    <li>"포인트"란 인플루언서가 캠페인 참여를 통해 적립하는 리워드를 의미하며, 1포인트는 1원의 가치를 가집니다.</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제3조 (포인트 제도)</h2>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>인플루언서는 캠페인 참여를 통해 포인트를 적립할 수 있습니다.</li>
+                    <li>포인트는 다음의 경우에 적립됩니다:
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>캠페인 완료 시 지정된 포인트 지급</li>
+                        <li>제품 체험 또는 방문형 서비스 이용 후 리뷰 작성</li>
+                        <li>게시물 작성 등의 간단한 캠페인 참여</li>
+                        <li>기타 회사가 정하는 보너스 포인트</li>
+                      </ul>
+                    </li>
+                    <li>적립된 포인트는 5,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
+                    <li>출금 신청 시 등록된 계좌로 영업일 기준 7일 이내에 지급됩니다.</li>
+                    <li>부정한 방법으로 포인트를 적립한 경우, 회사는 해당 포인트를 회수하고 회원 자격을 제한할 수 있습니다.</li>
+                    <li>포인트의 유효기간은 적립일로부터 2년입니다.</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제4조 (캠페인 참여)</h2>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>인플루언서는 승인된 캠페인에 자유롭게 지원할 수 있습니다.</li>
+                    <li>광고주는 지원자 중 적합한 인플루언서를 선정할 권한이 있습니다.</li>
+                    <li>선정된 인플루언서는 캠페인 요구사항에 따라 성실히 활동해야 합니다.</li>
+                    <li>캠페인 완료 후 포스트 URL 등 증빙자료를 제출해야 포인트가 지급됩니다.</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제5조 (회원의 의무)</h2>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>회원은 관계 법령, 본 약관, 이용안내 및 서비스상 공지사항 등을 준수해야 합니다.</li>
+                    <li>회원은 본인의 계정 정보를 제3자에게 제공하거나 이용하게 해서는 안 됩니다.</li>
+                    <li>인플루언서는 진실하고 성실한 리뷰를 작성해야 하며, 허위 또는 과장된 내용을 포함해서는 안 됩니다.</li>
+                    <li>광고주는 적법한 제품 및 서비스에 대한 캠페인만 등록해야 합니다.</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제6조 (서비스 이용 제한)</h2>
+                  <p>회사는 다음 각 호에 해당하는 경우 사전 통지 없이 회원의 서비스 이용을 제한하거나 계약을 해지할 수 있습니다:</p>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>타인의 정보를 도용한 경우</li>
+                    <li>허위 또는 과장된 리뷰를 작성한 경우</li>
+                    <li>부정한 방법으로 포인트를 적립하거나 출금한 경우</li>
+                    <li>기타 관계 법령 또는 본 약관을 위반한 경우</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">제7조 (면책조항)</h2>
+                  <ol class="list-decimal pl-5 space-y-2">
+                    <li>회사는 천재지변, 전쟁, 시스템 장애 등 불가항력으로 인한 서비스 제공 불능에 대해 책임을 지지 않습니다.</li>
+                    <li>회사는 회원 간의 거래나 분쟁에 대해 책임을 지지 않습니다.</li>
+                    <li>회사는 회원이 게시한 정보의 신뢰성, 정확성 등에 대해 책임을 지지 않습니다.</li>
+                  </ol>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">부칙</h2>
+                  <p>본 약관은 2025년 11월 10일부터 시행됩니다.</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        ${this.renderFooter()}
+      </div>
+    `;
+  }
+
+  showPrivacy() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.token && this.user ? this.renderNav() : `
+          <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+              <div class="flex justify-between items-center h-14 sm:h-16">
+                <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showHome()">
+                  <i class="fas fa-globe mr-1 sm:mr-2"></i>ReviewSphere
+                </h1>
+              </div>
+            </div>
+          </nav>
+        `}
+        
+        <div class="flex-grow">
+          <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <button onclick="${this.token ? 'app.showDashboard()' : 'app.showHome()'}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+              <i class="fas fa-arrow-left mr-2"></i>돌아가기
+            </button>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+              <h1 class="text-3xl font-bold text-gray-800 mb-6">개인정보처리방침</h1>
+              
+              <div class="prose max-w-none space-y-6 text-sm">
+                <section>
+                  <h2 class="text-xl font-bold mb-3">1. 개인정보의 수집 및 이용 목적</h2>
+                  <p>리뷰스피어((주)모빈)는 다음의 목적을 위하여 개인정보를 처리합니다:</p>
+                  <ul class="list-disc pl-5 space-y-2">
+                    <li>회원 가입 및 관리: 회원 자격 유지·관리, 본인확인, 부정이용 방지</li>
+                    <li>서비스 제공: 캠페인 매칭, 포인트 적립 및 출금, 고객상담</li>
+                    <li>마케팅 및 광고: 이벤트 정보 제공, 맞춤형 서비스 제공</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">2. 수집하는 개인정보 항목</h2>
+                  <p><strong>필수항목:</strong></p>
+                  <ul class="list-disc pl-5 space-y-1">
+                    <li>회원 가입 시: 이메일, 닉네임, 비밀번호</li>
+                    <li>인플루언서: SNS 계정 정보, 팔로워 수, 계좌정보(출금 시)</li>
+                    <li>광고주: 회사명, 사업자등록번호, 대표자명, 연락처</li>
+                  </ul>
+                  <p class="mt-2"><strong>자동 수집 항목:</strong> IP 주소, 쿠키, 서비스 이용 기록, 접속 로그</p>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">3. 개인정보의 보유 및 이용 기간</h2>
+                  <ul class="list-disc pl-5 space-y-2">
+                    <li>회원 탈퇴 시까지 (단, 관계 법령에 따라 보존 필요 시 해당 기간 동안 보존)</li>
+                    <li>전자상거래법: 계약 또는 청약철회 등에 관한 기록 5년</li>
+                    <li>전자금융거래법: 전자금융 거래에 관한 기록 5년</li>
+                    <li>통신비밀보호법: 로그인 기록 3개월</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">4. 개인정보의 제3자 제공</h2>
+                  <p>회사는 원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다:</p>
+                  <ul class="list-disc pl-5 space-y-2">
+                    <li>이용자가 사전에 동의한 경우</li>
+                    <li>법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">5. 개인정보 처리 위탁</h2>
+                  <p>회사는 서비스 향상을 위해 다음과 같이 개인정보 처리 업무를 위탁하고 있습니다:</p>
+                  <ul class="list-disc pl-5 space-y-1">
+                    <li>Cloudflare: 클라우드 서버 호스팅 및 데이터 저장</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">6. 정보주체의 권리·의무 및 행사방법</h2>
+                  <p>이용자는 언제든지 다음의 권리를 행사할 수 있습니다:</p>
+                  <ul class="list-disc pl-5 space-y-2">
+                    <li>개인정보 열람 요구</li>
+                    <li>개인정보 정정·삭제 요구</li>
+                    <li>개인정보 처리정지 요구</li>
+                    <li>회원 탈퇴 (동의 철회)</li>
+                  </ul>
+                  <p class="mt-2">권리 행사는 서비스 내 설정 메뉴 또는 개인정보 보호책임자에게 이메일, 전화 등을 통해 가능합니다.</p>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">7. 개인정보의 파기</h2>
+                  <p>회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+                  <ul class="list-disc pl-5 space-y-1">
+                    <li>전자적 파일: 복구 불가능한 방법으로 영구 삭제</li>
+                    <li>종이 문서: 분쇄 또는 소각</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">8. 개인정보 보호책임자</h2>
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <p><strong>개인정보 보호책임자</strong></p>
+                    <ul class="list-none space-y-1 mt-2">
+                      <li>성명: 안중경</li>
+                      <li>직책: 개인정보 관리책임자</li>
+                      <li>이메일: mobin_info@mobin-inc.com</li>
+                    </ul>
+                  </div>
+                </section>
+
+                <section>
+                  <h2 class="text-xl font-bold mb-3">9. 개인정보 처리방침 변경</h2>
+                  <p>본 방침은 2025년 11월 10일부터 시행됩니다.</p>
+                  <p>개인정보 처리방침의 내용 추가, 삭제 및 수정이 있을 시에는 시행 최소 7일 전부터 서비스 공지사항을 통해 알립니다.</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        ${this.renderFooter()}
+      </div>
+    `;
+  }
 }
 
 // Initialize app

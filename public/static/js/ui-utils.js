@@ -86,8 +86,12 @@ const UIUtils = {
             </div>
           </div>
           
-          <div class="border-t border-gray-700 pt-3 text-center text-xs">
-            <p>© 2025 리뷰스피어. All rights reserved. Operated by <strong>(주)모빈</strong></p>
+          <div class="border-t border-gray-700 pt-3">
+            <div class="flex justify-center space-x-4 mb-2 text-xs">
+              <a href="#" onclick="app.showTerms(); return false;" class="hover:text-white underline">이용약관</a>
+              <a href="#" onclick="app.showPrivacy(); return false;" class="hover:text-white underline">개인정보처리방침</a>
+            </div>
+            <p class="text-center text-xs">© 2025 리뷰스피어. All rights reserved. Operated by <strong>(주)모빈</strong></p>
           </div>
         </div>
       </footer>
