@@ -95,58 +95,169 @@ class ReviewSphere {
   // Page Rendering Methods
   // ============================================
 
-  showHome() {
+  async showHome() {
     const app = document.getElementById('app');
+    
+    // Load campaigns for display
+    let ongoingCampaigns = [];
+    let bestCampaigns = [];
+    let bestReviews = [];
+    
+    try {
+      const response = await axios.get('/api/campaigns');
+      const allCampaigns = response.data || [];
+      ongoingCampaigns = allCampaigns.slice(0, 10); // First 10 as ongoing
+      bestCampaigns = allCampaigns.slice(0, 5); // Top 5 as best
+    } catch (error) {
+      console.log('Failed to load campaigns:', error);
+    }
+    
     app.innerHTML = `
-      <div class="min-h-screen flex flex-col">
-        <nav class="bg-white shadow-lg">
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        <nav class="bg-white shadow-lg sticky top-0 z-50">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div class="flex justify-between items-center h-14 sm:h-16">
               <div class="flex items-center">
-                <h1 class="text-lg sm:text-2xl font-bold text-purple-600">
+                <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showHome()">
                   <i class="fas fa-globe mr-1 sm:mr-2"></i>ReviewSphere
                 </h1>
               </div>
               <div class="flex space-x-2 sm:space-x-4">
-                <button onclick="app.showLogin()" class="text-gray-700 hover:text-purple-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
-                  로그인
-                </button>
-                <button onclick="app.showRegister()" class="bg-purple-600 text-white hover:bg-purple-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
-                  회원가입
+                <button onclick="app.showLogin()" class="bg-purple-600 text-white hover:bg-purple-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition">
+                  시작하기
                 </button>
               </div>
             </div>
           </div>
         </nav>
 
-        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500">
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-8 sm:py-12 lg:py-16">
-            <div class="text-center text-white">
-              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 sm:mb-6">
-                인플루언서 마케팅의<br class="sm:hidden"> 새로운 기준
-              </h2>
-              <p class="text-base sm:text-lg lg:text-xl mb-8 sm:mb-12 text-purple-100">
-                ReviewSphere와 함께 성공적인 캠페인을 시작하세요
-              </p>
-              
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mt-8 sm:mt-16">
-                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-6 sm:p-8 hover:bg-opacity-20 transition active:scale-95">
-                  <i class="fas fa-bullhorn text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
-                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">광고주/대행사/렙사</h3>
-                  <p class="text-sm sm:text-base mb-4 sm:mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
-                  <button onclick="app.showRegister()" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
-                    비즈니스 시작하기
-                  </button>
-                </div>
-                
-                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-6 sm:p-8 hover:bg-opacity-20 transition active:scale-95">
-                  <i class="fas fa-star text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
-                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">인플루언서</h3>
-                  <p class="text-sm sm:text-base mb-4 sm:mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
-                  <button onclick="app.showRegister()" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
-                    인플루언서로 시작하기
-                  </button>
-                </div>
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-br from-purple-600 to-blue-500 text-white py-12 sm:py-16">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
+              인플루언서 마케팅의 새로운 기준
+            </h2>
+            <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
+              ReviewSphere와 함께 성공적인 캠페인을 시작하세요
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg">
+                <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+              </button>
+              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg">
+                <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ongoing Campaigns Section -->
+        <div class="py-8 sm:py-12 bg-white">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-fire text-orange-500 mr-2"></i>진행중인 캠페인
+              </h3>
+              ${ongoingCampaigns.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
+            </div>
+            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+              <div class="flex space-x-4" style="width: max-content;">
+                ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => `
+                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
+                    <div class="flex items-center justify-between mb-3">
+                      <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">진행중</span>
+                      <span class="text-sm text-gray-500">${c.slots || 1}명 모집</span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
+                      <button class="text-purple-600 hover:text-purple-800 font-semibold">
+                        자세히 보기 <i class="fas fa-arrow-right ml-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                `).join('') : `
+                  <div class="w-full text-center py-16">
+                    <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-xl text-gray-500 mb-2">아직 진행중인 캠페인이 없어요</p>
+                    <p class="text-sm text-gray-400">곧 멋진 캠페인으로 찾아뵐게요!</p>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best Campaigns Section -->
+        <div class="py-8 sm:py-12 bg-gray-50">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-trophy text-yellow-500 mr-2"></i>베스트 캠페인
+              </h3>
+              ${bestCampaigns.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
+            </div>
+            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+              <div class="flex space-x-4" style="width: max-content;">
+                ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => `
+                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
+                    <div class="flex items-center justify-between mb-3">
+                      <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                        <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
+                      </span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
+                      <button class="text-purple-600 hover:text-purple-800 font-semibold">
+                        자세히 보기 <i class="fas fa-arrow-right ml-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                `).join('') : `
+                  <div class="w-full text-center py-16">
+                    <i class="fas fa-star text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-xl text-gray-500 mb-2">선정된 베스트 캠페인이 아직 없어요</p>
+                    <p class="text-sm text-gray-400">많은 참여 부탁드려요!</p>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best Reviews Section -->
+        <div class="py-8 sm:py-12 bg-white">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-heart text-red-500 mr-2"></i>베스트 리뷰
+              </h3>
+            </div>
+            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+              <div class="flex space-x-4" style="width: max-content;">
+                ${bestReviews.length > 0 ? bestReviews.map(r => `
+                  <div class="bg-white border-2 border-red-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
+                    <div class="flex items-center mb-3">
+                      <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                        <i class="fas fa-heart mr-1"></i>Best
+                      </span>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">리뷰 제목</h4>
+                    <p class="text-gray-600 text-sm mb-3">리뷰 내용...</p>
+                    <a href="#" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      포스트 보기 <i class="fas fa-external-link-alt ml-1"></i>
+                    </a>
+                  </div>
+                `).join('') : `
+                  <div class="w-full text-center py-16">
+                    <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
+                    <p class="text-sm text-gray-400">첫 베스트 리뷰의 주인공이 되어주세요!</p>
+                  </div>
+                `}
               </div>
             </div>
           </div>
@@ -317,6 +428,127 @@ class ReviewSphere {
 
   showRegisterWithRole(role) {
     this.showRegister(role);
+  }
+
+  async viewCampaignDetail(campaignId) {
+    // Check if user is logged in
+    if (!this.token || !this.user) {
+      if (confirm('캠페인 상세 정보를 보려면 로그인이 필요합니다. 로그인 하시겠습니까?')) {
+        this.showLogin();
+      }
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      const campaign = response.data;
+      
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+              <button onclick="app.showHome()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>홈으로 돌아가기
+              </button>
+              
+              <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getStatusBadge(campaign.status)}">
+                    ${this.getStatusText(campaign.status)}
+                  </span>
+                  <span class="text-gray-500">${campaign.slots || 1}명 모집</span>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">${campaign.title}</h1>
+                
+                <div class="prose max-w-none mb-6">
+                  <p class="text-gray-600 whitespace-pre-wrap">${campaign.description || '캠페인 설명이 없습니다.'}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  ${campaign.product_name ? `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <span class="text-sm text-gray-500">제품명</span>
+                      <p class="font-semibold">${campaign.product_name}</p>
+                    </div>
+                  ` : ''}
+                  
+                  ${campaign.budget ? `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <span class="text-sm text-gray-500">예산</span>
+                      <p class="font-semibold text-purple-600">${campaign.budget.toLocaleString()}원</p>
+                    </div>
+                  ` : ''}
+                  
+                  ${campaign.start_date ? `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <span class="text-sm text-gray-500">시작일</span>
+                      <p class="font-semibold">${campaign.start_date}</p>
+                    </div>
+                  ` : ''}
+                  
+                  ${campaign.end_date ? `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                      <span class="text-sm text-gray-500">종료일</span>
+                      <p class="font-semibold">${campaign.end_date}</p>
+                    </div>
+                  ` : ''}
+                </div>
+                
+                ${campaign.requirements ? `
+                  <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-blue-900 mb-2">
+                      <i class="fas fa-list-check mr-2"></i>요구사항
+                    </h3>
+                    <p class="text-blue-800 whitespace-pre-wrap">${campaign.requirements}</p>
+                  </div>
+                ` : ''}
+                
+                ${campaign.product_url ? `
+                  <div class="mb-6">
+                    <a href="${campaign.product_url}" target="_blank" class="text-purple-600 hover:text-purple-800 flex items-center">
+                      <i class="fas fa-external-link-alt mr-2"></i>제품 페이지 바로가기
+                    </a>
+                  </div>
+                ` : ''}
+                
+                ${this.user.role === 'influencer' && campaign.status === 'approved' ? `
+                  <div class="mt-8">
+                    <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                      <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                    </button>
+                    <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+          
+          ${this.renderFooter()}
+        </div>
+      `;
+    } catch (error) {
+      alert('캠페인 정보를 불러오는데 실패했습니다');
+      this.showHome();
+    }
+  }
+
+  async applyCampaign(campaignId) {
+    const message = prompt('지원 메시지를 입력해주세요 (선택사항):');
+    
+    try {
+      await axios.post(`/api/campaigns/${campaignId}/apply`, 
+        { message }, 
+        this.getAuthHeaders()
+      );
+      alert('캠페인에 성공적으로 지원되었습니다!');
+      this.showInfluencerDashboard();
+    } catch (error) {
+      alert(error.response?.data?.error || '지원에 실패했습니다');
+    }
   }
 
   showForgotPassword() {
