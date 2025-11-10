@@ -704,7 +704,20 @@ class ReviewSphere {
           ${campaigns.map(c => `
             <div class="border rounded-lg p-4 hover:shadow-md transition">
               <div class="flex justify-between items-start mb-2">
-                <h3 class="font-bold text-lg">${c.title}</h3>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-lg">${c.title}</h3>
+                  ${c.channel_type ? `
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${
+                      c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
+                      c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
+                      c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : ''
+                    }">
+                      ${c.channel_type === 'instagram' ? '📸 인스타그램' :
+                        c.channel_type === 'blog' ? '📝 블로그' :
+                        c.channel_type === 'youtube' ? '🎥 유튜브' : ''}
+                    </span>
+                  ` : ''}
+                </div>
                 <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
                   ${this.getStatusText(c.status)}
                 </span>
@@ -752,6 +765,18 @@ class ReviewSphere {
           
           <div class="space-y-4">
             <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 채널 *</label>
+              <select id="campaignChannelType" required onchange="app.handleChannelChange()"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <option value="">채널을 선택하세요</option>
+                <option value="instagram">인스타그램</option>
+                <option value="blog">네이버 블로그</option>
+                <option value="youtube">유튜브</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">⚠️ 한 캠페인은 하나의 채널만 선택 가능합니다. 여러 채널을 진행하려면 캠페인을 따로 등록해주세요.</p>
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 제목 *</label>
               <input type="text" id="campaignTitle" required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
@@ -769,6 +794,17 @@ class ReviewSphere {
                 oninput="app.calculateCampaignCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
+          </div>
+        </div>
+
+        <!-- 채널별 상세 정보 섹션 (동적 표시) -->
+        <div id="channelSpecificSection" style="display: none;" class="bg-white border-2 border-indigo-200 rounded-lg p-4">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-hashtag text-indigo-600 mr-2"></i><span id="channelSectionTitle">채널 상세 정보</span>
+          </h3>
+          
+          <div id="channelSpecificFields" class="space-y-4">
+            <!-- 채널별 필드가 여기에 동적으로 추가됩니다 -->
           </div>
         </div>
 
@@ -955,6 +991,63 @@ class ReviewSphere {
     setTimeout(() => this.calculateCampaignCost(), 0);
   }
 
+  handleChannelChange() {
+    const channelType = document.getElementById('campaignChannelType').value;
+    const section = document.getElementById('channelSpecificSection');
+    const titleElement = document.getElementById('channelSectionTitle');
+    const fieldsContainer = document.getElementById('channelSpecificFields');
+    
+    if (!channelType) {
+      section.style.display = 'none';
+      return;
+    }
+    
+    section.style.display = 'block';
+    
+    // 채널별 제목 및 필드 설정
+    const channelConfigs = {
+      instagram: {
+        title: '인스타그램 상세 정보',
+        fields: `
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">멘션할 인스타그램 계정 *</label>
+            <input type="text" id="instagramMentionAccount" required placeholder="@your_account"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">인플루언서가 포스팅 시 멘션할 계정을 입력해주세요 (예: @brandname)</p>
+          </div>
+        `
+      },
+      blog: {
+        title: '네이버 블로그 상세 정보',
+        fields: `
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">상품 구매 URL *</label>
+            <input type="url" id="blogProductUrl" required placeholder="https://..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">블로그 리뷰에 포함될 상품 구매 링크를 입력해주세요</p>
+          </div>
+        `
+      },
+      youtube: {
+        title: '유튜브 상세 정보',
+        fields: `
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">구매 링크 *</label>
+            <input type="url" id="youtubePurchaseLink" required placeholder="https://..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">영상 설명란에 포함될 구매 링크를 입력해주세요</p>
+          </div>
+        `
+      }
+    };
+    
+    const config = channelConfigs[channelType];
+    if (config) {
+      titleElement.textContent = config.title;
+      fieldsContainer.innerHTML = config.fields;
+    }
+  }
+
   calculateCampaignCost() {
     const slots = parseInt(document.getElementById('campaignSlots')?.value || 1);
     const pointPerPerson = parseInt(document.getElementById('campaignPointReward')?.value || 0);
@@ -974,6 +1067,12 @@ class ReviewSphere {
   async handleCreateCampaign() {
     try {
       const pointReward = parseInt(document.getElementById('campaignPointReward').value || 0);
+      const channelType = document.getElementById('campaignChannelType').value;
+      
+      if (!channelType) {
+        alert('캠페인 채널을 선택해주세요');
+        return;
+      }
       
       const data = {
         title: document.getElementById('campaignTitle').value,
@@ -984,6 +1083,12 @@ class ReviewSphere {
         budget: document.getElementById('campaignBudget').value || null,
         slots: document.getElementById('campaignSlots').value || 1,
         point_reward: pointReward,
+        
+        // 채널 정보
+        channel_type: channelType,
+        instagram_mention_account: channelType === 'instagram' ? document.getElementById('instagramMentionAccount')?.value : null,
+        blog_product_url: channelType === 'blog' ? document.getElementById('blogProductUrl')?.value : null,
+        youtube_purchase_link: channelType === 'youtube' ? document.getElementById('youtubePurchaseLink')?.value : null,
         
         // 일정 관리
         application_start_date: document.getElementById('campaignApplicationStartDate').value || null,
