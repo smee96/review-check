@@ -874,40 +874,51 @@ class ReviewSphere {
           <div class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 시작일</label>
-                <input type="date" id="campaignApplicationStartDate"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 시작일 *</label>
+                <input type="text" id="campaignApplicationStartDate" required readonly
+                  placeholder="날짜를 선택하세요"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 마감일</label>
-                <input type="date" id="campaignApplicationEndDate"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 마감일 *</label>
+                <input type="text" id="campaignApplicationEndDate" required readonly
+                  placeholder="날짜를 선택하세요"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">인플루언서 선정발표일</label>
-              <input type="date" id="campaignAnnouncementDate"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <label class="block text-sm font-medium text-gray-700 mb-2">인플루언서 선정발표일 *</label>
+              <input type="text" id="campaignAnnouncementDate" required readonly
+                placeholder="날짜를 선택하세요"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 시작일</label>
-                <input type="date" id="campaignContentStartDate"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 시작일 *</label>
+                <input type="text" id="campaignContentStartDate" required readonly
+                  placeholder="날짜를 선택하세요"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 마감일</label>
-                <input type="date" id="campaignContentEndDate"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 마감일 *</label>
+                <input type="text" id="campaignContentEndDate" required readonly
+                  placeholder="날짜를 선택하세요"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">결과 발표일</label>
-              <input type="date" id="campaignResultAnnouncementDate"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <label class="block text-sm font-medium text-gray-700 mb-2">결과 발표일 *</label>
+              <input type="text" id="campaignResultAnnouncementDate" required readonly
+                placeholder="날짜를 선택하세요"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+              <i class="fas fa-info-circle mr-2"></i>
+              날짜는 순서대로 입력되어야 합니다: 신청시작 → 신청마감 → 선정발표 → 등록시작 → 등록마감 → 결과발표
             </div>
           </div>
         </div>
@@ -1044,8 +1055,11 @@ class ReviewSphere {
       </form>
     `;
     
-    // Initialize cost calculation
-    setTimeout(() => this.calculateCampaignCost(), 0);
+    // Initialize cost calculation and date pickers
+    setTimeout(() => {
+      this.calculateCampaignCost();
+      this.initializeDatePickers();
+    }, 0);
   }
 
   handleChannelChange() {
@@ -1103,6 +1117,105 @@ class ReviewSphere {
       titleElement.textContent = config.title;
       fieldsContainer.innerHTML = config.fields;
     }
+  }
+
+  initializeDatePickers() {
+    // Flatpickr가 로드되지 않은 경우 대기
+    if (typeof flatpickr === 'undefined') {
+      console.error('Flatpickr is not loaded');
+      return;
+    }
+
+    // 날짜 필드 인스턴스 저장
+    const datePickers = {};
+
+    // 공통 설정
+    const commonConfig = {
+      locale: 'ko',
+      dateFormat: 'Y-m-d',
+      disableMobile: false,
+      allowInput: false,
+      clickOpens: true
+    };
+
+    // 1. 캠페인 신청 시작일 (가장 이른 날짜, 오늘 이후만 가능)
+    datePickers.applicationStart = flatpickr('#campaignApplicationStartDate', {
+      ...commonConfig,
+      minDate: 'today',
+      onChange: (selectedDates) => {
+        if (selectedDates.length > 0) {
+          // 신청 마감일의 최소 날짜를 신청 시작일로 설정
+          if (datePickers.applicationEnd) {
+            datePickers.applicationEnd.set('minDate', selectedDates[0]);
+          }
+        }
+      }
+    });
+
+    // 2. 캠페인 신청 마감일 (신청 시작일 이후)
+    datePickers.applicationEnd = flatpickr('#campaignApplicationEndDate', {
+      ...commonConfig,
+      minDate: 'today',
+      onChange: (selectedDates) => {
+        if (selectedDates.length > 0) {
+          // 선정발표일의 최소 날짜를 신청 마감일로 설정
+          if (datePickers.announcement) {
+            datePickers.announcement.set('minDate', selectedDates[0]);
+          }
+        }
+      }
+    });
+
+    // 3. 인플루언서 선정발표일 (신청 마감일 이후)
+    datePickers.announcement = flatpickr('#campaignAnnouncementDate', {
+      ...commonConfig,
+      minDate: 'today',
+      onChange: (selectedDates) => {
+        if (selectedDates.length > 0) {
+          // 컨텐츠 등록 시작일의 최소 날짜를 선정발표일로 설정
+          if (datePickers.contentStart) {
+            datePickers.contentStart.set('minDate', selectedDates[0]);
+          }
+        }
+      }
+    });
+
+    // 4. 컨텐츠 등록 시작일 (선정발표일 이후)
+    datePickers.contentStart = flatpickr('#campaignContentStartDate', {
+      ...commonConfig,
+      minDate: 'today',
+      onChange: (selectedDates) => {
+        if (selectedDates.length > 0) {
+          // 컨텐츠 등록 마감일의 최소 날짜를 등록 시작일로 설정
+          if (datePickers.contentEnd) {
+            datePickers.contentEnd.set('minDate', selectedDates[0]);
+          }
+        }
+      }
+    });
+
+    // 5. 컨텐츠 등록 마감일 (등록 시작일 이후)
+    datePickers.contentEnd = flatpickr('#campaignContentEndDate', {
+      ...commonConfig,
+      minDate: 'today',
+      onChange: (selectedDates) => {
+        if (selectedDates.length > 0) {
+          // 결과 발표일의 최소 날짜를 등록 마감일로 설정
+          if (datePickers.resultAnnouncement) {
+            datePickers.resultAnnouncement.set('minDate', selectedDates[0]);
+          }
+        }
+      }
+    });
+
+    // 6. 결과 발표일 (등록 마감일 이후)
+    datePickers.resultAnnouncement = flatpickr('#campaignResultAnnouncementDate', {
+      ...commonConfig,
+      minDate: 'today'
+    });
+
+    // 인스턴스를 클래스 속성에 저장 (나중에 필요시 접근 가능)
+    this.campaignDatePickers = datePickers;
   }
 
   handleThumbnailUpload(event) {
