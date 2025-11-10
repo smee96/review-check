@@ -280,6 +280,28 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+    
+    // Add real-time password confirmation validation
+    setTimeout(() => {
+      const password = document.getElementById('registerPassword');
+      const passwordConfirm = document.getElementById('registerPasswordConfirm');
+      const errorElement = document.getElementById('passwordMatchError');
+      
+      const checkPasswordMatch = () => {
+        if (passwordConfirm.value.length > 0) {
+          if (password.value !== passwordConfirm.value) {
+            errorElement.classList.remove('hidden');
+            passwordConfirm.classList.add('border-red-500');
+          } else {
+            errorElement.classList.add('hidden');
+            passwordConfirm.classList.remove('border-red-500');
+          }
+        }
+      };
+      
+      passwordConfirm?.addEventListener('input', checkPasswordMatch);
+      password?.addEventListener('input', checkPasswordMatch);
+    }, 0);
   }
 
   showRegisterWithRole(role) {
