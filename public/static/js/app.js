@@ -246,6 +246,7 @@ class ReviewSphere {
                   <input type="password" id="registerPasswordConfirm" required minlength="8"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
                   <p id="passwordMatchError" class="text-red-500 text-xs mt-1 hidden">비밀번호가 일치하지 않습니다</p>
+                  <p id="passwordMatchSuccess" class="text-green-500 text-xs mt-1 hidden">비밀번호가 일치합니다</p>
                 </div>
 
                 <div>
@@ -286,16 +287,26 @@ class ReviewSphere {
       const password = document.getElementById('registerPassword');
       const passwordConfirm = document.getElementById('registerPasswordConfirm');
       const errorElement = document.getElementById('passwordMatchError');
+      const successElement = document.getElementById('passwordMatchSuccess');
       
       const checkPasswordMatch = () => {
         if (passwordConfirm.value.length > 0) {
           if (password.value !== passwordConfirm.value) {
             errorElement.classList.remove('hidden');
+            successElement.classList.add('hidden');
             passwordConfirm.classList.add('border-red-500');
+            passwordConfirm.classList.remove('border-green-500');
           } else {
             errorElement.classList.add('hidden');
+            successElement.classList.remove('hidden');
             passwordConfirm.classList.remove('border-red-500');
+            passwordConfirm.classList.add('border-green-500');
           }
+        } else {
+          errorElement.classList.add('hidden');
+          successElement.classList.add('hidden');
+          passwordConfirm.classList.remove('border-red-500');
+          passwordConfirm.classList.remove('border-green-500');
         }
       };
       
