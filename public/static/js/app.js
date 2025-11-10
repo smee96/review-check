@@ -258,6 +258,26 @@ class ReviewSphere {
           </div>
         </div>
 
+        <!-- Best Reviews Section -->
+        <div class="py-8 sm:py-12 bg-white">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-heart text-red-500 mr-2"></i>베스트 리뷰
+              </h3>
+            </div>
+            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+              <div class="flex space-x-4" style="width: max-content;">
+                <div class="w-full text-center py-16">
+                  <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
+                  <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
+                  <p class="text-sm text-gray-400">인플루언서들의 멋진 콘텐츠가 곧 이곳에 표시됩니다!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Stats Section -->
         <div class="py-8 sm:py-12 bg-gradient-to-r from-purple-600 to-blue-500">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
