@@ -148,10 +148,81 @@ ReviewSphere는 광고주와 인플루언서를 연결하는 혁신적인 마케
    - 인플루언서 계좌 정보, 포스트 URL 확인
    - 엑셀 다운로드하여 별도 정산 처리
 
+## 📁 프로젝트 구조
+
+```
+webapp/
+├── src/                          # 백엔드 소스 (TypeScript)
+│   ├── index.ts                  # 메인 애플리케이션 (라우트 통합)
+│   ├── types.ts                  # TypeScript 타입 정의
+│   ├── utils.ts                  # 유틸리티 함수 (JWT, 해싱 등)
+│   ├── middleware/               # 미들웨어
+│   │   └── auth.ts              # 인증 미들웨어
+│   └── routes/                   # API 라우트 (역할별 분리)
+│       ├── auth.ts              # 인증 관련 API
+│       ├── campaigns.ts         # 캠페인 관련 API
+│       ├── applications.ts      # 지원/리뷰 관련 API
+│       ├── profiles.ts          # 프로필 관련 API
+│       ├── admin.ts             # 관리자 관련 API
+│       └── notifications.ts     # 알림 관련 API
+│
+├── public/static/js/             # 프론트엔드 소스 (JavaScript)
+│   ├── app.js                   # 메인 애플리케이션 (UI 로직)
+│   ├── api.js                   # API 서비스 레이어
+│   └── ui-utils.js              # UI 유틸리티 함수
+│
+├── migrations/                   # 데이터베이스 마이그레이션
+│   └── 0001_initial_schema.sql
+│
+├── package.json                  # 의존성 및 스크립트
+├── wrangler.jsonc               # Cloudflare 설정
+├── vite.config.ts               # Vite 빌드 설정
+├── tsconfig.json                # TypeScript 설정
+└── ecosystem.config.cjs         # PM2 설정
+```
+
+### 파일 분리 전략
+
+#### 백엔드 (Backend)
+- **라우트 분리**: 각 도메인별로 독립적인 라우트 파일
+  - `auth.ts`: 회원가입, 로그인, 비밀번호 재설정
+  - `campaigns.ts`: 캠페인 CRUD 및 지원
+  - `applications.ts`: 지원 관리 및 리뷰 제출
+  - `profiles.ts`: 광고주/인플루언서 프로필
+  - `admin.ts`: 관리자 전용 기능
+  - `notifications.ts`: 알림 시스템
+
+- **미들웨어 분리**: 재사용 가능한 미들웨어
+  - `auth.ts`: JWT 인증 및 역할 기반 권한 검사
+
+#### 프론트엔드 (Frontend)
+- **API 레이어 분리**: `api.js`
+  - 모든 API 호출을 중앙 집중화
+  - 인증 헤더 자동 처리
+  - 재사용 가능한 API 메서드
+
+- **UI 유틸리티 분리**: `ui-utils.js`
+  - 공통 UI 컴포넌트 (네비게이션, 푸터)
+  - 상태 뱃지 및 텍스트 헬퍼
+  - CSV 다운로드 등 유틸리티 함수
+
+- **메인 앱**: `app.js`
+  - 페이지 렌더링 로직
+  - 사용자 상태 관리
+  - 이벤트 핸들러
+
+### 장점
+✅ **유지보수성**: 각 파일이 단일 책임을 가짐  
+✅ **확장성**: 새 기능 추가 시 해당 파일만 수정  
+✅ **가독성**: 작은 파일로 코드 이해가 쉬움  
+✅ **재사용성**: 공통 기능을 쉽게 재사용  
+✅ **테스트**: 독립적인 모듈로 테스트 용이  
+
 ## 🚀 배포 현황
 
 ### 현재 상태
 - ✅ 로컬 개발 환경 구축 완료
+- ✅ 모듈화된 코드 구조로 리팩토링 완료
 - ✅ Sandbox 테스트 서버 실행 중
 - ⏳ Cloudflare Pages 프로덕션 배포 대기
 
@@ -161,6 +232,7 @@ ReviewSphere는 광고주와 인플루언서를 연결하는 혁신적인 마케
 - **Database**: Cloudflare D1 (SQLite)
 - **Authentication**: JWT
 - **Deployment**: Cloudflare Pages/Workers
+- **Architecture**: 모듈화된 라우트 기반 구조
 
 ## 📞 문의사항
 
@@ -216,12 +288,18 @@ ReviewSphere는 광고주와 인플루언서를 연결하는 혁신적인 마케
 - ✅ 회사 정보 푸터 추가
 - ✅ 모바일 최적화 완료 (인플루언서 우선)
 - ✅ 푸터 높이 최소화
+- ✅ M-Spheres → ReviewSphere 리브랜딩
+- ✅ **백엔드/프론트엔드 모듈화 리팩토링**
+  - 백엔드: 라우트 및 미들웨어를 역할별로 분리
+  - 프론트엔드: API, UI 유틸리티 분리
+  - 단일 파일 코드 → 모듈화된 구조로 개선
 
 ### 다음 단계
 - 📧 Resend 이메일 연동
 - 🚀 Cloudflare Pages 프로덕션 배포
 - 📱 GitHub 저장소 연동
 - 🔐 소셜 로그인 추가
+- 🔍 코드 최적화 및 에러 핸들링 강화
 
 ---
 
