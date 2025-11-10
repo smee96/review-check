@@ -885,9 +885,18 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">유의사항</label>
-              <textarea id="campaignNotes" rows="3" placeholder="예: 제품은 사용 후 반납 불필요, 네거티브 후기도 가능"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"></textarea>
-              <p class="text-xs text-gray-500 mt-1">캠페인 참여 시 주의사항이나 추가 안내사항을 작성해주세요</p>
+              <textarea id="campaignNotes" rows="8"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">1. 제공받은 제품의 양도·판매·교환 금지 (적발 시 제재)
+2. 리뷰 기한 내 미등록 시 제품 가격 청구
+3. 선정 후 옵션 및 배송지 변경 불가
+4. 제공 내역 불일치 또는 배송 지연(3일 이상) 시 1:1 문의
+5. 업체 요청에 따라 선정 인원수 변경 가능
+6. 선정된 제품으로만 촬영 진행
+7. 리뷰는 마감일 기준 6개월간 유지 필수 (미유지 시 페널티)
+8. 작성한 리뷰는 업체 홍보에 활용될 수 있음
+9. 수정 요청이 있을 수 있으니 정확한 리뷰 작성 요망
+10. 네이버 블로그는 공정위 배너 필수 첨부</textarea>
+              <p class="text-xs text-gray-500 mt-1">기본 유의사항이 자동 입력됩니다. 필요시 수정 또는 추가 가능합니다</p>
             </div>
           </div>
         </div>
