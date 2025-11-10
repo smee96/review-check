@@ -107,9 +107,10 @@ campaigns.get('/', requireRole('influencer', 'admin'), async (c) => {
   try {
     const { env } = c;
     
+    // 승인된 캠페인 중 결제 완료되었거나 포인트가 없는 캠페인만 표시
     const campaigns = await env.DB.prepare(
-      'SELECT * FROM campaigns WHERE status = ? ORDER BY created_at DESC'
-    ).bind('approved').all();
+      'SELECT * FROM campaigns WHERE status = ? AND (payment_status = ? OR point_reward = 0) ORDER BY created_at DESC'
+    ).bind('approved', 'paid').all();
     
     return c.json(campaigns.results);
   } catch (error) {
