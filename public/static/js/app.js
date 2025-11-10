@@ -1441,6 +1441,11 @@ class ReviewSphere {
     }
   }
 
+  async editCampaign(campaignId) {
+    alert('캠페인 수정 기능은 현재 준비 중입니다.\n캠페인을 수정하려면 관리자에게 문의해주세요.');
+    // TODO: 캠페인 수정 기능 구현
+  }
+
   async viewApplications(campaignId) {
     try {
       const response = await axios.get(`/api/campaigns/${campaignId}/applications`, this.getAuthHeaders());
