@@ -783,7 +783,12 @@ class ReviewSphere {
   }
 
   showCreateCampaign() {
-    const content = document.getElementById('advertiserContent');
+    // 관리자는 adminContent, 광고주는 advertiserContent 사용
+    const content = document.getElementById('adminContent') || document.getElementById('advertiserContent');
+    if (!content) {
+      console.error('Content container not found');
+      return;
+    }
     content.innerHTML = `
       <h2 class="text-2xl font-bold mb-6">캠페인 등록</h2>
       <form id="createCampaignForm" onsubmit="event.preventDefault(); app.handleCreateCampaign();" class="space-y-6">
