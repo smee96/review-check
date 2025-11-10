@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "reviewsphere",
+  "name": "review-spheres-v1",
   "compatibility_date": "2025-11-10",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
@@ -9,8 +9,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "reviewsphere-production",
-      "database_id": "to-be-created"
+      "database_name": "review-spheres-v1-production",
+      "database_id": "907a208c-c1cb-4ca4-a5d7-73d7731f11b9"
     }
   ]
 }
