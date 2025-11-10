@@ -110,18 +110,18 @@ class MSpheres {
     app.innerHTML = `
       <div class="min-h-screen flex flex-col">
         <nav class="bg-white shadow-lg">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
               <div class="flex items-center">
-                <h1 class="text-2xl font-bold text-purple-600">
-                  <i class="fas fa-globe mr-2"></i>M-Spheres
+                <h1 class="text-lg sm:text-2xl font-bold text-purple-600">
+                  <i class="fas fa-globe mr-1 sm:mr-2"></i>M-Spheres
                 </h1>
               </div>
-              <div class="flex space-x-4">
-                <button onclick="app.showLogin()" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">
+              <div class="flex space-x-2 sm:space-x-4">
+                <button onclick="app.showLogin()" class="text-gray-700 hover:text-purple-600 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
                   로그인
                 </button>
-                <button onclick="app.showRegister()" class="bg-purple-600 text-white hover:bg-purple-700 px-4 py-2 rounded-md text-sm font-medium">
+                <button onclick="app.showRegister()" class="bg-purple-600 text-white hover:bg-purple-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
                   회원가입
                 </button>
               </div>
@@ -130,30 +130,30 @@ class MSpheres {
         </nav>
 
         <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-8 sm:py-12 lg:py-16">
             <div class="text-center text-white">
-              <h2 class="text-5xl font-extrabold mb-6">
-                인플루언서 마케팅의 새로운 기준
+              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 sm:mb-6">
+                인플루언서 마케팅의<br class="sm:hidden"> 새로운 기준
               </h2>
-              <p class="text-xl mb-12 text-purple-100">
+              <p class="text-base sm:text-lg lg:text-xl mb-8 sm:mb-12 text-purple-100">
                 M-Spheres와 함께 성공적인 캠페인을 시작하세요
               </p>
               
-              <div class="grid md:grid-cols-2 gap-8 mt-16">
-                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
-                  <i class="fas fa-bullhorn text-6xl mb-4"></i>
-                  <h3 class="text-2xl font-bold mb-4">광고주</h3>
-                  <p class="mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
-                  <button onclick="app.showRegisterWithRole('advertiser')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mt-8 sm:mt-16">
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-6 sm:p-8 hover:bg-opacity-20 transition active:scale-95">
+                  <i class="fas fa-bullhorn text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
+                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">광고주</h3>
+                  <p class="text-sm sm:text-base mb-4 sm:mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
+                  <button onclick="app.showRegisterWithRole('advertiser')" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
                     광고주로 시작하기
                   </button>
                 </div>
                 
-                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
-                  <i class="fas fa-star text-6xl mb-4"></i>
-                  <h3 class="text-2xl font-bold mb-4">인플루언서</h3>
-                  <p class="mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
-                  <button onclick="app.showRegisterWithRole('influencer')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-6 sm:p-8 hover:bg-opacity-20 transition active:scale-95">
+                  <i class="fas fa-star text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
+                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">인플루언서</h3>
+                  <p class="text-sm sm:text-base mb-4 sm:mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
+                  <button onclick="app.showRegisterWithRole('influencer')" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
                     인플루언서로 시작하기
                   </button>
                 </div>
@@ -349,31 +349,34 @@ class MSpheres {
         ${this.renderNav()}
         
         <div class="flex-grow">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-8">
-              <h1 class="text-3xl font-bold text-gray-800">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-bullhorn text-purple-600 mr-2"></i>광고주 대시보드
               </h1>
-              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <button onclick="app.showMyCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold">내 캠페인</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-8">
+              <button onclick="app.showMyCampaigns()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">내 캠페인</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">등록한 캠페인 관리</p>
               </button>
-              <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-plus-circle text-3xl mb-2"></i>
-                <h3 class="font-semibold">캠페인 등록</h3>
+              <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-plus-circle text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">캠페인 등록</h3>
+                <p class="text-xs sm:text-sm opacity-90 mt-1">새 캠페인 만들기</p>
               </button>
-              <button onclick="app.showAdvertiserProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold">프로필 관리</h3>
+              <button onclick="app.showAdvertiserProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">사업자 정보 관리</p>
               </button>
             </div>
 
-            <div id="advertiserContent" class="bg-white rounded-lg shadow p-6 mb-8">
-              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            <div id="advertiserContent" class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-8">
+              <p class="text-sm sm:text-base text-gray-600">위 메뉴를 선택해주세요</p>
             </div>
           </div>
         </div>
@@ -677,31 +680,34 @@ class MSpheres {
         ${this.renderNav()}
         
         <div class="flex-grow">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-8">
-              <h1 class="text-3xl font-bold text-gray-800">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-star text-purple-600 mr-2"></i>인플루언서 대시보드
               </h1>
-              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <button onclick="app.showAvailableCampaigns()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-search text-3xl mb-2"></i>
-                <h3 class="font-semibold">캠페인 찾기</h3>
+            <div class="grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-8">
+              <button onclick="app.showAvailableCampaigns()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-search text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">캠페인 찾기</h3>
+                <p class="text-xs sm:text-sm opacity-90 mt-1">진행 중인 캠페인 보기</p>
               </button>
-              <button onclick="app.showMyApplications()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-clipboard-list text-purple-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold">내 지원 내역</h3>
+              <button onclick="app.showMyApplications()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-clipboard-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">내 지원 내역</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">지원 상태 확인</p>
               </button>
-              <button onclick="app.showInfluencerProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold">프로필 관리</h3>
+              <button onclick="app.showInfluencerProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">채널 및 정산 정보</p>
               </button>
             </div>
 
-            <div id="influencerContent" class="bg-white rounded-lg shadow p-6 mb-8">
-              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            <div id="influencerContent" class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-8">
+              <p class="text-sm sm:text-base text-gray-600">위 메뉴를 선택해주세요</p>
             </div>
           </div>
         </div>
@@ -1133,16 +1139,16 @@ class MSpheres {
 
   renderNav() {
     return `
-      <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16">
-            <h1 class="text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showDashboard()">
-              <i class="fas fa-globe mr-2"></i>M-Spheres
+      <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div class="flex justify-between items-center h-14 sm:h-16">
+            <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showDashboard()">
+              <i class="fas fa-globe mr-1 sm:mr-2"></i><span class="hidden xs:inline">M-Spheres</span><span class="xs:hidden">M-S</span>
             </h1>
-            <div class="flex items-center space-x-4">
-              <span class="text-gray-700">${this.user.nickname}</span>
-              <button onclick="app.logout()" class="text-red-600 hover:text-red-700">
-                <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
+            <div class="flex items-center space-x-2 sm:space-x-4">
+              <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${this.user.nickname}</span>
+              <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
+                <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
               </button>
             </div>
           </div>
@@ -1153,40 +1159,29 @@ class MSpheres {
 
   renderFooter() {
     return `
-      <footer class="bg-gray-800 text-gray-300 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <footer class="bg-gray-800 text-gray-300 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <h3 class="text-white text-lg font-semibold mb-4">
-                <i class="fas fa-globe mr-2"></i>M-Spheres (엠스피어스)
+              <h3 class="text-white text-sm font-semibold mb-2">
+                <i class="fas fa-globe mr-1"></i>M-Spheres (엠스피어스)
               </h3>
-              <p class="text-sm mb-2">인플루언서 마케팅의 새로운 기준</p>
-              <p class="text-sm">
-                <i class="fas fa-envelope mr-2"></i>
+              <p class="text-xs mb-1">인플루언서 마케팅의 새로운 기준</p>
+              <p class="text-xs">
+                <i class="fas fa-envelope mr-1"></i>
                 <a href="mailto:mobin_info@mobin-inc.com" class="hover:text-white">mobin_info@mobin-inc.com</a>
-              </p>
-              <p class="text-sm mt-2">
-                <i class="fas fa-question-circle mr-2"></i>
-                문의: <a href="mailto:checknreview@mobin-inc.com" class="hover:text-white">checknreview@mobin-inc.com</a>
               </p>
             </div>
             
             <div>
-              <h4 class="text-white text-md font-semibold mb-4">운영사 정보</h4>
-              <p class="text-sm mb-1"><strong>(주)모빈</strong></p>
-              <p class="text-sm mb-1">대표이사: 이규한</p>
-              <p class="text-sm mb-1">개인정보 관리책임자: 안중경</p>
-              <p class="text-sm mb-3">
-                <i class="fas fa-map-marker-alt mr-2"></i>
-                서울시 구로구 디지털로31길 12, 본관 2층 넥스트데이 2호<br>
-                <span class="ml-6">(구로동, 티피타워)</span>
-              </p>
+              <h4 class="text-white text-sm font-semibold mb-2">운영사 정보</h4>
+              <p class="text-xs mb-1"><strong>(주)모빈</strong> | 대표이사 이규한 | 개인정보 관리책임자 안중경</p>
+              <p class="text-xs">서울시 구로구 디지털로31길 12, 본관 2층 넥스트데이 2호 (구로동, 티피타워)</p>
             </div>
           </div>
           
-          <div class="border-t border-gray-700 pt-8 text-center text-sm">
-            <p class="mb-2">© 2025 엠스피어스 (M-Spheres). All rights reserved.</p>
-            <p class="text-gray-400">Operated by <strong class="text-gray-300">(주)모빈</strong></p>
+          <div class="border-t border-gray-700 pt-3 text-center text-xs">
+            <p>© 2025 엠스피어스. All rights reserved. Operated by <strong>(주)모빈</strong></p>
           </div>
         </div>
       </footer>
