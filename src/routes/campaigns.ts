@@ -170,26 +170,66 @@ campaigns.put('/:id', async (c) => {
     }
     
     const data = await c.req.json();
-    const { title, description, product_name, product_url, requirements, budget, slots, start_date, end_date } = data;
+    const { 
+      title, description, product_name, product_url, requirements, budget, slots,
+      point_reward, thumbnail_image, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
+      application_start_date, application_end_date, announcement_date,
+      content_start_date, content_end_date, result_announcement_date,
+      provided_items, mission, keywords, notes
+    } = data;
     
-    await env.DB.prepare(
-      `UPDATE campaigns 
+    if (!title) {
+      return c.json({ error: '캠페인 제목을 입력해주세요' }, 400);
+    }
+    
+    if (!channel_type) {
+      return c.json({ error: '캠페인 채널을 선택해주세요' }, 400);
+    }
+    
+    // 썸네일 이미지가 새로 제공된 경우만 업데이트
+    let updateQuery = `UPDATE campaigns 
        SET title = ?, description = ?, product_name = ?, product_url = ?, requirements = ?, 
-           budget = ?, slots = ?, start_date = ?, end_date = ?, updated_at = ?
-       WHERE id = ?`
-    ).bind(
+           budget = ?, slots = ?, point_reward = ?, channel_type = ?, instagram_mention_account = ?, 
+           blog_product_url = ?, youtube_purchase_link = ?, application_start_date = ?, application_end_date = ?, 
+           announcement_date = ?, content_start_date = ?, content_end_date = ?, result_announcement_date = ?,
+           provided_items = ?, mission = ?, keywords = ?, notes = ?, updated_at = ?`;
+    
+    const params = [
       title,
       description || null,
       product_name || null,
       product_url || null,
       requirements || null,
       budget || null,
-      slots || 1,
-      start_date || null,
-      end_date || null,
-      getCurrentDateTime(),
-      campaignId
-    ).run();
+      slots || 10,
+      point_reward || 0,
+      channel_type,
+      instagram_mention_account || null,
+      blog_product_url || null,
+      youtube_purchase_link || null,
+      application_start_date || null,
+      application_end_date || null,
+      announcement_date || null,
+      content_start_date || null,
+      content_end_date || null,
+      result_announcement_date || null,
+      provided_items || null,
+      mission || null,
+      keywords || null,
+      notes || null,
+      getCurrentDateTime()
+    ];
+    
+    // 썸네일 이미지가 제공된 경우 추가
+    if (thumbnail_image) {
+      updateQuery += ', thumbnail_image = ?';
+      params.push(thumbnail_image);
+    }
+    
+    updateQuery += ' WHERE id = ?';
+    params.push(campaignId);
+    
+    await env.DB.prepare(updateQuery).bind(...params).run();
     
     return c.json({ success: true, message: '캠페인이 수정되었습니다' });
   } catch (error) {

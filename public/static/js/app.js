@@ -657,25 +657,27 @@ class ReviewSphere {
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-8">
-              <button onclick="app.showMyCampaigns()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">내 캠페인</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">등록한 캠페인 관리</p>
+              <button onclick="app.showAdvertiserProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">사업자 정보 관리</p>
               </button>
               <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
                 <i class="fas fa-plus-circle text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
                 <h3 class="font-semibold text-base sm:text-lg">캠페인 등록</h3>
                 <p class="text-xs sm:text-sm opacity-90 mt-1">새 캠페인 만들기</p>
               </button>
-              <button onclick="app.showAdvertiserProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">사업자 정보 관리</p>
+              <button onclick="app.showMyCampaigns()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">새로고침</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">캠페인 목록 새로고침</p>
               </button>
             </div>
 
             <div id="advertiserContent" class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-8">
-              <p class="text-sm sm:text-base text-gray-600">위 메뉴를 선택해주세요</p>
+              <p class="text-sm sm:text-base text-gray-600 text-center py-8">
+                <i class="fas fa-spinner fa-spin mr-2"></i>캠페인 목록을 불러오는 중...
+              </p>
             </div>
           </div>
         </div>
@@ -683,6 +685,11 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+    
+    // 자동으로 캠페인 목록 로드
+    setTimeout(() => {
+      this.showMyCampaigns();
+    }, 100);
   }
 
   async showMyCampaigns() {
@@ -1442,8 +1449,226 @@ class ReviewSphere {
   }
 
   async editCampaign(campaignId) {
-    alert('캠페인 수정 기능은 현재 준비 중입니다.\n캠페인을 수정하려면 관리자에게 문의해주세요.');
-    // TODO: 캠페인 수정 기능 구현
+    try {
+      // 캠페인 데이터 가져오기
+      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      const campaign = response.data;
+      
+      // 수정 불가능한 상태 체크
+      if (campaign.status === 'active') {
+        if (!confirm('진행 중인 캠페인입니다. 일부 항목만 수정 가능합니다. 계속하시겠습니까?')) {
+          return;
+        }
+      }
+      
+      // showCreateCampaign과 동일한 폼 표시
+      await this.showCreateCampaign();
+      
+      // 폼 제목 변경
+      setTimeout(() => {
+        const formTitle = document.querySelector('h2');
+        if (formTitle && formTitle.textContent.includes('캠페인 등록')) {
+          formTitle.innerHTML = '<i class="fas fa-edit text-purple-600 mr-2"></i>캠페인 수정';
+        }
+        
+        // 기존 데이터 채우기
+        document.getElementById('campaignTitle').value = campaign.title || '';
+        document.getElementById('campaignDescription').value = campaign.description || '';
+        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        
+        // 채널 타입 선택
+        const channelTypeSelect = document.getElementById('campaignChannelType');
+        if (channelTypeSelect && campaign.channel_type) {
+          channelTypeSelect.value = campaign.channel_type;
+          this.handleChannelChange(); // 채널별 필드 표시
+        }
+        
+        // 채널별 필드 채우기
+        setTimeout(() => {
+          if (campaign.channel_type === 'instagram' && campaign.instagram_mention_account) {
+            const instagramField = document.getElementById('instagramMentionAccount');
+            if (instagramField) instagramField.value = campaign.instagram_mention_account;
+          } else if (campaign.channel_type === 'blog' && campaign.blog_product_url) {
+            const blogField = document.getElementById('blogProductUrl');
+            if (blogField) blogField.value = campaign.blog_product_url;
+          } else if (campaign.channel_type === 'youtube' && campaign.youtube_purchase_link) {
+            const youtubeField = document.getElementById('youtubePurchaseLink');
+            if (youtubeField) youtubeField.value = campaign.youtube_purchase_link;
+          }
+        }, 100);
+        
+        // 날짜 필드 채우기
+        if (this.campaignDatePickers) {
+          if (campaign.application_start_date) {
+            this.campaignDatePickers.applicationStart.setDate(campaign.application_start_date);
+          }
+          if (campaign.application_end_date) {
+            this.campaignDatePickers.applicationEnd.setDate(campaign.application_end_date);
+          }
+          if (campaign.announcement_date) {
+            this.campaignDatePickers.announcement.setDate(campaign.announcement_date);
+          }
+          if (campaign.content_start_date) {
+            this.campaignDatePickers.contentStart.setDate(campaign.content_start_date);
+          }
+          if (campaign.content_end_date) {
+            this.campaignDatePickers.contentEnd.setDate(campaign.content_end_date);
+          }
+          if (campaign.result_announcement_date) {
+            this.campaignDatePickers.resultAnnouncement.setDate(campaign.result_announcement_date);
+          }
+        }
+        
+        // 제공 내역
+        document.getElementById('campaignProvidedItems').value = campaign.provided_items || '';
+        document.getElementById('campaignProductName').value = campaign.product_name || '';
+        document.getElementById('campaignProductUrl').value = campaign.product_url || '';
+        
+        // 예상 가액 (숫자 포맷)
+        const budgetField = document.getElementById('campaignBudget');
+        if (budgetField && campaign.budget) {
+          budgetField.value = campaign.budget.toLocaleString();
+        }
+        
+        // 미션 필드 초기화 및 채우기
+        const missionContainer = document.getElementById('missionContainer');
+        if (missionContainer && campaign.mission) {
+          missionContainer.innerHTML = ''; // 기존 필드 제거
+          const missions = campaign.mission.split('\n').filter(m => m.trim());
+          missions.forEach((mission, index) => {
+            this.addMissionField();
+            const missionInput = document.getElementById(`mission${index + 1}`);
+            if (missionInput) missionInput.value = mission.trim();
+          });
+          // 최소 5개 필드 유지
+          while (missionContainer.children.length < 5) {
+            this.addMissionField();
+          }
+        }
+        
+        // 요구사항
+        document.getElementById('campaignRequirements').value = campaign.requirements || '';
+        
+        // 키워드 (해시태그)
+        if (campaign.keywords) {
+          this.keywords = []; // 초기화
+          const keywords = campaign.keywords.split(',').map(k => k.trim()).filter(k => k);
+          keywords.forEach(keyword => {
+            this.addKeyword(keyword);
+          });
+        }
+        
+        // 유의사항
+        document.getElementById('campaignNotes').value = campaign.notes || '';
+        
+        // 포인트 리워드 (숫자 포맷)
+        const pointRewardField = document.getElementById('campaignPointReward');
+        if (pointRewardField && campaign.point_reward) {
+          pointRewardField.value = campaign.point_reward.toLocaleString();
+        }
+        
+        // 비용 재계산
+        this.calculateCampaignCost();
+        
+        // 제출 버튼 변경
+        const form = document.getElementById('createCampaignForm');
+        if (form) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.textContent = '캠페인 수정';
+            submitBtn.onclick = (e) => {
+              e.preventDefault();
+              this.handleUpdateCampaign(campaignId);
+            };
+          }
+        }
+      }, 200);
+      
+    } catch (error) {
+      console.error('Edit campaign error:', error);
+      alert(error.response?.data?.error || '캠페인 정보를 불러오는데 실패했습니다');
+    }
+  }
+  
+  async handleUpdateCampaign(campaignId) {
+    try {
+      const channelType = document.getElementById('campaignChannelType').value;
+      const slots = parseInt(document.getElementById('campaignSlots').value || 10);
+      
+      if (!channelType) {
+        alert('캠페인 채널을 선택해주세요');
+        return;
+      }
+      
+      if (slots < 10) {
+        alert('모집인원은 최소 10명 이상이어야 합니다');
+        return;
+      }
+      
+      // 미션 수집
+      const missions = [];
+      const missionContainer = document.getElementById('missionContainer');
+      if (missionContainer) {
+        const missionInputs = missionContainer.querySelectorAll('input[id^="mission"]');
+        missionInputs.forEach(input => {
+          if (input.value.trim()) {
+            missions.push(input.value.trim());
+          }
+        });
+      }
+      
+      // 숫자 필드에서 콤마 제거하고 순수 숫자만 추출
+      const budgetInput = document.getElementById('campaignBudget');
+      const pointRewardInput = document.getElementById('campaignPointReward');
+      
+      const budget = this.getNumericValue(budgetInput);
+      const pointReward = this.getNumericValue(pointRewardInput);
+      
+      const data = {
+        title: document.getElementById('campaignTitle').value,
+        description: document.getElementById('campaignDescription').value,
+        product_name: document.getElementById('campaignProductName').value,
+        product_url: document.getElementById('campaignProductUrl').value,
+        requirements: document.getElementById('campaignRequirements').value,
+        budget: budget || null,
+        slots: slots,
+        point_reward: pointReward,
+        
+        // 썸네일 이미지 (수정 시 새로 업로드한 경우만)
+        thumbnail_image: this.thumbnailData || null,
+        
+        // 채널 정보
+        channel_type: channelType,
+        instagram_mention_account: channelType === 'instagram' ? document.getElementById('instagramMentionAccount')?.value : null,
+        blog_product_url: channelType === 'blog' ? document.getElementById('blogProductUrl')?.value : null,
+        youtube_purchase_link: channelType === 'youtube' ? document.getElementById('youtubePurchaseLink')?.value : null,
+        
+        // 일정 관리
+        application_start_date: document.getElementById('campaignApplicationStartDate').value || null,
+        application_end_date: document.getElementById('campaignApplicationEndDate').value || null,
+        announcement_date: document.getElementById('campaignAnnouncementDate').value || null,
+        content_start_date: document.getElementById('campaignContentStartDate').value || null,
+        content_end_date: document.getElementById('campaignContentEndDate').value || null,
+        result_announcement_date: document.getElementById('campaignResultAnnouncementDate').value || null,
+        
+        // 캠페인 상세 정보
+        provided_items: document.getElementById('campaignProvidedItems').value,
+        mission: missions.join('\n'), // 미션 배열을 줄바꿈으로 연결
+        keywords: document.getElementById('campaignKeywords').value,
+        notes: document.getElementById('campaignNotes').value,
+      };
+
+      if (!confirm('캠페인을 수정하시겠습니까?')) {
+        return;
+      }
+
+      const response = await axios.put(`/api/campaigns/${campaignId}`, data, this.getAuthHeaders());
+      alert('캠페인이 수정되었습니다.');
+      this.showMyCampaigns();
+    } catch (error) {
+      console.error('Update campaign error:', error);
+      alert(error.response?.data?.error || '캠페인 수정에 실패했습니다');
+    }
   }
 
   async viewApplications(campaignId) {
