@@ -21,7 +21,7 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
     const data = await c.req.json();
     const { 
       title, description, product_name, product_url, requirements, budget, slots,
-      point_reward, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
+      point_reward, thumbnail_image, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
       provided_items, mission, keywords, notes
@@ -40,11 +40,11 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
     const result = await env.DB.prepare(
       `INSERT INTO campaigns (
         advertiser_id, title, description, product_name, product_url, requirements, 
-        budget, slots, point_reward, channel_type, instagram_mention_account, 
+        budget, slots, point_reward, thumbnail_image, channel_type, instagram_mention_account, 
         blog_product_url, youtube_purchase_link, application_start_date, application_end_date, 
         announcement_date, content_start_date, content_end_date, result_announcement_date,
         provided_items, mission, keywords, notes, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
     ).bind(
       user.userId,
       title,
@@ -55,6 +55,7 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
       budget || null,
       slots || 1,
       point_reward || 0,
+      thumbnail_image || null,
       channel_type,
       instagram_mention_account || null,
       blog_product_url || null,

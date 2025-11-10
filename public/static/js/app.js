@@ -702,45 +702,61 @@ class ReviewSphere {
         ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
         <div class="space-y-4">
           ${campaigns.map(c => `
-            <div class="border rounded-lg p-4 hover:shadow-md transition">
-              <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-lg">${c.title}</h3>
-                  ${c.channel_type ? `
-                    <span class="px-2 py-1 rounded text-xs font-semibold ${
-                      c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
-                      c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
-                      c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : ''
-                    }">
-                      ${c.channel_type === 'instagram' ? '📸 인스타그램' :
-                        c.channel_type === 'blog' ? '📝 블로그' :
-                        c.channel_type === 'youtube' ? '🎥 유튜브' : ''}
+            <div class="border rounded-lg hover:shadow-md transition overflow-hidden">
+              <div class="flex">
+                <!-- 썸네일 이미지 -->
+                ${c.thumbnail_image ? `
+                  <div class="w-32 h-32 flex-shrink-0">
+                    <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                  </div>
+                ` : `
+                  <div class="w-32 h-32 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                  </div>
+                `}
+                
+                <!-- 캠페인 정보 -->
+                <div class="flex-1 p-4">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-bold text-lg">${c.title}</h3>
+                      ${c.channel_type ? `
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${
+                          c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
+                          c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
+                          c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : ''
+                        }">
+                          ${c.channel_type === 'instagram' ? '📸 인스타그램' :
+                            c.channel_type === 'blog' ? '📝 블로그' :
+                            c.channel_type === 'youtube' ? '🎥 유튜브' : ''}
+                        </span>
+                      ` : ''}
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
+                      ${this.getStatusText(c.status)}
                     </span>
-                  ` : ''}
+                  </div>
+                  <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
+                  <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
+                    <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
+                    <span>모집인원: ${c.slots}명</span>
+                    ${c.point_reward > 0 ? `
+                      <span class="col-span-2 text-purple-600 font-semibold">
+                        <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
+                      </span>
+                    ` : ''}
+                  </div>
+                  <div class="mt-4 flex space-x-2">
+                    <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm">
+                      <i class="fas fa-edit mr-1"></i>수정
+                    </button>
+                    ${c.status === 'approved' ? `
+                      <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-sm">
+                        <i class="fas fa-users mr-1"></i>지원자 보기
+                      </button>
+                    ` : ''}
+                  </div>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
-                  ${this.getStatusText(c.status)}
-                </span>
-              </div>
-              <p class="text-gray-600 mb-2">${c.description || ''}</p>
-              <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
-                <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                <span>모집인원: ${c.slots}명</span>
-                ${c.point_reward > 0 ? `
-                  <span class="col-span-2 text-purple-600 font-semibold">
-                    <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
-                  </span>
-                ` : ''}
-              </div>
-              <div class="mt-4 flex space-x-2">
-                <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm">
-                  <i class="fas fa-edit mr-1"></i>수정
-                </button>
-                ${c.status === 'approved' ? `
-                  <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-sm">
-                    <i class="fas fa-users mr-1"></i>지원자 보기
-                  </button>
-                ` : ''}
               </div>
             </div>
           `).join('')}
@@ -793,6 +809,47 @@ class ReviewSphere {
               <input type="number" id="campaignSlots" value="1" min="1" required
                 oninput="app.calculateCampaignCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+        </div>
+
+        <!-- 썸네일 이미지 섹션 -->
+        <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-image text-indigo-600 mr-2"></i>썸네일 이미지
+          </h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이미지 업로드</label>
+              <input type="file" id="campaignThumbnail" accept=".jpg,.jpeg,.png,.gif,.bmp"
+                onchange="app.handleThumbnailUpload(event)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <div class="mt-2 text-xs text-gray-600">
+                <p class="font-semibold mb-1">📋 이미지 요구사항:</p>
+                <ul class="list-disc list-inside space-y-1 ml-2">
+                  <li>권장 크기: 1000px × 1000px</li>
+                  <li>최소 크기: 300px × 300px 초과</li>
+                  <li>최대 크기: 4000px × 4000px 미만</li>
+                  <li>가로:세로 비율: 1:2 이내</li>
+                  <li>최대 용량: 10MB</li>
+                  <li>형식: JPG, JPEG, PNG, GIF, BMP</li>
+                </ul>
+              </div>
+            </div>
+            
+            <!-- 이미지 미리보기 -->
+            <div id="thumbnailPreview" style="display: none;" class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">미리보기</label>
+              <div class="relative inline-block">
+                <img id="thumbnailPreviewImage" src="" alt="썸네일 미리보기" 
+                  class="max-w-xs max-h-64 border-2 border-gray-300 rounded-lg">
+                <button type="button" onclick="app.removeThumbnail()" 
+                  class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <p id="thumbnailInfo" class="text-xs text-gray-500 mt-2"></p>
             </div>
           </div>
         </div>
@@ -1048,6 +1105,77 @@ class ReviewSphere {
     }
   }
 
+  handleThumbnailUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 파일 형식 검증
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('JPG, JPEG, PNG, GIF, BMP 형식의 이미지만 업로드 가능합니다.');
+      event.target.value = '';
+      return;
+    }
+
+    // 파일 크기 검증 (10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      alert('이미지 크기는 10MB를 초과할 수 없습니다.');
+      event.target.value = '';
+      return;
+    }
+
+    // 이미지 로드 및 크기 검증
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+
+        // 크기 검증
+        if (width <= 300 || height <= 300) {
+          alert('이미지 크기는 300px × 300px을 초과해야 합니다.');
+          event.target.value = '';
+          return;
+        }
+
+        if (width >= 4000 || height >= 4000) {
+          alert('이미지 크기는 4000px × 4000px 미만이어야 합니다.');
+          event.target.value = '';
+          return;
+        }
+
+        // 비율 검증 (가로:세로 = 1:2 이내)
+        const ratio = width / height;
+        if (ratio > 2 || ratio < 0.5) {
+          alert('이미지 비율은 가로:세로 = 1:2 이내여야 합니다.\n현재 비율: ' + ratio.toFixed(2));
+          event.target.value = '';
+          return;
+        }
+
+        // 검증 통과 - 미리보기 표시
+        document.getElementById('thumbnailPreview').style.display = 'block';
+        document.getElementById('thumbnailPreviewImage').src = e.target.result;
+        document.getElementById('thumbnailInfo').textContent = 
+          `크기: ${width}px × ${height}px | 용량: ${(file.size / 1024 / 1024).toFixed(2)}MB | 비율: ${ratio.toFixed(2)}`;
+        
+        // Base64 데이터 저장
+        this.thumbnailData = e.target.result;
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeThumbnail() {
+    document.getElementById('campaignThumbnail').value = '';
+    document.getElementById('thumbnailPreview').style.display = 'none';
+    document.getElementById('thumbnailPreviewImage').src = '';
+    document.getElementById('thumbnailInfo').textContent = '';
+    this.thumbnailData = null;
+  }
+
   calculateCampaignCost() {
     const slots = parseInt(document.getElementById('campaignSlots')?.value || 1);
     const pointPerPerson = parseInt(document.getElementById('campaignPointReward')?.value || 0);
@@ -1083,6 +1211,9 @@ class ReviewSphere {
         budget: document.getElementById('campaignBudget').value || null,
         slots: document.getElementById('campaignSlots').value || 1,
         point_reward: pointReward,
+        
+        // 썸네일 이미지
+        thumbnail_image: this.thumbnailData || null,
         
         // 채널 정보
         channel_type: channelType,
