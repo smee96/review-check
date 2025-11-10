@@ -1535,6 +1535,15 @@ class ReviewSphere {
   // ============================================
 
   async showInfluencerDashboard() {
+    // Load profile to get points balance
+    let pointsBalance = 0;
+    try {
+      const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
+      pointsBalance = response.data.points_balance || 0;
+    } catch (error) {
+      console.error('Failed to load points:', error);
+    }
+
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="min-h-screen flex flex-col bg-gray-50">
@@ -1547,6 +1556,22 @@ class ReviewSphere {
                 <i class="fas fa-star text-purple-600 mr-2"></i>인플루언서 대시보드
               </h1>
               <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
+            </div>
+
+            <!-- 포인트 카드 -->
+            <div class="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-5 sm:p-6 rounded-lg shadow-lg mb-4 sm:mb-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs sm:text-sm opacity-90 mb-1">보유 스피어포인트</p>
+                  <h2 class="text-3xl sm:text-4xl font-bold">${pointsBalance.toLocaleString()} <span class="text-xl">P</span></h2>
+                </div>
+                <div class="text-4xl sm:text-5xl opacity-80">
+                  <i class="fas fa-coins"></i>
+                </div>
+              </div>
+              <p class="text-xs sm:text-sm opacity-75 mt-3">
+                <i class="fas fa-info-circle mr-1"></i>포인트는 캠페인 완료 시 지급됩니다
+              </p>
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-8">
@@ -1613,7 +1638,16 @@ class ReviewSphere {
     }
   }
 
-  showApplyCampaignForm(campaignId) {
+  async showApplyCampaignForm(campaignId) {
+    // Load saved shipping info from profile
+    let profile = {};
+    try {
+      const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
+      profile = response.data;
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    }
+
     const content = document.getElementById('influencerContent');
     content.innerHTML = `
       <div class="mb-4">
@@ -1639,18 +1673,22 @@ class ReviewSphere {
           <h3 class="font-bold text-gray-800 mb-4 flex items-center">
             <i class="fas fa-truck text-green-600 mr-2"></i>배송 정보
           </h3>
-          <p class="text-sm text-gray-600 mb-4">상품 배송을 위한 정보를 입력해주세요</p>
+          <p class="text-sm text-gray-600 mb-4">
+            ${profile.shipping_name ? '<i class="fas fa-check-circle text-green-600 mr-1"></i>프로필에서 자동으로 불러왔습니다' : '상품 배송을 위한 정보를 입력해주세요'}
+          </p>
           
           <div class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">수령인 *</label>
-                <input type="text" id="shippingRecipient" required placeholder="받으실 분 성함"
+                <input type="text" id="shippingRecipient" required placeholder="받으실 분 성함" 
+                  value="${profile.shipping_name || ''}"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">연락처 *</label>
                 <input type="tel" id="shippingPhone" required placeholder="010-1234-5678"
+                  value="${profile.shipping_phone || ''}"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               </div>
             </div>
@@ -1658,18 +1696,21 @@ class ReviewSphere {
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">우편번호 *</label>
               <input type="text" id="shippingZipcode" required placeholder="12345"
+                value="${profile.shipping_postal_code || ''}"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">주소 *</label>
               <input type="text" id="shippingAddress" required placeholder="서울시 강남구 테헤란로 123"
+                value="${profile.shipping_address || ''}"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">상세주소</label>
               <input type="text" id="shippingDetail" placeholder="아파트 동/호수, 건물명 등"
+                value="${profile.shipping_address_detail || ''}"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
           </div>
@@ -1703,7 +1744,7 @@ class ReviewSphere {
 
   async applyCampaign(campaignId) {
     // 지원 폼 표시
-    this.showApplyCampaignForm(campaignId);
+    await this.showApplyCampaignForm(campaignId);
   }
 
   async showMyApplications() {
@@ -1892,6 +1933,47 @@ class ReviewSphere {
             </div>
           </div>
 
+          <!-- 배송 정보 섹션 -->
+          <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-truck text-orange-600 mr-2"></i>기본 배송 정보
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">캠페인 지원 시 자동으로 입력됩니다</p>
+            
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">수령인</label>
+                  <input type="text" id="shippingName" value="${profile.shipping_name || ''}" placeholder="받으실 분 성함"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
+                  <input type="tel" id="shippingPhone" value="${profile.shipping_phone || ''}" placeholder="010-1234-5678"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">우편번호</label>
+                <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
+                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="서울시 강남구 테헤란로 123"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">상세주소</label>
+                <input type="text" id="shippingAddressDetail" value="${profile.shipping_address_detail || ''}" placeholder="아파트 동/호수, 건물명 등"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+            </div>
+          </div>
+
           <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
             저장
           </button>
@@ -1924,6 +2006,13 @@ class ReviewSphere {
         bank_name: document.getElementById('bankName').value,
         account_number: document.getElementById('accountNumber').value,
         business_number: document.getElementById('businessNumber').value,
+        
+        // 배송 정보
+        shipping_name: document.getElementById('shippingName').value,
+        shipping_phone: document.getElementById('shippingPhone').value,
+        shipping_postal_code: document.getElementById('shippingPostalCode').value,
+        shipping_address: document.getElementById('shippingAddress').value,
+        shipping_address_detail: document.getElementById('shippingAddressDetail').value,
       };
 
       await axios.put('/api/profile/influencer', data, this.getAuthHeaders());

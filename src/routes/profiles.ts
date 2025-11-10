@@ -42,7 +42,9 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
       instagram_handle, youtube_channel, blog_url, tiktok_handle, 
       follower_count, category,
       // 정산 정보
-      account_holder_name, bank_name, account_number, business_number
+      account_holder_name, bank_name, account_number, business_number,
+      // 배송 정보
+      shipping_name, shipping_phone, shipping_postal_code, shipping_address, shipping_address_detail
     } = data;
     
     const { env } = c;
@@ -53,7 +55,10 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
            instagram_handle = ?, youtube_channel = ?, blog_url = ?, tiktok_handle = ?,
            follower_count = ?, category = ?,
            account_holder_name = ?, bank_name = ?, account_number = ?, 
-           business_number = ?, updated_at = ?
+           business_number = ?,
+           shipping_name = ?, shipping_phone = ?, shipping_postal_code = ?, 
+           shipping_address = ?, shipping_address_detail = ?,
+           updated_at = ?
        WHERE user_id = ?`
     ).bind(
       real_name || null,
@@ -70,6 +75,11 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
       bank_name || null,
       account_number || null,
       business_number || null,
+      shipping_name || null,
+      shipping_phone || null,
+      shipping_postal_code || null,
+      shipping_address || null,
+      shipping_address_detail || null,
       getCurrentDateTime(),
       user.userId
     ).run();
