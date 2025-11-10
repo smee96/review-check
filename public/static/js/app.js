@@ -1035,9 +1035,17 @@ class ReviewSphere {
               <span class="text-sm text-gray-600">플랫폼 수수료 (20%)</span>
               <span class="font-bold text-orange-600" id="platformFee">0원</span>
             </div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">소계</span>
+              <span class="font-bold text-gray-700" id="subtotal">0원</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">부가세 (10%)</span>
+              <span class="font-bold text-blue-600" id="vat">0원</span>
+            </div>
             <div class="border-t border-purple-200 pt-2 mt-2">
               <div class="flex justify-between items-center">
-                <span class="font-bold text-gray-800">결제 필요 금액</span>
+                <span class="font-bold text-gray-800">최종 결제 금액</span>
                 <span class="font-bold text-2xl text-red-600" id="totalCost">0원</span>
               </div>
             </div>
@@ -1045,6 +1053,9 @@ class ReviewSphere {
           <p class="text-xs text-gray-600 mt-2">
             <i class="fas fa-info-circle mr-1"></i>
             포인트 지급이 있는 캠페인은 사전 결제가 필요합니다. 결제 완료 후 캠페인이 활성화됩니다.
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            * 부가세 별도 (세금계산서 발행)
           </p>
         </div>
 
@@ -1297,12 +1308,16 @@ class ReviewSphere {
     const totalPoints = slots * pointPerPerson;
     const totalPointCost = totalPoints;
     const platformFee = Math.floor(totalPointCost * 0.20);
-    const totalCost = totalPointCost + platformFee;
+    const subtotal = totalPointCost + platformFee;
+    const vat = Math.floor(subtotal * 0.10);
+    const totalCost = subtotal + vat;
     
     // Update display
     document.getElementById('totalPoints').value = totalPoints.toLocaleString() + ' P';
     document.getElementById('totalPointCost').textContent = totalPointCost.toLocaleString() + '원';
     document.getElementById('platformFee').textContent = platformFee.toLocaleString() + '원';
+    document.getElementById('subtotal').textContent = subtotal.toLocaleString() + '원';
+    document.getElementById('vat').textContent = vat.toLocaleString() + '원';
     document.getElementById('totalCost').textContent = totalCost.toLocaleString() + '원';
   }
 
@@ -1359,8 +1374,13 @@ class ReviewSphere {
       // Validate point reward for campaigns requiring payment
       if (pointReward > 0) {
         const slots = parseInt(data.slots);
-        const totalCost = Math.floor((pointReward * slots) * 1.20);
-        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 비용 + 수수료 20%)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
+        const totalPointCost = pointReward * slots;
+        const platformFee = Math.floor(totalPointCost * 0.20);
+        const subtotal = totalPointCost + platformFee;
+        const vat = Math.floor(subtotal * 0.10);
+        const totalCost = subtotal + vat;
+        
+        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 ${totalPointCost.toLocaleString()}원 + 수수료 ${platformFee.toLocaleString()}원 + 부가세 ${vat.toLocaleString()}원)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
           return;
         }
       }
