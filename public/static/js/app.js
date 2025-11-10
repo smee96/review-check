@@ -2361,7 +2361,9 @@ class ReviewSphere {
             </div>
 
             <div id="adminContent" class="bg-white rounded-lg shadow p-6 mb-8">
-              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+              <p class="text-gray-600 text-center py-8">
+                <i class="fas fa-spinner fa-spin mr-2"></i>캠페인 목록을 확인하는 중...
+              </p>
             </div>
           </div>
         </div>
@@ -2369,6 +2371,38 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+    
+    // 승인 대기 중인 캠페인이 있는지 확인하고 자동으로 표시
+    setTimeout(async () => {
+      try {
+        const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
+        const campaigns = response.data;
+        const pendingCampaigns = campaigns.filter(c => c.status === 'pending');
+        
+        if (pendingCampaigns.length > 0) {
+          // 승인 대기 중인 캠페인이 있으면 자동으로 캠페인 관리 표시
+          this.showAllCampaigns();
+        } else {
+          // 승인 대기 중인 캠페인이 없으면 기본 메시지 표시
+          const content = document.getElementById('adminContent');
+          if (content) {
+            content.innerHTML = `
+              <div class="text-center py-12">
+                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                <p class="text-gray-600 text-lg">승인 대기 중인 캠페인이 없습니다</p>
+                <p class="text-gray-500 text-sm mt-2">위 메뉴에서 캠페인 관리 또는 정산 내역을 선택해주세요</p>
+              </div>
+            `;
+          }
+        }
+      } catch (error) {
+        console.error('Check pending campaigns error:', error);
+        const content = document.getElementById('adminContent');
+        if (content) {
+          content.innerHTML = '<p class="text-gray-600">위 메뉴를 선택해주세요</p>';
+        }
+      }
+    }, 100);
   }
 
   async showAllCampaigns() {
