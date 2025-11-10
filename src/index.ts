@@ -39,7 +39,7 @@ app.get('/', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>R.SPHERE - 인플루언서 마케팅 플랫폼</title>
-        <link rel="icon" type="image/png" href="/static/logo.png">
+        <link rel="icon" type="image/png" href="/static/favicon.png">
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <!-- Flatpickr CSS -->
