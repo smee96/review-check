@@ -48,9 +48,9 @@ const UIUtils = {
       <nav class="bg-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div class="flex justify-between items-center h-14 sm:h-16">
-            <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showDashboard()">
-              <i class="fas fa-globe mr-1 sm:mr-2"></i><span class="hidden xs:inline">ReviewSphere</span><span class="xs:hidden">RS</span>
-            </h1>
+            <div class="cursor-pointer" onclick="app.showDashboard()">
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-8 sm:h-10">
+            </div>
             <div class="flex items-center space-x-2 sm:space-x-4">
               <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>
               <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
@@ -70,7 +70,7 @@ const UIUtils = {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <h3 class="text-white text-sm font-semibold mb-2">
-                <i class="fas fa-globe mr-1"></i>ReviewSphere (리뷰스피어)
+                <i class="fas fa-star mr-1"></i>R.SPHERE (리뷰스피어)
               </h3>
               <p class="text-xs mb-1">인플루언서 마케팅의 새로운 기준</p>
               <p class="text-xs">

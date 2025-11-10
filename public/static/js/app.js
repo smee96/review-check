@@ -117,10 +117,8 @@ class ReviewSphere {
         <nav class="bg-white shadow-lg sticky top-0 z-50">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div class="flex justify-between items-center h-14 sm:h-16">
-              <div class="flex items-center">
-                <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showHome()">
-                  <i class="fas fa-globe mr-1 sm:mr-2"></i>ReviewSphere
-                </h1>
+              <div class="flex items-center cursor-pointer" onclick="app.showHome()">
+                <img src="/static/logo.png" alt="R.SPHERE" class="h-8 sm:h-10">
               </div>
               <div class="flex space-x-2 sm:space-x-4">
                 <button onclick="app.showLogin()" class="bg-purple-600 text-white hover:bg-purple-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition">
@@ -291,10 +289,8 @@ class ReviewSphere {
         <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-              <h2 class="text-3xl font-bold text-gray-800">
-                <i class="fas fa-globe text-purple-600 mr-2"></i>ReviewSphere
-              </h2>
-              <p class="text-gray-600 mt-2">로그인</p>
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-16 mx-auto mb-4">
+              <p class="text-gray-600 text-lg font-semibold">로그인</p>
             </div>
 
             <form id="loginForm" onsubmit="event.preventDefault(); app.handleLogin();">
@@ -342,10 +338,8 @@ class ReviewSphere {
         <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-              <h2 class="text-3xl font-bold text-gray-800">
-                <i class="fas fa-globe text-purple-600 mr-2"></i>ReviewSphere
-              </h2>
-              <p class="text-gray-600 mt-2">회원가입</p>
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-16 mx-auto mb-4">
+              <p class="text-gray-600 text-lg font-semibold">회원가입</p>
             </div>
 
             <form id="registerForm" onsubmit="event.preventDefault(); app.handleRegister();">
