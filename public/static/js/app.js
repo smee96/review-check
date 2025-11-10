@@ -1695,16 +1695,22 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">우편번호 *</label>
-              <input type="text" id="shippingZipcode" required placeholder="12345"
-                value="${profile.shipping_postal_code || ''}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <div class="flex gap-2">
+                <input type="text" id="shippingZipcode" required placeholder="12345" readonly
+                  value="${profile.shipping_postal_code || ''}"
+                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
+                <button type="button" onclick="app.searchAddress('apply')" 
+                  class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                  <i class="fas fa-search mr-1"></i>주소 검색
+                </button>
+              </div>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">주소 *</label>
-              <input type="text" id="shippingAddress" required placeholder="서울시 강남구 테헤란로 123"
+              <input type="text" id="shippingAddress" required placeholder="주소 검색 버튼을 클릭하세요" readonly
                 value="${profile.shipping_address || ''}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
             </div>
 
             <div>
@@ -1956,14 +1962,20 @@ class ReviewSphere {
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">우편번호</label>
-                <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <div class="flex gap-2">
+                  <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345" readonly
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
+                  <button type="button" onclick="app.searchAddress('profile')" 
+                    class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                    <i class="fas fa-search mr-1"></i>주소 검색
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
-                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="서울시 강남구 테헤란로 123"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="주소 검색 버튼을 클릭하세요" readonly
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
               </div>
 
               <div>
@@ -2389,6 +2401,43 @@ class ReviewSphere {
       </div>
     `;
   }
+
+  // ============================================
+  // Address Search (Daum Postcode API)
+  // ============================================
+
+  searchAddress(type) {
+    new daum.Postcode({
+      oncomplete: (data) => {
+        // 도로명 주소 또는 지번 주소를 변수에 저장
+        let addr = '';
+        
+        // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져옴
+        if (data.userSelectedType === 'R') { // 도로명 주소
+          addr = data.roadAddress;
+        } else { // 지번 주소
+          addr = data.jibunAddress;
+        }
+
+        // type에 따라 다른 input 필드에 값을 넣음
+        if (type === 'profile') {
+          // 프로필 관리 페이지
+          document.getElementById('shippingPostalCode').value = data.zonecode;
+          document.getElementById('shippingAddress').value = addr;
+          document.getElementById('shippingAddressDetail').focus();
+        } else if (type === 'apply') {
+          // 캠페인 지원 페이지
+          document.getElementById('shippingZipcode').value = data.zonecode;
+          document.getElementById('shippingAddress').value = addr;
+          document.getElementById('shippingDetail').focus();
+        }
+      }
+    }).open();
+  }
+
+  // ============================================
+  // Privacy Policy & Terms
+  // ============================================
 
   showPrivacy() {
     const app = document.getElementById('app');
