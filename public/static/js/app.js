@@ -115,13 +115,15 @@ class ReviewSphere {
     // Load campaigns for display
     let ongoingCampaigns = [];
     let bestCampaigns = [];
-    let bestReviews = [];
     
     try {
-      const response = await axios.get('/api/campaigns');
-      const allCampaigns = response.data || [];
-      ongoingCampaigns = allCampaigns.slice(0, 10); // First 10 as ongoing
-      bestCampaigns = allCampaigns.slice(0, 5); // Top 5 as best
+      // 진행중인 캠페인 (모든 승인된 캠페인)
+      const ongoingResponse = await axios.get('/api/campaigns');
+      ongoingCampaigns = ongoingResponse.data || [];
+      
+      // 베스트 캠페인 (지원자 수 많은 순)
+      const bestResponse = await axios.get('/api/campaigns?type=best');
+      bestCampaigns = bestResponse.data || [];
     } catch (error) {
       console.log('Failed to load campaigns:', error);
     }
@@ -256,36 +258,25 @@ class ReviewSphere {
           </div>
         </div>
 
-        <!-- Best Reviews Section -->
-        <div class="py-8 sm:py-12 bg-white">
+        <!-- Stats Section -->
+        <div class="py-8 sm:py-12 bg-gradient-to-r from-purple-600 to-blue-500">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
-                <i class="fas fa-heart text-red-500 mr-2"></i>베스트 리뷰
-              </h3>
-            </div>
-            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
-              <div class="flex space-x-4" style="width: max-content;">
-                ${bestReviews.length > 0 ? bestReviews.map(r => `
-                  <div class="bg-white border-2 border-red-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
-                    <div class="flex items-center mb-3">
-                      <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
-                        <i class="fas fa-heart mr-1"></i>Best
-                      </span>
-                    </div>
-                    <h4 class="font-bold text-lg mb-2">리뷰 제목</h4>
-                    <p class="text-gray-600 text-sm mb-3">리뷰 내용...</p>
-                    <a href="#" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
-                      포스트 보기 <i class="fas fa-external-link-alt ml-1"></i>
-                    </a>
-                  </div>
-                `).join('') : `
-                  <div class="w-full text-center py-16">
-                    <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
-                    <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
-                    <p class="text-sm text-gray-400">첫 베스트 리뷰의 주인공이 되어주세요!</p>
-                  </div>
-                `}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              <div class="text-center text-white">
+                <div class="text-3xl sm:text-4xl font-bold mb-2">${ongoingCampaigns.length}</div>
+                <div class="text-sm sm:text-base opacity-90">진행중인 캠페인</div>
+              </div>
+              <div class="text-center text-white">
+                <div class="text-3xl sm:text-4xl font-bold mb-2">${bestCampaigns.length}</div>
+                <div class="text-sm sm:text-base opacity-90">인기 캠페인</div>
+              </div>
+              <div class="text-center text-white">
+                <div class="text-3xl sm:text-4xl font-bold mb-2">1,000+</div>
+                <div class="text-sm sm:text-base opacity-90">활동 인플루언서</div>
+              </div>
+              <div class="text-center text-white">
+                <div class="text-3xl sm:text-4xl font-bold mb-2">100+</div>
+                <div class="text-sm sm:text-base opacity-90">협력 브랜드</div>
               </div>
             </div>
           </div>

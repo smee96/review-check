@@ -102,17 +102,32 @@ campaigns.get('/my', requireRole('advertiser', 'agency', 'rep', 'admin'), async 
   }
 });
 
-// 승인된 캠페인 목록 조회 (인플루언서)
-campaigns.get('/', requireRole('influencer', 'admin'), async (c) => {
+// 승인된 캠페인 목록 조회 (인플루언서 및 메인 페이지)
+campaigns.get('/', async (c) => {
   try {
     const { env } = c;
+    const type = c.req.query('type'); // 'best' or undefined
     
-    // 승인된 캠페인 중 결제 완료되었거나 포인트가 없는 캠페인만 표시
-    const campaigns = await env.DB.prepare(
-      'SELECT * FROM campaigns WHERE status = ? AND (payment_status = ? OR point_reward = 0) ORDER BY created_at DESC'
-    ).bind('approved', 'paid').all();
-    
-    return c.json(campaigns.results);
+    if (type === 'best') {
+      // 베스트 캠페인: 승인되고 결제 완료된 캠페인 중 최근 10개
+      const campaigns = await env.DB.prepare(
+        `SELECT c.*, 
+         (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
+         FROM campaigns c
+         WHERE c.status = ? AND (c.payment_status = ? OR c.point_reward = 0)
+         ORDER BY application_count DESC, c.created_at DESC
+         LIMIT 10`
+      ).bind('approved', 'paid').all();
+      
+      return c.json(campaigns.results);
+    } else {
+      // 진행중인 캠페인: 승인되고 결제 완료된 모든 캠페인
+      const campaigns = await env.DB.prepare(
+        'SELECT * FROM campaigns WHERE status = ? AND (payment_status = ? OR point_reward = 0) ORDER BY created_at DESC'
+      ).bind('approved', 'paid').all();
+      
+      return c.json(campaigns.results);
+    }
   } catch (error) {
     console.error('Get campaigns error:', error);
     return c.json({ error: '캠페인 목록 조회 중 오류가 발생했습니다' }, 500);
