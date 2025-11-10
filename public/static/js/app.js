@@ -135,16 +135,16 @@ class ReviewSphere {
         <div class="bg-gradient-to-br from-purple-600 to-blue-500 text-white py-12 sm:py-16">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
-              인플루언서 마케팅의 새로운 기준
+              진짜 리뷰, 진짜 성장
             </h2>
             <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
-              ReviewSphere와 함께 성공적인 캠페인을 시작하세요
+              AI 기반 매칭으로 광고주와 인플루언서를 직접 연결합니다
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg">
+              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
                 <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
               </button>
-              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg">
+              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
                 <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
               </button>
             </div>
