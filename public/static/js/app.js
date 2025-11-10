@@ -1027,26 +1027,22 @@ class ReviewSphere {
           </div>
           
           <div class="bg-white p-3 rounded border border-purple-200">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">총 포인트 비용</span>
-              <span class="font-bold text-purple-900" id="totalPointCost">0원</span>
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-semibold text-gray-700">총 포인트 비용</span>
+              <span class="font-bold text-lg text-purple-900" id="totalPointCost">0원</span>
             </div>
             <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">플랫폼 수수료 (20%)</span>
-              <span class="font-bold text-orange-600" id="platformFee">0원</span>
+              <span class="text-xs text-gray-500">플랫폼 수수료 (20%)</span>
+              <span class="text-sm text-gray-600" id="platformFee">0원</span>
             </div>
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">소계</span>
-              <span class="font-bold text-gray-700" id="subtotal">0원</span>
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-xs text-gray-500">부가세 (10%)</span>
+              <span class="text-sm text-gray-600" id="vat">0원</span>
             </div>
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">부가세 (10%)</span>
-              <span class="font-bold text-blue-600" id="vat">0원</span>
-            </div>
-            <div class="border-t border-purple-200 pt-2 mt-2">
+            <div class="border-t border-purple-200 pt-3 mt-2">
               <div class="flex justify-between items-center">
                 <span class="font-bold text-gray-800">최종 결제 금액</span>
-                <span class="font-bold text-2xl text-red-600" id="totalCost">0원</span>
+                <span class="font-bold text-2xl text-green-600" id="totalCost">0원</span>
               </div>
             </div>
           </div>
@@ -1316,7 +1312,6 @@ class ReviewSphere {
     document.getElementById('totalPoints').value = totalPoints.toLocaleString() + ' P';
     document.getElementById('totalPointCost').textContent = totalPointCost.toLocaleString() + '원';
     document.getElementById('platformFee').textContent = platformFee.toLocaleString() + '원';
-    document.getElementById('subtotal').textContent = subtotal.toLocaleString() + '원';
     document.getElementById('vat').textContent = vat.toLocaleString() + '원';
     document.getElementById('totalCost').textContent = totalCost.toLocaleString() + '원';
   }
