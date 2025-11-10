@@ -176,30 +176,38 @@ class ReviewSphere {
             </div>
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
-                ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => `
-                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
-                    <div class="flex items-center justify-between mb-3">
-                      <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">진행중</span>
-                      <span class="text-sm text-gray-500">${c.slots || 1}명 모집</span>
-                    </div>
-                    <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
-                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
-                    ${c.point_reward > 0 ? `
-                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2">
-                        <div class="flex items-center justify-between text-xs text-purple-700">
-                          <span><i class="fas fa-coins mr-1"></i>스피어포인트</span>
-                          <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P/인</span>
-                        </div>
+                ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => {
+                  const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
+                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                  return `
+                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
+                    ${c.thumbnail_image ? `
+                      <div class="w-full h-40 overflow-hidden bg-gray-100">
+                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
                       </div>
-                    ` : ''}
-                    <div class="flex items-center justify-between text-sm">
-                      <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
-                      <button class="text-purple-600 hover:text-purple-800 font-semibold">
-                        자세히 보기 <i class="fas fa-arrow-right ml-1"></i>
-                      </button>
+                    ` : `
+                      <div class="w-full h-40 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                        <i class="fas fa-image text-white text-5xl opacity-50"></i>
+                      </div>
+                    `}
+                    <div class="p-4">
+                      <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                      <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                      ${c.point_reward > 0 ? `
+                        <div class="bg-purple-50 px-3 py-2 rounded-lg mb-3">
+                          <div class="flex items-center justify-between text-xs text-purple-700">
+                            <span><i class="fas fa-coins mr-1"></i>포인트</span>
+                            <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P</span>
+                          </div>
+                        </div>
+                      ` : ''}
+                      <div class="flex items-center justify-between pt-2 border-t">
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
+                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i>${c.slots}명</span>
+                      </div>
                     </div>
                   </div>
-                `).join('') : `
+                `}).join('') : `
                   <div class="w-full text-center py-16">
                     <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
                     <p class="text-xl text-gray-500 mb-2">아직 진행중인 캠페인이 없어요</p>
@@ -222,28 +230,45 @@ class ReviewSphere {
             </div>
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
-                ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => `
-                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl p-5 hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
-                    <div class="flex items-center justify-between mb-3">
-                      <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
-                        <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
-                      </span>
-                    </div>
-                    <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
-                    <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
-                    ${c.point_reward > 0 ? `
-                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2">
-                        <div class="flex items-center justify-between text-xs text-purple-700">
-                          <span><i class="fas fa-coins mr-1"></i>스피어포인트</span>
-                          <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P/인</span>
+                ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => {
+                  const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
+                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                  return `
+                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
+                    ${c.thumbnail_image ? `
+                      <div class="w-full h-40 overflow-hidden bg-gray-100 relative">
+                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                        <div class="absolute top-2 left-2">
+                          <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold shadow-md">
+                            <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
+                          </span>
                         </div>
                       </div>
-                    ` : ''}
-                    <div class="flex items-center justify-between text-sm">
-                      <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
-                      <button class="text-purple-600 hover:text-purple-800 font-semibold">
-                        자세히 보기 <i class="fas fa-arrow-right ml-1"></i>
-                      </button>
+                    ` : `
+                      <div class="w-full h-40 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center relative">
+                        <i class="fas fa-trophy text-white text-5xl opacity-50"></i>
+                        <div class="absolute top-2 left-2">
+                          <span class="px-3 py-1 bg-white text-yellow-800 rounded-full text-xs font-semibold shadow-md">
+                            <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
+                          </span>
+                        </div>
+                      </div>
+                    `}
+                    <div class="p-4">
+                      <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                      <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                      ${c.point_reward > 0 ? `
+                        <div class="bg-purple-50 px-3 py-2 rounded-lg mb-3">
+                          <div class="flex items-center justify-between text-xs text-purple-700">
+                            <span><i class="fas fa-coins mr-1"></i>포인트</span>
+                            <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P</span>
+                          </div>
+                        </div>
+                      ` : ''}
+                      <div class="flex items-center justify-between pt-2 border-t">
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
+                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i>${c.slots}명</span>
+                      </div>
                     </div>
                   </div>
                 `).join('') : `
@@ -2129,36 +2154,85 @@ class ReviewSphere {
       const response = await axios.get('/api/campaigns', this.getAuthHeaders());
       const campaigns = response.data;
 
+      // 지원자 수 가져오기
+      const campaignsWithCounts = await Promise.all(campaigns.map(async (c) => {
+        try {
+          const appResponse = await axios.get(`/api/campaigns/${c.id}/applications`, this.getAuthHeaders());
+          return { ...c, applicationCount: appResponse.data.length };
+        } catch (error) {
+          return { ...c, applicationCount: 0 };
+        }
+      }));
+
       const content = document.getElementById('influencerContent');
       content.innerHTML = `
         <h2 class="text-2xl font-bold mb-6">진행 중인 캠페인</h2>
-        ${campaigns.length === 0 ? '<p class="text-gray-600">현재 진행 중인 캠페인이 없습니다</p>' : ''}
-        <div class="space-y-4">
-          ${campaigns.map(c => `
-            <div class="border rounded-lg p-4 hover:shadow-md transition">
-              <h3 class="font-bold text-lg mb-2">${c.title}</h3>
-              <p class="text-gray-600 mb-3">${c.description || ''}</p>
-              
-              ${c.product_name ? `<p class="text-sm mb-1"><strong>제품:</strong> ${c.product_name}</p>` : ''}
-              ${c.requirements ? `<p class="text-sm mb-3"><strong>요구사항:</strong> ${c.requirements}</p>` : ''}
-              
-              <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
-                <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                <span>모집인원: ${c.slots}명</span>
-              </div>
-
-              ${c.payment_status === 'paid' ? `
-                <button onclick="app.applyCampaign(${c.id})" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 text-sm">
-                  <i class="fas fa-paper-plane mr-1"></i>지원하기
-                </button>
+        ${campaignsWithCounts.length === 0 ? '<p class="text-gray-600">현재 진행 중인 캠페인이 없습니다</p>' : ''}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${campaignsWithCounts.map(c => {
+            const channelIcon = c.channel_type === 'instagram' ? '📸' : 
+                               c.channel_type === 'blog' ? '📝' : 
+                               c.channel_type === 'youtube' ? '🎥' : '📱';
+            const channelName = c.channel_type === 'instagram' ? '인스타그램' : 
+                               c.channel_type === 'blog' ? '블로그' : 
+                               c.channel_type === 'youtube' ? '유튜브' : '기타';
+            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : 
+                                c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : 
+                                c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+            
+            return `
+            <div class="border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+              <!-- 썸네일 이미지 -->
+              ${c.thumbnail_image ? `
+                <div class="w-full h-48 overflow-hidden bg-gray-100">
+                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                </div>
               ` : `
-                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm">
-                  <i class="fas fa-clock text-yellow-600 mr-1"></i>
-                  <span class="text-yellow-800">결제 대기 중 - 결제 완료 후 지원 가능합니다</span>
+                <div class="w-full h-48 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                  <i class="fas fa-image text-white text-6xl opacity-50"></i>
                 </div>
               `}
+              
+              <!-- 캠페인 정보 -->
+              <div class="p-4">
+                <h3 class="font-bold text-lg mb-2 line-clamp-1">${c.title}</h3>
+                <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                
+                ${c.point_reward > 0 ? `
+                  <div class="bg-purple-50 px-3 py-2 rounded-lg mb-3">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
+                      <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P</span>
+                    </div>
+                  </div>
+                ` : ''}
+                
+                <!-- 하단 정보 -->
+                <div class="flex items-center justify-between pt-3 border-t">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">
+                      ${channelIcon} ${channelName}
+                    </span>
+                  </div>
+                  <div class="text-sm text-gray-600">
+                    <i class="fas fa-users mr-1"></i>
+                    <span class="font-semibold text-purple-600">${c.applicationCount}</span>/${c.slots}
+                  </div>
+                </div>
+                
+                ${c.payment_status === 'paid' ? `
+                  <button onclick="event.stopPropagation(); app.applyCampaign(${c.id})" class="w-full mt-3 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 text-sm font-semibold">
+                    <i class="fas fa-paper-plane mr-1"></i>지원하기
+                  </button>
+                ` : `
+                  <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-center">
+                    <i class="fas fa-clock text-yellow-600 mr-1"></i>
+                    <span class="text-yellow-800">결제 대기 중</span>
+                  </div>
+                `}
+              </div>
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
       `;
     } catch (error) {
