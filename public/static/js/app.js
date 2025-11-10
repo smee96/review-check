@@ -1332,16 +1332,35 @@ class ReviewSphere {
     const pointPerPerson = pointRewardInput ? this.getNumericValue(pointRewardInput) : 0;
     
     const totalPoints = slots * pointPerPerson;
-    const totalPointCost = totalPoints;
-    const platformFee = Math.floor(totalPointCost * 0.20);
-    const subtotal = totalPointCost + platformFee;
-    const vat = Math.floor(subtotal * 0.10);
-    const totalCost = subtotal + vat;
+    let totalPointCost = totalPoints;
+    let platformFee = 0;
+    let subtotal = 0;
+    let vat = 0;
+    let totalCost = 0;
+    
+    if (pointPerPerson > 0) {
+      // 포인트가 있는 경우: 기존 계산 방식
+      platformFee = Math.floor(totalPointCost * 0.20);
+      subtotal = totalPointCost + platformFee;
+      vat = Math.floor(subtotal * 0.10);
+      totalCost = subtotal + vat;
+    } else {
+      // 포인트가 0인 경우: 고정 수수료 10,000원
+      platformFee = 10000;
+      subtotal = platformFee;
+      vat = Math.floor(subtotal * 0.10);
+      totalCost = subtotal + vat;
+      totalPointCost = 0;
+    }
     
     // Update display
     const totalPointsField = document.getElementById('totalPoints');
     if (totalPointsField) {
-      totalPointsField.value = totalPoints.toLocaleString() + ' P';
+      if (pointPerPerson > 0) {
+        totalPointsField.value = totalPoints.toLocaleString() + ' P';
+      } else {
+        totalPointsField.value = '0 P';
+      }
     }
     
     const totalPointCostField = document.getElementById('totalPointCost');
@@ -1351,7 +1370,11 @@ class ReviewSphere {
     
     const platformFeeField = document.getElementById('platformFee');
     if (platformFeeField) {
-      platformFeeField.textContent = platformFee.toLocaleString() + '원';
+      if (pointPerPerson > 0) {
+        platformFeeField.textContent = platformFee.toLocaleString() + '원 (20%)';
+      } else {
+        platformFeeField.textContent = platformFee.toLocaleString() + '원 (고정)';
+      }
     }
     
     const vatField = document.getElementById('vat');

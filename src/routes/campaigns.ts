@@ -109,32 +109,24 @@ campaigns.get('/', async (c) => {
     const type = c.req.query('type'); // 'best' or undefined
     
     if (type === 'best') {
-      // 베스트 캠페인: 승인된 캠페인 중 지원자 수가 많은 순
-      // - 포인트 있는 캠페인: 결제 완료되어야 표시
-      // - 포인트 없는 캠페인: 승인만 되면 표시
+      // 베스트 캠페인: 승인되고 결제 완료된 캠페인 중 지원자 수가 많은 순
+      // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.status = ? AND (
-           (c.point_reward > 0 AND c.payment_status = ?) OR 
-           c.point_reward = 0
-         )
+         WHERE c.status = ? AND c.payment_status = ?
          ORDER BY application_count DESC, c.created_at DESC
          LIMIT 10`
       ).bind('approved', 'paid').all();
       
       return c.json(campaigns.results);
     } else {
-      // 진행중인 캠페인: 승인된 모든 활성 캠페인
-      // - 포인트 있는 캠페인: 결제 완료되어야 표시
-      // - 포인트 없는 캠페인: 승인만 되면 표시
+      // 진행중인 캠페인: 승인되고 결제 완료된 모든 캠페인
+      // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
       const campaigns = await env.DB.prepare(
         `SELECT * FROM campaigns 
-         WHERE status = ? AND (
-           (point_reward > 0 AND payment_status = ?) OR 
-           point_reward = 0
-         )
+         WHERE status = ? AND payment_status = ?
          ORDER BY created_at DESC`
       ).bind('approved', 'paid').all();
       
