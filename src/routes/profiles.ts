@@ -36,21 +36,30 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
     const user = c.get('user');
     const data = await c.req.json();
     const { 
+      // 개인 정보
+      real_name, birth_date, gender, contact_phone,
+      // 채널 정보
       instagram_handle, youtube_channel, blog_url, tiktok_handle, 
       follower_count, category,
-      account_holder_name, bank_name, account_number, business_number, contact_phone
+      // 정산 정보
+      account_holder_name, bank_name, account_number, business_number
     } = data;
     
     const { env } = c;
     
     await env.DB.prepare(
       `UPDATE influencer_profiles 
-       SET instagram_handle = ?, youtube_channel = ?, blog_url = ?, tiktok_handle = ?,
+       SET real_name = ?, birth_date = ?, gender = ?, contact_phone = ?,
+           instagram_handle = ?, youtube_channel = ?, blog_url = ?, tiktok_handle = ?,
            follower_count = ?, category = ?,
            account_holder_name = ?, bank_name = ?, account_number = ?, 
-           business_number = ?, contact_phone = ?, updated_at = ?
+           business_number = ?, updated_at = ?
        WHERE user_id = ?`
     ).bind(
+      real_name || null,
+      birth_date || null,
+      gender || null,
+      contact_phone || null,
       instagram_handle || null,
       youtube_channel || null,
       blog_url || null,
@@ -61,7 +70,6 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
       bank_name || null,
       account_number || null,
       business_number || null,
-      contact_phone || null,
       getCurrentDateTime(),
       user.userId
     ).run();

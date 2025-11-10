@@ -19,7 +19,12 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
   try {
     const user = c.get('user');
     const data = await c.req.json();
-    const { title, description, product_name, product_url, requirements, budget, slots, start_date, end_date } = data;
+    const { 
+      title, description, product_name, product_url, requirements, budget, slots,
+      point_reward, application_start_date, application_end_date, announcement_date,
+      content_start_date, content_end_date, result_announcement_date,
+      provided_items, mission, keywords, notes
+    } = data;
     
     if (!title) {
       return c.json({ error: '캠페인 제목을 입력해주세요' }, 400);
@@ -28,8 +33,12 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
     const { env } = c;
     
     const result = await env.DB.prepare(
-      `INSERT INTO campaigns (advertiser_id, title, description, product_name, product_url, requirements, budget, slots, start_date, end_date, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+      `INSERT INTO campaigns (
+        advertiser_id, title, description, product_name, product_url, requirements, 
+        budget, slots, point_reward, application_start_date, application_end_date, 
+        announcement_date, content_start_date, content_end_date, result_announcement_date,
+        provided_items, mission, keywords, notes, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
     ).bind(
       user.userId,
       title,
@@ -39,8 +48,17 @@ campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (
       requirements || null,
       budget || null,
       slots || 1,
-      start_date || null,
-      end_date || null,
+      point_reward || 0,
+      application_start_date || null,
+      application_end_date || null,
+      announcement_date || null,
+      content_start_date || null,
+      content_end_date || null,
+      result_announcement_date || null,
+      provided_items || null,
+      mission || null,
+      keywords || null,
+      notes || null,
       getCurrentDateTime(),
       getCurrentDateTime()
     ).run();
@@ -174,7 +192,11 @@ campaigns.post('/:id/apply', requireRole('influencer'), async (c) => {
   try {
     const campaignId = c.req.param('id');
     const user = c.get('user');
-    const { message } = await c.req.json();
+    const { 
+      message, 
+      shipping_recipient, shipping_phone, shipping_zipcode, 
+      shipping_address, shipping_detail 
+    } = await c.req.json();
     const { env } = c;
     
     // Check if campaign exists and is approved
@@ -195,10 +217,29 @@ campaigns.post('/:id/apply', requireRole('influencer'), async (c) => {
       return c.json({ error: '이미 지원한 캠페인입니다' }, 400);
     }
     
-    // Create application
+    // Validate required shipping information
+    if (!shipping_recipient || !shipping_phone || !shipping_zipcode || !shipping_address) {
+      return c.json({ error: '배송 정보를 모두 입력해주세요' }, 400);
+    }
+    
+    // Create application with shipping info
     await env.DB.prepare(
-      'INSERT INTO applications (campaign_id, influencer_id, message, applied_at) VALUES (?, ?, ?, ?)'
-    ).bind(campaignId, user.userId, message || null, getCurrentDateTime()).run();
+      `INSERT INTO applications (
+        campaign_id, influencer_id, message, 
+        shipping_recipient, shipping_phone, shipping_zipcode, shipping_address, shipping_detail,
+        applied_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      campaignId, 
+      user.userId, 
+      message || null,
+      shipping_recipient,
+      shipping_phone,
+      shipping_zipcode,
+      shipping_address,
+      shipping_detail || null,
+      getCurrentDateTime()
+    ).run();
     
     return c.json({ success: true, message: '캠페인에 지원되었습니다' }, 201);
   } catch (error) {
@@ -232,10 +273,11 @@ campaigns.get('/:id/applications', async (c) => {
       return c.json({ error: '승인된 캠페인만 지원자를 조회할 수 있습니다' }, 403);
     }
     
-    // Get applications with influencer info
+    // Get applications with influencer info and shipping details
     const applications = await env.DB.prepare(
       `SELECT a.*, u.email, u.nickname,
-              ip.instagram_handle, ip.youtube_channel, ip.blog_url, ip.tiktok_handle, ip.follower_count, ip.category
+              ip.instagram_handle, ip.youtube_channel, ip.blog_url, ip.tiktok_handle, 
+              ip.follower_count, ip.category, ip.real_name, ip.contact_phone
        FROM applications a
        JOIN users u ON a.influencer_id = u.id
        LEFT JOIN influencer_profiles ip ON u.id = ip.user_id
