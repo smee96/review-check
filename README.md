@@ -233,6 +233,7 @@ webapp/
   - Project: review-spheres-v1
   - URL: https://review-spheres-v1.pages.dev
   - Database: review-spheres-v1-production (D1)
+  - Admin User: kyuhan.lee@mobin-inc.com (모빈관리자)
 
 ### 기술 스택
 - **Backend**: Hono (TypeScript) - 경량 웹 프레임워크
