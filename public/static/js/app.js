@@ -132,10 +132,10 @@ class ReviewSphere {
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mt-8 sm:mt-16">
                 <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-6 sm:p-8 hover:bg-opacity-20 transition active:scale-95">
                   <i class="fas fa-bullhorn text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
-                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">광고주</h3>
+                  <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">광고주/대행사/렙사</h3>
                   <p class="text-sm sm:text-base mb-4 sm:mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
-                  <button onclick="app.showRegisterWithRole('advertiser')" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
-                    광고주로 시작하기
+                  <button onclick="app.showRegister()" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
+                    비즈니스 시작하기
                   </button>
                 </div>
                 
@@ -143,7 +143,7 @@ class ReviewSphere {
                   <i class="fas fa-star text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4"></i>
                   <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">인플루언서</h3>
                   <p class="text-sm sm:text-base mb-4 sm:mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
-                  <button onclick="app.showRegisterWithRole('influencer')" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
+                  <button onclick="app.showRegister()" class="bg-white text-purple-600 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-100 transition active:scale-95">
                     인플루언서로 시작하기
                   </button>
                 </div>
