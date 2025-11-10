@@ -15,7 +15,7 @@ const campaigns = new Hono<{ Bindings: Bindings }>();
 campaigns.use('*', authMiddleware);
 
 // 캠페인 등록 (광고주)
-campaigns.post('/', requireRole('advertiser', 'admin'), async (c) => {
+campaigns.post('/', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
     const user = c.get('user');
     const data = await c.req.json();
@@ -57,7 +57,7 @@ campaigns.post('/', requireRole('advertiser', 'admin'), async (c) => {
 });
 
 // 내 캠페인 목록 조회 (광고주)
-campaigns.get('/my', requireRole('advertiser', 'admin'), async (c) => {
+campaigns.get('/my', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
     const user = c.get('user');
     const { env } = c;
@@ -104,8 +104,8 @@ campaigns.get('/:id', async (c) => {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
     
-    // 광고주는 자신의 캠페인만, 인플루언서는 승인된 캠페인만, 관리자는 모두 조회 가능
-    if (user.role === 'advertiser' && campaign.advertiser_id !== user.userId) {
+    // 광고주/대행사/렙사는 자신의 캠페인만, 인플루언서는 승인된 캠페인만, 관리자는 모두 조회 가능
+    if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     

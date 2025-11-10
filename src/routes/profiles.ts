@@ -73,8 +73,8 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
   }
 });
 
-// 광고주 프로필 조회
-profiles.get('/advertiser', requireRole('advertiser'), async (c) => {
+// 광고주 프로필 조회 (광고주/대행사/렙사 공통)
+profiles.get('/advertiser', requireRole('advertiser', 'agency', 'rep'), async (c) => {
   try {
     const user = c.get('user');
     const { env } = c;
@@ -90,8 +90,8 @@ profiles.get('/advertiser', requireRole('advertiser'), async (c) => {
   }
 });
 
-// 광고주 프로필 업데이트
-profiles.put('/advertiser', requireRole('advertiser'), async (c) => {
+// 광고주 프로필 업데이트 (광고주/대행사/렙사 공통)
+profiles.put('/advertiser', requireRole('advertiser', 'agency', 'rep'), async (c) => {
   try {
     const user = c.get('user');
     const data = await c.req.json();

@@ -1,6 +1,6 @@
 // ReviewSphere Type Definitions
 
-export type UserRole = 'advertiser' | 'influencer' | 'admin';
+export type UserRole = 'advertiser' | 'agency' | 'rep' | 'influencer' | 'admin';
 
 export interface User {
   id: number;

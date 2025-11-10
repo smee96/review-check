@@ -242,11 +242,20 @@ class ReviewSphere {
                 </div>
 
                 <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+                  <input type="password" id="registerPasswordConfirm" required minlength="8"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                  <p id="passwordMatchError" class="text-red-500 text-xs mt-1 hidden">비밀번호가 일치하지 않습니다</p>
+                </div>
+
+                <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">역할</label>
                   <select id="registerRole" required ${preselectedRole ? 'disabled' : ''}
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
                     <option value="">선택하세요</option>
                     <option value="advertiser" ${preselectedRole === 'advertiser' ? 'selected' : ''}>광고주</option>
+                    <option value="agency" ${preselectedRole === 'agency' ? 'selected' : ''}>대행사</option>
+                    <option value="rep" ${preselectedRole === 'rep' ? 'selected' : ''}>렙사</option>
                     <option value="influencer" ${preselectedRole === 'influencer' ? 'selected' : ''}>인플루언서</option>
                   </select>
                   ${preselectedRole ? `<input type="hidden" id="registerRoleHidden" value="${preselectedRole}">` : ''}
@@ -317,6 +326,8 @@ class ReviewSphere {
   showDashboard() {
     switch (this.user.role) {
       case 'advertiser':
+      case 'agency':
+      case 'rep':
         this.showAdvertiserDashboard();
         break;
       case 'influencer':
@@ -334,6 +345,8 @@ class ReviewSphere {
 
   async showAdvertiserDashboard() {
     const app = document.getElementById('app');
+    const roleTitle = this.user.role === 'advertiser' ? '광고주' : 
+                      this.user.role === 'agency' ? '대행사' : '렙사';
     app.innerHTML = `
       <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
@@ -342,7 +355,7 @@ class ReviewSphere {
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div class="mb-4 sm:mb-8">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
-                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>광고주 대시보드
+                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${roleTitle} 대시보드
               </h1>
               <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
             </div>
@@ -1161,7 +1174,17 @@ class ReviewSphere {
     const email = document.getElementById('registerEmail').value;
     const nickname = document.getElementById('registerNickname').value;
     const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
     const role = document.getElementById('registerRoleHidden')?.value || document.getElementById('registerRole').value;
+    
+    // Password match validation
+    const errorElement = document.getElementById('passwordMatchError');
+    if (password !== passwordConfirm) {
+      errorElement.classList.remove('hidden');
+      return;
+    }
+    errorElement.classList.add('hidden');
+    
     this.register(email, nickname, password, role);
   }
 

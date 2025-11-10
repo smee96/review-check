@@ -37,7 +37,7 @@ auth.post('/register', async (c) => {
       return c.json({ error: '비밀번호는 최소 8자 이상이어야 합니다' }, 400);
     }
     
-    if (!['advertiser', 'influencer', 'admin'].includes(role)) {
+    if (!['advertiser', 'agency', 'rep', 'influencer', 'admin'].includes(role)) {
       return c.json({ error: '유효하지 않은 역할입니다' }, 400);
     }
     
@@ -63,7 +63,7 @@ auth.post('/register', async (c) => {
     const userId = result.meta.last_row_id;
     
     // Create profile based on role
-    if (role === 'advertiser') {
+    if (role === 'advertiser' || role === 'agency' || role === 'rep') {
       await env.DB.prepare(
         'INSERT INTO advertiser_profiles (user_id, created_at, updated_at) VALUES (?, ?, ?)'
       ).bind(userId, getCurrentDateTime(), getCurrentDateTime()).run();

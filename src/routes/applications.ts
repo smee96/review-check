@@ -34,8 +34,8 @@ applications.get('/my', requireRole('influencer'), async (c) => {
   }
 });
 
-// 지원자 확정/거절 (광고주)
-applications.put('/:id/status', async (c) => {
+// 지원자 확정/거절 (광고주/대행사/렙사)
+applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
     const applicationId = c.req.param('id');
     const user = c.get('user');
