@@ -806,9 +806,10 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">모집인원 *</label>
-              <input type="number" id="campaignSlots" value="1" min="1" required
+              <input type="number" id="campaignSlots" value="10" min="10" required
                 oninput="app.calculateCampaignCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <p class="text-xs text-gray-500 mt-1">최소 10명부터 모집 가능합니다</p>
             </div>
           </div>
         </div>
@@ -1290,7 +1291,7 @@ class ReviewSphere {
   }
 
   calculateCampaignCost() {
-    const slots = parseInt(document.getElementById('campaignSlots')?.value || 1);
+    const slots = parseInt(document.getElementById('campaignSlots')?.value || 10);
     const pointPerPerson = parseInt(document.getElementById('campaignPointReward')?.value || 0);
     
     const totalPoints = slots * pointPerPerson;
@@ -1309,9 +1310,15 @@ class ReviewSphere {
     try {
       const pointReward = parseInt(document.getElementById('campaignPointReward').value || 0);
       const channelType = document.getElementById('campaignChannelType').value;
+      const slots = parseInt(document.getElementById('campaignSlots').value || 10);
       
       if (!channelType) {
         alert('캠페인 채널을 선택해주세요');
+        return;
+      }
+      
+      if (slots < 10) {
+        alert('모집인원은 최소 10명 이상이어야 합니다');
         return;
       }
       
@@ -1322,7 +1329,7 @@ class ReviewSphere {
         product_url: document.getElementById('campaignProductUrl').value,
         requirements: document.getElementById('campaignRequirements').value,
         budget: document.getElementById('campaignBudget').value || null,
-        slots: document.getElementById('campaignSlots').value || 1,
+        slots: document.getElementById('campaignSlots').value || 10,
         point_reward: pointReward,
         
         // 썸네일 이미지
