@@ -49,7 +49,7 @@ const UIUtils = {
         <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div class="flex justify-between items-center h-14 sm:h-16">
             <div class="cursor-pointer" onclick="app.showDashboard()">
-              <img src="/static/logo.png" alt="R.SPHERE" class="h-10 sm:h-12">
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-32 sm:h-36">
             </div>
             <div class="flex items-center space-x-2 sm:space-x-4">
               <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>

@@ -118,7 +118,7 @@ class ReviewSphere {
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div class="flex justify-between items-center h-14 sm:h-16">
               <div class="flex items-center cursor-pointer" onclick="app.showHome()">
-                <img src="/static/logo.png" alt="R.SPHERE" class="h-10 sm:h-12">
+                <img src="/static/logo.png" alt="R.SPHERE" class="h-32 sm:h-36">
               </div>
               <div class="flex space-x-2 sm:space-x-4">
                 <button onclick="app.showLogin()" class="bg-purple-600 text-white hover:bg-purple-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition">
@@ -289,7 +289,7 @@ class ReviewSphere {
         <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-              <img src="/static/logo.png" alt="R.SPHERE" class="h-20 mx-auto mb-4">
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-60 mx-auto mb-4">
               <p class="text-gray-600 text-lg font-semibold">로그인</p>
             </div>
 
@@ -338,7 +338,7 @@ class ReviewSphere {
         <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-              <img src="/static/logo.png" alt="R.SPHERE" class="h-20 mx-auto mb-4">
+              <img src="/static/logo.png" alt="R.SPHERE" class="h-60 mx-auto mb-4">
               <p class="text-gray-600 text-lg font-semibold">회원가입</p>
             </div>
 
