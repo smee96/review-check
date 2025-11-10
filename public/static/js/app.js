@@ -1031,7 +1031,7 @@ class ReviewSphere {
               <span class="font-bold text-purple-900" id="totalPointCost">0원</span>
             </div>
             <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-gray-600">플랫폼 수수료 (15%)</span>
+              <span class="text-sm text-gray-600">플랫폼 수수료 (20%)</span>
               <span class="font-bold text-orange-600" id="platformFee">0원</span>
             </div>
             <div class="border-t border-purple-200 pt-2 mt-2">
@@ -1295,7 +1295,7 @@ class ReviewSphere {
     
     const totalPoints = slots * pointPerPerson;
     const totalPointCost = totalPoints;
-    const platformFee = Math.floor(totalPointCost * 0.15);
+    const platformFee = Math.floor(totalPointCost * 0.20);
     const totalCost = totalPointCost + platformFee;
     
     // Update display
@@ -1352,8 +1352,8 @@ class ReviewSphere {
       // Validate point reward for campaigns requiring payment
       if (pointReward > 0) {
         const slots = parseInt(data.slots);
-        const totalCost = Math.floor((pointReward * slots) * 1.15);
-        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 비용 + 수수료 15%)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
+        const totalCost = Math.floor((pointReward * slots) * 1.20);
+        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 비용 + 수수료 20%)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
           return;
         }
       }
