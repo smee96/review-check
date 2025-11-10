@@ -57,7 +57,8 @@ ReviewSphere는 광고주와 인플루언서를 연결하는 혁신적인 마케
 - **Sandbox URL**: https://3000-idu9nocxtg1m76pm1zhg7-de59bda9.sandbox.novita.ai
 
 ### 프로덕션 환경
-- **Production URL**: (배포 후 업데이트 예정)
+- **Production URL**: https://review-spheres-v1.pages.dev
+- **Latest Deployment**: https://4c23534f.review-spheres-v1.pages.dev
 
 ## 📊 데이터 아키텍처
 
@@ -228,13 +229,16 @@ webapp/
 - ✅ 로컬 개발 환경 구축 완료
 - ✅ 모듈화된 코드 구조로 리팩토링 완료
 - ✅ Sandbox 테스트 서버 실행 중
-- ⏳ Cloudflare Pages 프로덕션 배포 대기
+- ✅ **Cloudflare Pages 프로덕션 배포 완료**
+  - Project: review-spheres-v1
+  - URL: https://review-spheres-v1.pages.dev
+  - Database: review-spheres-v1-production (D1)
 
 ### 기술 스택
 - **Backend**: Hono (TypeScript) - 경량 웹 프레임워크
 - **Frontend**: Vanilla JavaScript + TailwindCSS
-- **Database**: Cloudflare D1 (SQLite)
-- **Authentication**: JWT
+- **Database**: Cloudflare D1 (SQLite) - 프로덕션 배포 완료
+- **Authentication**: JWT (Web Crypto API)
 - **Deployment**: Cloudflare Pages/Workers
 - **Architecture**: 모듈화된 라우트 기반 구조
 
@@ -299,14 +303,23 @@ webapp/
   - 단일 파일 코드 → 모듈화된 구조로 개선
 - ✅ **대행사/렙사 역할 추가**
   - 광고주, 대행사, 렙사 세 역할이 동일한 권한 공유
-  - 회원가입 시 비밀번호 확인 필드 추가
+  - 회원가입 시 비밀번호 확인 필드 추가 (실시간 검증)
   - 역할별 대시보드 타이틀 표시
   - 모든 백엔드 라우트 권한 검사 업데이트
+- ✅ **회원가입 흐름 통합**
+  - 모든 회원가입 버튼이 동일한 폼으로 연결
+  - 역할 선택 드롭다운 통일 (4개 옵션)
+  - 비즈니스 역할 명확화 (광고주/대행사/렙사)
+- ✅ **Cloudflare Pages 프로덕션 배포**
+  - Project: review-spheres-v1
+  - D1 Database: review-spheres-v1-production
+  - 마이그레이션 적용 완료
+  - URL: https://review-spheres-v1.pages.dev
 
 ### 다음 단계
 - 📧 Resend 이메일 연동
-- 🚀 Cloudflare Pages 프로덕션 배포
 - 📱 GitHub 저장소 연동
+- 🔗 D1 바인딩 최종 확인 및 테스트
 - 🔐 소셜 로그인 추가
 - 🔍 코드 최적화 및 에러 핸들링 강화
 
