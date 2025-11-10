@@ -136,7 +136,7 @@ class ReviewSphere {
               진짜 리뷰, 진짜 성장
             </h2>
             <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
-              AI 기반 매칭으로 광고주와 인플루언서를 직접 연결합니다
+              리뷰스피어의 AI 매칭으로 광고주와 인플루언서를 직접 연결
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
