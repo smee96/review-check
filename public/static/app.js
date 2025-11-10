@@ -108,7 +108,7 @@ class MSpheres {
   showHome() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500">
+      <div class="min-h-screen flex flex-col">
         <nav class="bg-white shadow-lg">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -129,40 +129,40 @@ class MSpheres {
           </div>
         </nav>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div class="text-center text-white">
-            <h2 class="text-5xl font-extrabold mb-6">
-              인플루언서 마케팅의 새로운 기준
-            </h2>
-            <p class="text-xl mb-12 text-purple-100">
-              M-Spheres와 함께 성공적인 캠페인을 시작하세요
-            </p>
-            
-            <div class="grid md:grid-cols-2 gap-8 mt-16">
-              <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
-                <i class="fas fa-bullhorn text-6xl mb-4"></i>
-                <h3 class="text-2xl font-bold mb-4">광고주</h3>
-                <p class="mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
-                <button onclick="app.showRegisterWithRole('advertiser')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
-                  광고주로 시작하기
-                </button>
-              </div>
+        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center text-white">
+              <h2 class="text-5xl font-extrabold mb-6">
+                인플루언서 마케팅의 새로운 기준
+              </h2>
+              <p class="text-xl mb-12 text-purple-100">
+                M-Spheres와 함께 성공적인 캠페인을 시작하세요
+              </p>
               
-              <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
-                <i class="fas fa-star text-6xl mb-4"></i>
-                <h3 class="text-2xl font-bold mb-4">인플루언서</h3>
-                <p class="mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
-                <button onclick="app.showRegisterWithRole('influencer')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
-                  인플루언서로 시작하기
-                </button>
+              <div class="grid md:grid-cols-2 gap-8 mt-16">
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
+                  <i class="fas fa-bullhorn text-6xl mb-4"></i>
+                  <h3 class="text-2xl font-bold mb-4">광고주</h3>
+                  <p class="mb-6">캠페인을 등록하고 최적의 인플루언서를 만나보세요</p>
+                  <button onclick="app.showRegisterWithRole('advertiser')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
+                    광고주로 시작하기
+                  </button>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-8 hover:bg-opacity-20 transition">
+                  <i class="fas fa-star text-6xl mb-4"></i>
+                  <h3 class="text-2xl font-bold mb-4">인플루언서</h3>
+                  <p class="mb-6">다양한 캠페인에 참여하고 수익을 창출하세요</p>
+                  <button onclick="app.showRegisterWithRole('influencer')" class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-100 transition">
+                    인플루언서로 시작하기
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div class="mt-16 text-sm text-purple-100">
-              <p>문의사항: <a href="mailto:checknreview@mobin-inc.com" class="underline hover:text-white">checknreview@mobin-inc.com</a></p>
             </div>
           </div>
         </div>
+
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -170,47 +170,50 @@ class MSpheres {
   showLogin() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">
-              <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
-            </h2>
-            <p class="text-gray-600 mt-2">로그인</p>
-          </div>
+      <div class="min-h-screen flex flex-col">
+        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
+          <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
+              </h2>
+              <p class="text-gray-600 mt-2">로그인</p>
+            </div>
 
-          <form id="loginForm" onsubmit="event.preventDefault(); app.handleLogin();">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-                <input type="email" id="loginEmail" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <form id="loginForm" onsubmit="event.preventDefault(); app.handleLogin();">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                  <input type="email" id="loginEmail" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                  <input type="password" id="loginPassword" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                  로그인
+                </button>
               </div>
+            </form>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                <input type="password" id="loginPassword" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <div class="mt-6 text-center space-y-2">
+              <button onclick="app.showForgotPassword()" class="text-purple-600 hover:underline text-sm">
+                비밀번호를 잊으셨나요?
+              </button>
+              <div class="text-gray-600 text-sm">
+                계정이 없으신가요? <button onclick="app.showRegister()" class="text-purple-600 hover:underline font-semibold">회원가입</button>
               </div>
-
-              <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-                로그인
+              <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>홈으로
               </button>
             </div>
-          </form>
-
-          <div class="mt-6 text-center space-y-2">
-            <button onclick="app.showForgotPassword()" class="text-purple-600 hover:underline text-sm">
-              비밀번호를 잊으셨나요?
-            </button>
-            <div class="text-gray-600 text-sm">
-              계정이 없으신가요? <button onclick="app.showRegister()" class="text-purple-600 hover:underline font-semibold">회원가입</button>
-            </div>
-            <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
-              <i class="fas fa-arrow-left mr-1"></i>홈으로
-            </button>
           </div>
         </div>
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -218,61 +221,64 @@ class MSpheres {
   showRegister(preselectedRole = null) {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-8">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">
-              <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
-            </h2>
-            <p class="text-gray-600 mt-2">회원가입</p>
-          </div>
+      <div class="min-h-screen flex flex-col">
+        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
+          <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
+              </h2>
+              <p class="text-gray-600 mt-2">회원가입</p>
+            </div>
 
-          <form id="registerForm" onsubmit="event.preventDefault(); app.handleRegister();">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-                <input type="email" id="registerEmail" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <form id="registerForm" onsubmit="event.preventDefault(); app.handleRegister();">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                  <input type="email" id="registerEmail" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
+                  <input type="text" id="registerNickname" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 (최소 8자)</label>
+                  <input type="password" id="registerPassword" required minlength="8"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">역할</label>
+                  <select id="registerRole" required ${preselectedRole ? 'disabled' : ''}
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    <option value="">선택하세요</option>
+                    <option value="advertiser" ${preselectedRole === 'advertiser' ? 'selected' : ''}>광고주</option>
+                    <option value="influencer" ${preselectedRole === 'influencer' ? 'selected' : ''}>인플루언서</option>
+                  </select>
+                  ${preselectedRole ? `<input type="hidden" id="registerRoleHidden" value="${preselectedRole}">` : ''}
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                  회원가입
+                </button>
               </div>
+            </form>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
-                <input type="text" id="registerNickname" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <div class="mt-6 text-center space-y-2">
+              <div class="text-gray-600 text-sm">
+                이미 계정이 있으신가요? <button onclick="app.showLogin()" class="text-purple-600 hover:underline font-semibold">로그인</button>
               </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 (최소 8자)</label>
-                <input type="password" id="registerPassword" required minlength="8"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">역할</label>
-                <select id="registerRole" required ${preselectedRole ? 'disabled' : ''}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-                  <option value="">선택하세요</option>
-                  <option value="advertiser" ${preselectedRole === 'advertiser' ? 'selected' : ''}>광고주</option>
-                  <option value="influencer" ${preselectedRole === 'influencer' ? 'selected' : ''}>인플루언서</option>
-                </select>
-                ${preselectedRole ? `<input type="hidden" id="registerRoleHidden" value="${preselectedRole}">` : ''}
-              </div>
-
-              <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-                회원가입
+              <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>홈으로
               </button>
             </div>
-          </form>
-
-          <div class="mt-6 text-center space-y-2">
-            <div class="text-gray-600 text-sm">
-              이미 계정이 있으신가요? <button onclick="app.showLogin()" class="text-purple-600 hover:underline font-semibold">로그인</button>
-            </div>
-            <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
-              <i class="fas fa-arrow-left mr-1"></i>홈으로
-            </button>
           </div>
         </div>
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -284,33 +290,36 @@ class MSpheres {
   showForgotPassword() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">비밀번호 찾기</h2>
-            <p class="text-gray-600 mt-2">이메일로 재설정 링크를 보내드립니다</p>
-          </div>
+      <div class="min-h-screen flex flex-col">
+        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
+          <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-bold text-gray-800">비밀번호 찾기</h2>
+              <p class="text-gray-600 mt-2">이메일로 재설정 링크를 보내드립니다</p>
+            </div>
 
-          <form id="forgotPasswordForm" onsubmit="event.preventDefault(); app.handleForgotPassword();">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-                <input type="email" id="forgotEmail" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <form id="forgotPasswordForm" onsubmit="event.preventDefault(); app.handleForgotPassword();">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                  <input type="email" id="forgotEmail" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                </div>
+
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                  재설정 링크 보내기
+                </button>
               </div>
+            </form>
 
-              <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-                재설정 링크 보내기
+            <div class="mt-6 text-center">
+              <button onclick="app.showLogin()" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>로그인으로 돌아가기
               </button>
             </div>
-          </form>
-
-          <div class="mt-6 text-center">
-            <button onclick="app.showLogin()" class="text-gray-500 hover:text-gray-700 text-sm">
-              <i class="fas fa-arrow-left mr-1"></i>로그인으로 돌아가기
-            </button>
           </div>
         </div>
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -336,36 +345,40 @@ class MSpheres {
   async showAdvertiserDashboard() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gray-50">
+      <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">
-              <i class="fas fa-bullhorn text-purple-600 mr-2"></i>광고주 대시보드
-            </h1>
-            <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
-          </div>
+        <div class="flex-grow">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>광고주 대시보드
+              </h1>
+              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+            </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <button onclick="app.showMyCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
-              <h3 class="font-semibold">내 캠페인</h3>
-            </button>
-            <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-plus-circle text-3xl mb-2"></i>
-              <h3 class="font-semibold">캠페인 등록</h3>
-            </button>
-            <button onclick="app.showAdvertiserProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
-              <h3 class="font-semibold">프로필 관리</h3>
-            </button>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <button onclick="app.showMyCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold">내 캠페인</h3>
+              </button>
+              <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-plus-circle text-3xl mb-2"></i>
+                <h3 class="font-semibold">캠페인 등록</h3>
+              </button>
+              <button onclick="app.showAdvertiserProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold">프로필 관리</h3>
+              </button>
+            </div>
 
-          <div id="advertiserContent" class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            <div id="advertiserContent" class="bg-white rounded-lg shadow p-6 mb-8">
+              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            </div>
           </div>
         </div>
+        
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -660,36 +673,40 @@ class MSpheres {
   async showInfluencerDashboard() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gray-50">
+      <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">
-              <i class="fas fa-star text-purple-600 mr-2"></i>인플루언서 대시보드
-            </h1>
-            <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
-          </div>
+        <div class="flex-grow">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-star text-purple-600 mr-2"></i>인플루언서 대시보드
+              </h1>
+              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+            </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <button onclick="app.showAvailableCampaigns()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-search text-3xl mb-2"></i>
-              <h3 class="font-semibold">캠페인 찾기</h3>
-            </button>
-            <button onclick="app.showMyApplications()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-clipboard-list text-purple-600 text-3xl mb-2"></i>
-              <h3 class="font-semibold">내 지원 내역</h3>
-            </button>
-            <button onclick="app.showInfluencerProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
-              <h3 class="font-semibold">프로필 관리</h3>
-            </button>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <button onclick="app.showAvailableCampaigns()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-search text-3xl mb-2"></i>
+                <h3 class="font-semibold">캠페인 찾기</h3>
+              </button>
+              <button onclick="app.showMyApplications()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-clipboard-list text-purple-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold">내 지원 내역</h3>
+              </button>
+              <button onclick="app.showInfluencerProfile()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-user text-purple-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold">프로필 관리</h3>
+              </button>
+            </div>
 
-          <div id="influencerContent" class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            <div id="influencerContent" class="bg-white rounded-lg shadow p-6 mb-8">
+              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            </div>
           </div>
         </div>
+        
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -921,32 +938,36 @@ class MSpheres {
   async showAdminDashboard() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen bg-gray-50">
+      <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">
-              <i class="fas fa-shield-alt text-purple-600 mr-2"></i>관리자 대시보드
-            </h1>
-            <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
-          </div>
+        <div class="flex-grow">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-shield-alt text-purple-600 mr-2"></i>관리자 대시보드
+              </h1>
+              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+            </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <button onclick="app.showAllCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
-              <h3 class="font-semibold">캠페인 관리</h3>
-            </button>
-            <button onclick="app.showSettlements()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-              <i class="fas fa-file-excel text-3xl mb-2"></i>
-              <h3 class="font-semibold">정산 내역</h3>
-            </button>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <button onclick="app.showAllCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold">캠페인 관리</h3>
+              </button>
+              <button onclick="app.showSettlements()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                <i class="fas fa-file-excel text-3xl mb-2"></i>
+                <h3 class="font-semibold">정산 내역</h3>
+              </button>
+            </div>
 
-          <div id="adminContent" class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            <div id="adminContent" class="bg-white rounded-lg shadow p-6 mb-8">
+              <p class="text-gray-600">위 메뉴를 선택해주세요</p>
+            </div>
           </div>
         </div>
+        
+        ${this.renderFooter()}
       </div>
     `;
   }
@@ -1127,6 +1148,48 @@ class MSpheres {
           </div>
         </div>
       </nav>
+    `;
+  }
+
+  renderFooter() {
+    return `
+      <footer class="bg-gray-800 text-gray-300 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+              <h3 class="text-white text-lg font-semibold mb-4">
+                <i class="fas fa-globe mr-2"></i>M-Spheres (엠스피어스)
+              </h3>
+              <p class="text-sm mb-2">인플루언서 마케팅의 새로운 기준</p>
+              <p class="text-sm">
+                <i class="fas fa-envelope mr-2"></i>
+                <a href="mailto:mobin_info@mobin-inc.com" class="hover:text-white">mobin_info@mobin-inc.com</a>
+              </p>
+              <p class="text-sm mt-2">
+                <i class="fas fa-question-circle mr-2"></i>
+                문의: <a href="mailto:checknreview@mobin-inc.com" class="hover:text-white">checknreview@mobin-inc.com</a>
+              </p>
+            </div>
+            
+            <div>
+              <h4 class="text-white text-md font-semibold mb-4">운영사 정보</h4>
+              <p class="text-sm mb-1"><strong>(주)모빈</strong></p>
+              <p class="text-sm mb-1">대표이사: 이규한</p>
+              <p class="text-sm mb-1">개인정보 관리책임자: 안중경</p>
+              <p class="text-sm mb-3">
+                <i class="fas fa-map-marker-alt mr-2"></i>
+                서울시 구로구 디지털로31길 12, 본관 2층 넥스트데이 2호<br>
+                <span class="ml-6">(구로동, 티피타워)</span>
+              </p>
+            </div>
+          </div>
+          
+          <div class="border-t border-gray-700 pt-8 text-center text-sm">
+            <p class="mb-2">© 2025 엠스피어스 (M-Spheres). All rights reserved.</p>
+            <p class="text-gray-400">Operated by <strong class="text-gray-300">(주)모빈</strong></p>
+          </div>
+        </div>
+      </footer>
     `;
   }
 
