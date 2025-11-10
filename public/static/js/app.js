@@ -947,7 +947,9 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">예상 가액 (원)</label>
-              <input type="number" id="campaignBudget" placeholder="제공 항목의 예상 가액을 입력해주세요"
+              <input type="text" id="campaignBudget" placeholder="제공 항목의 예상 가액을 입력해주세요"
+                oninput="app.formatNumberInput(this)"
+                onfocus="app.clearDefaultZero(this)"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               <p class="text-xs text-gray-500 mt-1">제품 또는 서비스 제공 시 해당 금액 입력</p>
             </div>
@@ -962,9 +964,14 @@ class ReviewSphere {
           
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">미션</label>
-              <textarea id="campaignMission" rows="3" placeholder="예: 제품 사용 후 SNS에 솔직한 후기 게시"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"></textarea>
+              <label class="block text-sm font-medium text-gray-700 mb-2">미션 (최대 10개)</label>
+              <div id="missionContainer" class="space-y-2">
+                <!-- 미션 입력 필드들이 여기에 동적으로 추가됩니다 -->
+              </div>
+              <button type="button" id="addMissionBtn" onclick="app.addMissionField()" 
+                class="mt-2 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                <i class="fas fa-plus-circle mr-1"></i>미션 추가
+              </button>
               <p class="text-xs text-gray-500 mt-1">인플루언서가 수행해야 할 미션을 명확히 작성해주세요</p>
             </div>
 
@@ -977,9 +984,15 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">키워드</label>
-              <input type="text" id="campaignKeywords" placeholder="예: #화장품, #뷰티, #리뷰 (쉼표로 구분)"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-              <p class="text-xs text-gray-500 mt-1">컨텐츠에 포함될 해시태그나 키워드를 입력해주세요</p>
+              <div id="keywordContainer" class="w-full min-h-[100px] px-4 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-purple-600 flex flex-wrap gap-2 items-start cursor-text"
+                onclick="document.getElementById('keywordInput').focus()">
+                <!-- 해시태그 버튼들이 여기에 추가됩니다 -->
+                <input type="text" id="keywordInput" placeholder="키워드 입력 후 엔터, 쉼표, 스페이스"
+                  onkeydown="app.handleKeywordInput(event)"
+                  class="flex-1 min-w-[200px] outline-none border-none">
+              </div>
+              <input type="hidden" id="campaignKeywords">
+              <p class="text-xs text-gray-500 mt-1">키워드 입력 후 엔터, 쉼표(,), 스페이스로 추가됩니다</p>
             </div>
 
             <div>
@@ -1008,8 +1021,9 @@ class ReviewSphere {
           <div class="grid grid-cols-2 gap-4 mb-3">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">인당 지급 포인트</label>
-              <input type="number" id="campaignPointReward" value="0" min="0" step="1000"
-                oninput="app.calculateCampaignCost()"
+              <input type="text" id="campaignPointReward" value="0" placeholder="0"
+                oninput="app.formatNumberInput(this); app.calculateCampaignCost()"
+                onfocus="app.clearDefaultZero(this)"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               <p class="text-xs text-gray-500 mt-1">1포인트 = 1원</p>
             </div>
@@ -1057,10 +1071,12 @@ class ReviewSphere {
       </form>
     `;
     
-    // Initialize cost calculation and date pickers
+    // Initialize cost calculation, date pickers, and mission fields
     setTimeout(() => {
       this.calculateCampaignCost();
       this.initializeDatePickers();
+      this.initializeMissionFields();
+      this.initializeKeywords();
     }, 0);
   }
 
@@ -1312,7 +1328,6 @@ class ReviewSphere {
 
   async handleCreateCampaign() {
     try {
-      const pointReward = parseInt(document.getElementById('campaignPointReward').value || 0);
       const channelType = document.getElementById('campaignChannelType').value;
       const slots = parseInt(document.getElementById('campaignSlots').value || 10);
       
@@ -1326,14 +1341,33 @@ class ReviewSphere {
         return;
       }
       
+      // 미션 수집
+      const missions = [];
+      const missionContainer = document.getElementById('missionContainer');
+      if (missionContainer) {
+        const missionInputs = missionContainer.querySelectorAll('input[id^="mission"]');
+        missionInputs.forEach(input => {
+          if (input.value.trim()) {
+            missions.push(input.value.trim());
+          }
+        });
+      }
+      
+      // 숫자 필드에서 콤마 제거하고 순수 숫자만 추출
+      const budgetInput = document.getElementById('campaignBudget');
+      const pointRewardInput = document.getElementById('campaignPointReward');
+      
+      const budget = this.getNumericValue(budgetInput);
+      const pointReward = this.getNumericValue(pointRewardInput);
+      
       const data = {
         title: document.getElementById('campaignTitle').value,
         description: document.getElementById('campaignDescription').value,
         product_name: document.getElementById('campaignProductName').value,
         product_url: document.getElementById('campaignProductUrl').value,
         requirements: document.getElementById('campaignRequirements').value,
-        budget: document.getElementById('campaignBudget').value || null,
-        slots: document.getElementById('campaignSlots').value || 10,
+        budget: budget || null,
+        slots: slots,
         point_reward: pointReward,
         
         // 썸네일 이미지
@@ -1355,27 +1389,30 @@ class ReviewSphere {
         
         // 캠페인 상세 정보
         provided_items: document.getElementById('campaignProvidedItems').value,
-        mission: document.getElementById('campaignMission').value,
+        mission: missions.join('\n'), // 미션 배열을 줄바꿈으로 연결
         keywords: document.getElementById('campaignKeywords').value,
         notes: document.getElementById('campaignNotes').value,
       };
 
-      // Validate point reward for campaigns requiring payment
+      // 결제 정보 표시 (결제는 승인 후)
       if (pointReward > 0) {
-        const slots = parseInt(data.slots);
         const totalPointCost = pointReward * slots;
         const platformFee = Math.floor(totalPointCost * 0.20);
         const subtotal = totalPointCost + platformFee;
         const vat = Math.floor(subtotal * 0.10);
         const totalCost = subtotal + vat;
         
-        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 ${totalPointCost.toLocaleString()}원 + 수수료 ${platformFee.toLocaleString()}원 + 부가세 ${vat.toLocaleString()}원)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
+        if (!confirm(`캠페인 등록 신청을 하시겠습니까?\n\n관리자 승인 후 결제가 필요합니다.\n예상 결제 금액: ${totalCost.toLocaleString()}원\n(포인트 ${totalPointCost.toLocaleString()}원 + 수수료 ${platformFee.toLocaleString()}원 + 부가세 ${vat.toLocaleString()}원)`)) {
+          return;
+        }
+      } else {
+        if (!confirm('캠페인 등록 신청을 하시겠습니까?\n\n관리자 승인 후 인플루언서들이 참여 신청을 할 수 있습니다.')) {
           return;
         }
       }
 
       const response = await axios.post('/api/campaigns', data, this.getAuthHeaders());
-      alert(response.data.message);
+      alert('캠페인 등록 신청이 완료되었습니다.\n관리자 승인 후 진행됩니다.');
       this.showMyCampaigns();
     } catch (error) {
       alert(error.response?.data?.error || '캠페인 등록에 실패했습니다');
@@ -1626,9 +1663,16 @@ class ReviewSphere {
                 <span>모집인원: ${c.slots}명</span>
               </div>
 
-              <button onclick="app.applyCampaign(${c.id})" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 text-sm">
-                <i class="fas fa-paper-plane mr-1"></i>지원하기
-              </button>
+              ${c.payment_status === 'paid' ? `
+                <button onclick="app.applyCampaign(${c.id})" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 text-sm">
+                  <i class="fas fa-paper-plane mr-1"></i>지원하기
+                </button>
+              ` : `
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm">
+                  <i class="fas fa-clock text-yellow-600 mr-1"></i>
+                  <span class="text-yellow-800">결제 대기 중 - 결제 완료 후 지원 가능합니다</span>
+                </div>
+              `}
             </div>
           `).join('')}
         </div>
@@ -2098,28 +2142,45 @@ class ReviewSphere {
 
               <p class="text-gray-600 mb-2">${c.description || ''}</p>
               
+              ${c.point_reward > 0 ? `
+                <div class="bg-blue-50 border border-blue-200 rounded p-2 mb-2 text-sm">
+                  <p><strong>포인트:</strong> ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)</p>
+                  <p><strong>결제 상태:</strong> 
+                    <span class="px-2 py-1 rounded text-xs ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                      ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
+                    </span>
+                  </p>
+                </div>
+              ` : ''}
+              
               <div class="flex space-x-2 mt-3">
                 ${c.status === 'pending' ? `
                   <button onclick="app.updateCampaignStatus(${c.id}, 'approved')" 
                     class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                    승인
+                    <i class="fas fa-check mr-1"></i>승인
+                  </button>
+                ` : ''}
+                ${c.status === 'approved' && c.point_reward > 0 && c.payment_status === 'unpaid' ? `
+                  <button onclick="app.markAsPaid(${c.id})" 
+                    class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                    <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
                   </button>
                 ` : ''}
                 ${c.status === 'approved' ? `
                   <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
                     class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-sm">
-                    일시중지
+                    <i class="fas fa-pause mr-1"></i>일시중지
                   </button>
                 ` : ''}
                 ${c.status === 'suspended' ? `
                   <button onclick="app.updateCampaignStatus(${c.id}, 'approved')" 
                     class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                    재개
+                    <i class="fas fa-play mr-1"></i>재개
                   </button>
                 ` : ''}
                 <button onclick="app.updateCampaignStatus(${c.id}, 'cancelled')" 
                   class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">
-                  취소
+                  <i class="fas fa-ban mr-1"></i>취소
                 </button>
               </div>
             </div>
@@ -2138,6 +2199,20 @@ class ReviewSphere {
       this.showAllCampaigns();
     } catch (error) {
       alert(error.response?.data?.error || '상태 변경에 실패했습니다');
+    }
+  }
+
+  async markAsPaid(campaignId) {
+    if (!confirm('이 캠페인의 결제를 완료 처리하시겠습니까?')) {
+      return;
+    }
+    
+    try {
+      await axios.put(`/api/admin/campaigns/${campaignId}/payment`, { payment_status: 'paid' }, this.getAuthHeaders());
+      alert('결제 완료 처리되었습니다. 이제 인플루언서들이 참여 신청을 할 수 있습니다.');
+      this.showAllCampaigns();
+    } catch (error) {
+      alert(error.response?.data?.error || '결제 처리에 실패했습니다');
     }
   }
 
@@ -2400,6 +2475,171 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+  }
+
+  // ============================================
+  // Campaign Form Helpers
+  // ============================================
+
+  initializeMissionFields() {
+    const container = document.getElementById('missionContainer');
+    if (!container) return;
+    
+    // 기본 5개 미션 필드 생성
+    for (let i = 1; i <= 5; i++) {
+      this.addMissionField();
+    }
+  }
+
+  addMissionField() {
+    const container = document.getElementById('missionContainer');
+    const currentCount = container.children.length;
+    
+    if (currentCount >= 10) {
+      alert('미션은 최대 10개까지 추가할 수 있습니다');
+      return;
+    }
+    
+    const missionIndex = currentCount + 1;
+    const missionDiv = document.createElement('div');
+    missionDiv.className = 'flex gap-2 items-start';
+    missionDiv.innerHTML = `
+      <span class="text-sm font-medium text-gray-600 mt-2 min-w-[50px]">No.${missionIndex}</span>
+      <input type="text" id="mission${missionIndex}" placeholder="미션 내용을 입력하세요"
+        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+      <button type="button" onclick="app.removeMissionField(this)" 
+        class="mt-2 text-red-600 hover:text-red-700">
+        <i class="fas fa-times-circle"></i>
+      </button>
+    `;
+    
+    container.appendChild(missionDiv);
+    
+    // 10개가 되면 추가 버튼 숨기기
+    if (currentCount + 1 >= 10) {
+      document.getElementById('addMissionBtn').style.display = 'none';
+    }
+  }
+
+  removeMissionField(button) {
+    const container = document.getElementById('missionContainer');
+    const missionDiv = button.parentElement;
+    
+    // 최소 1개는 유지
+    if (container.children.length <= 1) {
+      alert('최소 1개의 미션은 필요합니다');
+      return;
+    }
+    
+    container.removeChild(missionDiv);
+    
+    // 번호 재정렬
+    Array.from(container.children).forEach((child, index) => {
+      const span = child.querySelector('span');
+      if (span) span.textContent = `No.${index + 1}`;
+      const input = child.querySelector('input');
+      if (input) input.id = `mission${index + 1}`;
+    });
+    
+    // 추가 버튼 다시 표시
+    document.getElementById('addMissionBtn').style.display = 'inline-block';
+  }
+
+  initializeKeywords() {
+    // 키워드 배열
+    this.keywords = [];
+  }
+
+  handleKeywordInput(event) {
+    const input = event.target;
+    const key = event.key;
+    
+    // Enter, Comma, Space 키로 키워드 추가
+    if (key === 'Enter' || key === ',' || key === ' ') {
+      event.preventDefault();
+      this.addKeyword(input.value.trim());
+      input.value = '';
+    }
+    // Backspace로 마지막 키워드 삭제
+    else if (key === 'Backspace' && input.value === '' && this.keywords.length > 0) {
+      event.preventDefault();
+      this.removeKeyword(this.keywords.length - 1);
+    }
+  }
+
+  addKeyword(keyword) {
+    if (!keyword) return;
+    
+    // # 제거 (자동으로 추가할 것이므로)
+    keyword = keyword.replace(/^#/, '');
+    
+    // 이미 존재하는 키워드인지 확인
+    if (this.keywords.includes(keyword)) {
+      return;
+    }
+    
+    this.keywords.push(keyword);
+    this.renderKeywords();
+    this.updateKeywordsInput();
+  }
+
+  removeKeyword(index) {
+    this.keywords.splice(index, 1);
+    this.renderKeywords();
+    this.updateKeywordsInput();
+  }
+
+  renderKeywords() {
+    const container = document.getElementById('keywordContainer');
+    const input = document.getElementById('keywordInput');
+    
+    // 기존 키워드 버튼들 제거
+    const existingTags = container.querySelectorAll('.keyword-tag');
+    existingTags.forEach(tag => tag.remove());
+    
+    // 새로운 키워드 버튼들 추가
+    this.keywords.forEach((keyword, index) => {
+      const tag = document.createElement('span');
+      tag.className = 'keyword-tag inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm';
+      tag.innerHTML = `
+        #${keyword}
+        <button type="button" onclick="app.removeKeyword(${index})" class="hover:text-purple-900">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      `;
+      container.insertBefore(tag, input);
+    });
+  }
+
+  updateKeywordsInput() {
+    const hiddenInput = document.getElementById('campaignKeywords');
+    hiddenInput.value = this.keywords.map(k => `#${k}`).join(', ');
+  }
+
+  formatNumberInput(input) {
+    // 숫자만 추출
+    let value = input.value.replace(/[^\d]/g, '');
+    
+    // 빈 값이면 그대로 유지
+    if (value === '') {
+      input.value = '';
+      return;
+    }
+    
+    // 숫자를 천 단위 콤마로 포맷
+    input.value = parseInt(value).toLocaleString();
+  }
+
+  clearDefaultZero(input) {
+    // 포커스 시 0이면 비우기
+    if (input.value === '0' || input.value === '0원') {
+      input.value = '';
+    }
+  }
+
+  getNumericValue(input) {
+    // 콤마 제거하고 숫자만 반환
+    return parseInt(input.value.replace(/[^\d]/g, '') || '0');
   }
 
   // ============================================

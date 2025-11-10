@@ -55,6 +55,29 @@ admin.put('/campaigns/:id/status', async (c) => {
   }
 });
 
+// 캠페인 결제 상태 변경
+admin.put('/campaigns/:id/payment', async (c) => {
+  try {
+    const campaignId = c.req.param('id');
+    const { payment_status } = await c.req.json();
+    
+    if (!['unpaid', 'paid'].includes(payment_status)) {
+      return c.json({ error: '유효하지 않은 결제 상태입니다' }, 400);
+    }
+    
+    const { env } = c;
+    
+    await env.DB.prepare(
+      'UPDATE campaigns SET payment_status = ?, updated_at = ? WHERE id = ?'
+    ).bind(payment_status, getCurrentDateTime(), campaignId).run();
+    
+    return c.json({ success: true, message: '결제 상태가 변경되었습니다' });
+  } catch (error) {
+    console.error('Update payment status error:', error);
+    return c.json({ error: '결제 상태 변경 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 // 정산 내역 조회 및 엑셀 다운로드용 데이터
 admin.get('/settlements', async (c) => {
   try {
