@@ -1309,7 +1309,10 @@ class ReviewSphere {
 
   calculateCampaignCost() {
     const slots = parseInt(document.getElementById('campaignSlots')?.value || 10);
-    const pointPerPerson = parseInt(document.getElementById('campaignPointReward')?.value || 0);
+    const pointRewardInput = document.getElementById('campaignPointReward');
+    
+    // 콤마 제거하고 순수 숫자만 추출
+    const pointPerPerson = pointRewardInput ? this.getNumericValue(pointRewardInput) : 0;
     
     const totalPoints = slots * pointPerPerson;
     const totalPointCost = totalPoints;
@@ -1319,11 +1322,30 @@ class ReviewSphere {
     const totalCost = subtotal + vat;
     
     // Update display
-    document.getElementById('totalPoints').value = totalPoints.toLocaleString() + ' P';
-    document.getElementById('totalPointCost').textContent = totalPointCost.toLocaleString() + '원';
-    document.getElementById('platformFee').textContent = platformFee.toLocaleString() + '원';
-    document.getElementById('vat').textContent = vat.toLocaleString() + '원';
-    document.getElementById('totalCost').textContent = totalCost.toLocaleString() + '원';
+    const totalPointsField = document.getElementById('totalPoints');
+    if (totalPointsField) {
+      totalPointsField.value = totalPoints.toLocaleString() + ' P';
+    }
+    
+    const totalPointCostField = document.getElementById('totalPointCost');
+    if (totalPointCostField) {
+      totalPointCostField.textContent = totalPointCost.toLocaleString() + '원';
+    }
+    
+    const platformFeeField = document.getElementById('platformFee');
+    if (platformFeeField) {
+      platformFeeField.textContent = platformFee.toLocaleString() + '원';
+    }
+    
+    const vatField = document.getElementById('vat');
+    if (vatField) {
+      vatField.textContent = vat.toLocaleString() + '원';
+    }
+    
+    const totalCostField = document.getElementById('totalCost');
+    if (totalCostField) {
+      totalCostField.textContent = totalCost.toLocaleString() + '원';
+    }
   }
 
   async handleCreateCampaign() {
