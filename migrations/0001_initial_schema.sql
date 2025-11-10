@@ -1,4 +1,4 @@
--- M-Spheres Database Schema
+-- ReviewSphere Database Schema
 
 -- Users table (광고주, 인플루언서, 관리자)
 CREATE TABLE IF NOT EXISTS users (

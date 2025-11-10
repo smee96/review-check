@@ -1,6 +1,6 @@
-// M-Spheres Frontend Application
+// ReviewSphere Frontend Application
 
-class MSpheres {
+class ReviewSphere {
   constructor() {
     this.token = localStorage.getItem('token');
     this.user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -114,7 +114,7 @@ class MSpheres {
             <div class="flex justify-between items-center h-14 sm:h-16">
               <div class="flex items-center">
                 <h1 class="text-lg sm:text-2xl font-bold text-purple-600">
-                  <i class="fas fa-globe mr-1 sm:mr-2"></i>M-Spheres
+                  <i class="fas fa-globe mr-1 sm:mr-2"></i>ReviewSphere
                 </h1>
               </div>
               <div class="flex space-x-2 sm:space-x-4">
@@ -136,7 +136,7 @@ class MSpheres {
                 인플루언서 마케팅의<br class="sm:hidden"> 새로운 기준
               </h2>
               <p class="text-base sm:text-lg lg:text-xl mb-8 sm:mb-12 text-purple-100">
-                M-Spheres와 함께 성공적인 캠페인을 시작하세요
+                ReviewSphere와 함께 성공적인 캠페인을 시작하세요
               </p>
               
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mt-8 sm:mt-16">
@@ -175,7 +175,7 @@ class MSpheres {
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
               <h2 class="text-3xl font-bold text-gray-800">
-                <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
+                <i class="fas fa-globe text-purple-600 mr-2"></i>ReviewSphere
               </h2>
               <p class="text-gray-600 mt-2">로그인</p>
             </div>
@@ -226,7 +226,7 @@ class MSpheres {
           <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
               <h2 class="text-3xl font-bold text-gray-800">
-                <i class="fas fa-globe text-purple-600 mr-2"></i>M-Spheres
+                <i class="fas fa-globe text-purple-600 mr-2"></i>ReviewSphere
               </h2>
               <p class="text-gray-600 mt-2">회원가입</p>
             </div>
@@ -1143,7 +1143,7 @@ class MSpheres {
         <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div class="flex justify-between items-center h-14 sm:h-16">
             <h1 class="text-lg sm:text-2xl font-bold text-purple-600 cursor-pointer" onclick="app.showDashboard()">
-              <i class="fas fa-globe mr-1 sm:mr-2"></i><span class="hidden xs:inline">M-Spheres</span><span class="xs:hidden">M-S</span>
+              <i class="fas fa-globe mr-1 sm:mr-2"></i><span class="hidden xs:inline">ReviewSphere</span><span class="xs:hidden">RS</span>
             </h1>
             <div class="flex items-center space-x-2 sm:space-x-4">
               <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${this.user.nickname}</span>
@@ -1164,7 +1164,7 @@ class MSpheres {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <h3 class="text-white text-sm font-semibold mb-2">
-                <i class="fas fa-globe mr-1"></i>M-Spheres (엠스피어스)
+                <i class="fas fa-globe mr-1"></i>ReviewSphere (리뷰스피어)
               </h3>
               <p class="text-xs mb-1">인플루언서 마케팅의 새로운 기준</p>
               <p class="text-xs">
@@ -1181,7 +1181,7 @@ class MSpheres {
           </div>
           
           <div class="border-t border-gray-700 pt-3 text-center text-xs">
-            <p>© 2025 엠스피어스. All rights reserved. Operated by <strong>(주)모빈</strong></p>
+            <p>© 2025 리뷰스피어. All rights reserved. Operated by <strong>(주)모빈</strong></p>
           </div>
         </div>
       </footer>
@@ -1249,4 +1249,4 @@ class MSpheres {
 }
 
 // Initialize app
-const app = new MSpheres();
+const app = new ReviewSphere();

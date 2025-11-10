@@ -1,9 +1,9 @@
 module.exports = {
   apps: [
     {
-      name: 'm-spheres',
+      name: 'reviewsphere',
       script: 'npx',
-      args: 'wrangler pages dev dist --d1=m-spheres-production --local --ip 0.0.0.0 --port 3000',
+      args: 'wrangler pages dev dist --d1=reviewsphere-production --local --ip 0.0.0.0 --port 3000',
       env: {
         NODE_ENV: 'development',
         PORT: 3000

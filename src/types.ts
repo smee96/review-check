@@ -1,4 +1,4 @@
-// M-Spheres Type Definitions
+// ReviewSphere Type Definitions
 
 export type UserRole = 'advertiser' | 'influencer' | 'admin';
 

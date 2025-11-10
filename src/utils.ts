@@ -1,4 +1,4 @@
-// M-Spheres Utility Functions
+// ReviewSphere Utility Functions
 
 import type { JWTPayload } from './types';
 
@@ -18,7 +18,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 // JWT functions using Web Crypto API
-const JWT_SECRET = 'mspheres-secret-key-change-in-production'; // TODO: Use environment variable
+const JWT_SECRET = 'reviewsphere-secret-key-change-in-production'; // TODO: Use environment variable
 
 export async function signJWT(payload: JWTPayload): Promise<string> {
   const header = { alg: 'HS256', typ: 'JWT' };
