@@ -170,6 +170,14 @@ class ReviewSphere {
                     </div>
                     <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
                     <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                    ${c.point_reward > 0 ? `
+                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2">
+                        <div class="flex items-center justify-between text-xs text-purple-700">
+                          <span><i class="fas fa-coins mr-1"></i>스피어포인트</span>
+                          <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P/인</span>
+                        </div>
+                      </div>
+                    ` : ''}
                     <div class="flex items-center justify-between text-sm">
                       <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
                       <button class="text-purple-600 hover:text-purple-800 font-semibold">
@@ -209,6 +217,14 @@ class ReviewSphere {
                     </div>
                     <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
                     <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
+                    ${c.point_reward > 0 ? `
+                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2">
+                        <div class="flex items-center justify-between text-xs text-purple-700">
+                          <span><i class="fas fa-coins mr-1"></i>스피어포인트</span>
+                          <span class="font-bold text-purple-600">${c.point_reward.toLocaleString()} P/인</span>
+                        </div>
+                      </div>
+                    ` : ''}
                     <div class="flex items-center justify-between text-sm">
                       <span class="text-purple-600 font-semibold">${c.budget ? c.budget.toLocaleString() + '원' : '예산 미정'}</span>
                       <button class="text-purple-600 hover:text-purple-800 font-semibold">
@@ -498,6 +514,27 @@ class ReviewSphere {
                   ` : ''}
                 </div>
                 
+                ${campaign.point_reward > 0 ? `
+                  <div class="bg-purple-50 p-4 rounded-lg mb-6 border-2 border-purple-200">
+                    <h3 class="font-semibold text-purple-900 mb-3 flex items-center">
+                      <i class="fas fa-coins mr-2"></i>스피어포인트 보상
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <span class="text-sm text-purple-700">인당 지급</span>
+                        <p class="text-2xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
+                      </div>
+                      <div>
+                        <span class="text-sm text-purple-700">총 포인트</span>
+                        <p class="text-2xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
+                      </div>
+                    </div>
+                    <p class="text-xs text-purple-600 mt-3">
+                      <i class="fas fa-info-circle mr-1"></i>캠페인 완료 후 자동으로 지급됩니다 (1P = 1원)
+                    </p>
+                  </div>
+                ` : ''}
+                
                 ${campaign.requirements ? `
                   <div class="bg-blue-50 p-4 rounded-lg mb-6">
                     <h3 class="font-semibold text-blue-900 mb-2">
@@ -673,9 +710,14 @@ class ReviewSphere {
                 </span>
               </div>
               <p class="text-gray-600 mb-2">${c.description || ''}</p>
-              <div class="flex justify-between items-center text-sm text-gray-500">
+              <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
                 <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
                 <span>모집인원: ${c.slots}명</span>
+                ${c.point_reward > 0 ? `
+                  <span class="col-span-2 text-purple-600 font-semibold">
+                    <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
+                  </span>
+                ` : ''}
               </div>
               <div class="mt-4 flex space-x-2">
                 <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm">
@@ -737,12 +779,56 @@ class ReviewSphere {
             <label class="block text-sm font-medium text-gray-700 mb-2">예산 (원)</label>
             <input type="number" id="campaignBudget"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">제품 또는 서비스 제공 시 해당 금액 입력</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">모집인원</label>
-            <input type="number" id="campaignSlots" value="1" min="1"
+            <label class="block text-sm font-medium text-gray-700 mb-2">모집인원 *</label>
+            <input type="number" id="campaignSlots" value="1" min="1" required
+              oninput="app.calculateCampaignCost()"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
           </div>
+        </div>
+
+        <!-- Sphere Points Section -->
+        <div class="bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
+          <h3 class="font-bold text-purple-900 mb-3 flex items-center">
+            <i class="fas fa-coins mr-2"></i>스피어포인트 지급
+          </h3>
+          <div class="grid grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">인당 지급 포인트</label>
+              <input type="number" id="campaignPointReward" value="0" min="0" step="1000"
+                oninput="app.calculateCampaignCost()"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <p class="text-xs text-gray-500 mt-1">1포인트 = 1원</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">총 포인트</label>
+              <input type="text" id="totalPoints" readonly 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+            </div>
+          </div>
+          
+          <div class="bg-white p-3 rounded border border-purple-200">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">총 포인트 비용</span>
+              <span class="font-bold text-purple-900" id="totalPointCost">0원</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">플랫폼 수수료 (15%)</span>
+              <span class="font-bold text-orange-600" id="platformFee">0원</span>
+            </div>
+            <div class="border-t border-purple-200 pt-2 mt-2">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-800">결제 필요 금액</span>
+                <span class="font-bold text-2xl text-red-600" id="totalCost">0원</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600 mt-2">
+            <i class="fas fa-info-circle mr-1"></i>
+            포인트 지급이 있는 캠페인은 사전 결제가 필요합니다. 결제 완료 후 캠페인이 활성화됩니다.
+          </p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -765,10 +851,31 @@ class ReviewSphere {
         <p class="text-sm text-gray-600 text-center">* 관리자 승인 후 활성화됩니다</p>
       </form>
     `;
+    
+    // Initialize cost calculation
+    setTimeout(() => this.calculateCampaignCost(), 0);
+  }
+
+  calculateCampaignCost() {
+    const slots = parseInt(document.getElementById('campaignSlots')?.value || 1);
+    const pointPerPerson = parseInt(document.getElementById('campaignPointReward')?.value || 0);
+    
+    const totalPoints = slots * pointPerPerson;
+    const totalPointCost = totalPoints;
+    const platformFee = Math.floor(totalPointCost * 0.15);
+    const totalCost = totalPointCost + platformFee;
+    
+    // Update display
+    document.getElementById('totalPoints').value = totalPoints.toLocaleString() + ' P';
+    document.getElementById('totalPointCost').textContent = totalPointCost.toLocaleString() + '원';
+    document.getElementById('platformFee').textContent = platformFee.toLocaleString() + '원';
+    document.getElementById('totalCost').textContent = totalCost.toLocaleString() + '원';
   }
 
   async handleCreateCampaign() {
     try {
+      const pointReward = parseInt(document.getElementById('campaignPointReward').value || 0);
+      
       const data = {
         title: document.getElementById('campaignTitle').value,
         description: document.getElementById('campaignDescription').value,
@@ -779,7 +886,17 @@ class ReviewSphere {
         slots: document.getElementById('campaignSlots').value || 1,
         start_date: document.getElementById('campaignStartDate').value || null,
         end_date: document.getElementById('campaignEndDate').value || null,
+        point_reward: pointReward,
       };
+
+      // Validate point reward for campaigns requiring payment
+      if (pointReward > 0) {
+        const slots = parseInt(data.slots);
+        const totalCost = Math.floor((pointReward * slots) * 1.15);
+        if (!confirm(`총 ${totalCost.toLocaleString()}원(포인트 비용 + 수수료 15%)을 결제하셔야 합니다. 계속하시겠습니까?`)) {
+          return;
+        }
+      }
 
       const response = await axios.post('/api/campaigns', data, this.getAuthHeaders());
       alert(response.data.message);
