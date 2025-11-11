@@ -3553,37 +3553,75 @@ class ReviewSphere {
         ${this.renderNav()}
         
         <div class="flex-grow">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-8">
-              <h1 class="text-3xl font-bold text-gray-800">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-user-circle text-purple-600 mr-2"></i>마이페이지
               </h1>
-              <p class="text-gray-600 mt-2">${this.user.nickname}님 (관리자)</p>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 (관리자)</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <button onclick="app.showAllCampaigns()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-list text-purple-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold">캠페인 관리</h3>
-              </button>
-              <button onclick="app.showSettlements()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
-                <i class="fas fa-file-excel text-3xl mb-2"></i>
-                <h3 class="font-semibold">정산 내역</h3>
-              </button>
-              <button onclick="app.logout()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-2 border-red-200">
-                <i class="fas fa-sign-out-alt text-red-600 text-3xl mb-2"></i>
-                <h3 class="font-semibold text-red-600">로그아웃</h3>
-              </button>
-            </div>
+            <!-- 아코디언 메뉴 -->
+            <div class="space-y-3 mb-4 sm:mb-8">
+              <!-- 캠페인 관리 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAdminAccordion('campaignManagement')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-list text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">캠페인 관리</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">전체 캠페인 승인 및 관리</p>
+                      </div>
+                    </div>
+                    <i id="campaignManagement-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="campaignManagement-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
 
-            <div id="adminContent" class="bg-white rounded-lg shadow p-6 mb-8">
-              <p class="text-gray-600 text-center py-8">
-                <i class="fas fa-spinner fa-spin mr-2"></i>캠페인 목록을 확인하는 중...
-              </p>
+              <!-- 정산 내역 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAdminAccordion('settlements')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-file-excel text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">정산 내역</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">캠페인 정산 내역 조회</p>
+                      </div>
+                    </div>
+                    <i id="settlements-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="settlements-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 로그아웃 -->
+              <div class="bg-white rounded-lg shadow border-2 border-red-200">
+                <button onclick="app.logout()" class="w-full p-5 sm:p-6 text-left hover:bg-red-50 transition">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-sign-out-alt text-red-600 text-xl sm:text-2xl"></i>
+                    <div>
+                      <h3 class="font-semibold text-base sm:text-lg text-red-600">로그아웃</h3>
+                      <p class="text-xs sm:text-sm text-gray-600">계정에서 로그아웃</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
         
+        ${UIUtils.renderBottomNav(this.user, 'mypage')}
         ${this.renderFooter()}
       </div>
     `;
@@ -3596,29 +3634,157 @@ class ReviewSphere {
         const pendingCampaigns = campaigns.filter(c => c.status === 'pending');
         
         if (pendingCampaigns.length > 0) {
-          // 승인 대기 중인 캠페인이 있으면 자동으로 캠페인 관리 표시
-          this.showAllCampaigns();
-        } else {
-          // 승인 대기 중인 캠페인이 없으면 기본 메시지 표시
-          const content = document.getElementById('adminContent');
-          if (content) {
-            content.innerHTML = `
-              <div class="text-center py-12">
-                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
-                <p class="text-gray-600 text-lg">승인 대기 중인 캠페인이 없습니다</p>
-                <p class="text-gray-500 text-sm mt-2">위 메뉴에서 캠페인 관리 또는 정산 내역을 선택해주세요</p>
-              </div>
-            `;
-          }
+          // 승인 대기 중인 캠페인이 있으면 자동으로 캠페인 관리 열기
+          await this.toggleAdminAccordion('campaignManagement');
         }
       } catch (error) {
         console.error('Check pending campaigns error:', error);
-        const content = document.getElementById('adminContent');
-        if (content) {
-          content.innerHTML = '<p class="text-gray-600">위 메뉴를 선택해주세요</p>';
-        }
       }
     }, 100);
+  }
+
+  async toggleAdminAccordion(sectionId) {
+    const content = document.getElementById(`${sectionId}-content`);
+    const icon = document.getElementById(`${sectionId}-icon`);
+    const allSections = ['campaignManagement', 'settlements'];
+    
+    const isOpen = !content.classList.contains('hidden');
+    
+    // 모든 섹션 닫기
+    allSections.forEach(id => {
+      const c = document.getElementById(`${id}-content`);
+      const i = document.getElementById(`${id}-icon`);
+      if (c) c.classList.add('hidden');
+      if (i) i.classList.remove('rotate-180');
+    });
+    
+    // 현재 섹션이 닫혀있었으면 열기
+    if (!isOpen) {
+      content.classList.remove('hidden');
+      icon.classList.add('rotate-180');
+      await this.loadAdminAccordionContent(sectionId);
+    }
+  }
+
+  async loadAdminAccordionContent(sectionId) {
+    const content = document.getElementById(`${sectionId}-content`);
+    if (!content) return;
+
+    try {
+      switch (sectionId) {
+        case 'campaignManagement':
+          await this.loadCampaignManagementContent(content);
+          break;
+        case 'settlements':
+          await this.loadSettlementsContent(content);
+          break;
+      }
+    } catch (error) {
+      console.error('Failed to load accordion content:', error);
+      content.innerHTML = '<p class="text-red-600 p-4">콘텐츠를 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async loadCampaignManagementContent(container) {
+    try {
+      const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
+      const campaigns = response.data;
+
+      container.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">전체 캠페인 관리</h2>
+          <div class="space-y-3 sm:space-y-4">
+            ${campaigns.map(c => `
+              <div class="border rounded-lg p-3 sm:p-4">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                  <div class="flex-1">
+                    <h3 class="font-bold text-base sm:text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
+                      <i class="fas fa-edit mr-1"></i>${c.title}
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status)} whitespace-nowrap self-start">
+                    ${this.getStatusText(c.status)}
+                  </span>
+                </div>
+
+                <p class="text-sm sm:text-base text-gray-600 mb-2">${c.description || ''}</p>
+                
+                ${c.point_reward > 0 ? `
+                  <div class="bg-blue-50 border border-blue-200 rounded p-2 sm:p-3 mb-2 text-xs sm:text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <p class="text-gray-600">인당 포인트</p>
+                        <p class="font-semibold text-base sm:text-lg">${c.point_reward.toLocaleString()}P</p>
+                      </div>
+                      <div>
+                        <p class="text-gray-600">총 포인트</p>
+                        <p class="font-semibold text-base sm:text-lg">${(c.point_reward * c.slots).toLocaleString()}P</p>
+                      </div>
+                      <div>
+                        <p class="text-gray-600">플랫폼 수익 (20%)</p>
+                        <p class="font-semibold text-base sm:text-lg text-green-600">${Math.floor(c.point_reward * c.slots * 0.20).toLocaleString()}원</p>
+                      </div>
+                      <div>
+                        <p class="text-gray-600">결제 상태</p>
+                        <p>
+                          <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+                
+                <div class="flex flex-wrap gap-2 mt-3">
+                  ${c.status === 'pending' ? `
+                    <button onclick="app.updateCampaignStatus(${c.id}, 'approved')" 
+                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
+                      <i class="fas fa-check mr-1"></i>승인
+                    </button>
+                  ` : ''}
+                  ${c.status === 'approved' && c.point_reward > 0 && c.payment_status === 'unpaid' ? `
+                    <button onclick="app.markAsPaid(${c.id})" 
+                      class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs sm:text-sm">
+                      <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
+                    </button>
+                  ` : ''}
+                  ${c.status === 'approved' ? `
+                    <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
+                      class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-xs sm:text-sm">
+                      <i class="fas fa-pause mr-1"></i>일시중지
+                    </button>
+                  ` : ''}
+                  ${c.status === 'suspended' ? `
+                    <button onclick="app.updateCampaignStatus(${c.id}, 'approved')" 
+                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
+                      <i class="fas fa-play mr-1"></i>재개
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load campaign management:', error);
+      container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async loadSettlementsContent(container) {
+    container.innerHTML = `
+      <div class="p-4 sm:p-6">
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">정산 내역</h2>
+        <div class="text-center py-8 sm:py-12">
+          <i class="fas fa-file-excel text-4xl sm:text-6xl text-gray-300 mb-4"></i>
+          <p class="text-sm sm:text-base text-gray-600 mb-2">정산 내역 기능 준비 중입니다</p>
+          <p class="text-xs sm:text-sm text-gray-500">곧 만나보실 수 있습니다</p>
+        </div>
+      </div>
+    `;
   }
 
   async showAllCampaigns() {
