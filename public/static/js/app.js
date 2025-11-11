@@ -635,7 +635,12 @@ class ReviewSphere {
         </div>
       `;
     } catch (error) {
-      alert('캠페인 정보를 불러오는데 실패했습니다');
+      console.error('Campaign detail error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      
+      const errorMsg = error.response?.data?.error || error.message || '캠페인 정보를 불러오는데 실패했습니다';
+      alert(`캠페인 정보를 불러오는데 실패했습니다\n\n에러: ${errorMsg}`);
       this.showHome();
     }
   }

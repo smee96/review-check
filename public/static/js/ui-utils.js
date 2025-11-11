@@ -52,10 +52,19 @@ const UIUtils = {
               <img src="/static/logo.png" alt="R.SPHERE" class="h-12 sm:h-14">
             </div>
             <div class="flex items-center space-x-2 sm:space-x-4">
-              <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>
-              <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
-                <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
-              </button>
+              ${user ? `
+                <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>
+                <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
+                  <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
+                </button>
+              ` : `
+                <button onclick="app.showLogin()" class="bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm sm:text-base">
+                  <i class="fas fa-sign-in-alt sm:mr-1"></i><span class="hidden sm:inline">로그인</span>
+                </button>
+                <button onclick="app.showRegister()" class="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm sm:text-base">
+                  <i class="fas fa-user-plus sm:mr-1"></i><span class="hidden sm:inline">회원가입</span>
+                </button>
+              `}
             </div>
           </div>
         </div>
