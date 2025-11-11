@@ -9,8 +9,76 @@ class ReviewSphere {
   }
 
   init() {
+    // History API 이벤트 리스너 등록
+    window.addEventListener('popstate', (event) => {
+      if (event.state) {
+        this.handleHistoryState(event.state);
+      }
+    });
+
     // 로그인 여부와 관계없이 항상 홈 페이지로 시작
     this.showHome();
+  }
+
+  // 히스토리 상태 처리
+  async handleHistoryState(state) {
+    const { page, data } = state;
+    
+    switch (page) {
+      case 'home':
+        await this.showHome(false);
+        break;
+      case 'bestCampaigns':
+        await this.showBestCampaigns(false);
+        break;
+      case 'bestReviews':
+        await this.showBestReviews(false);
+        break;
+      case 'myPage':
+        await this.showMyPage(false);
+        break;
+      case 'campaignDetail':
+        await this.viewCampaignDetail(data.id, false);
+        break;
+      case 'login':
+        this.showLogin(false);
+        break;
+      case 'register':
+        this.showRegister(false);
+        break;
+      default:
+        await this.showHome(false);
+    }
+  }
+
+  // 히스토리에 상태 추가
+  pushHistory(page, data = {}) {
+    const state = { page, data };
+    const title = this.getPageTitle(page);
+    const url = `#${page}${data.id ? `/${data.id}` : ''}`;
+    
+    // 같은 페이지면 히스토리에 추가하지 않음
+    if (window.history.state && 
+        window.history.state.page === page && 
+        JSON.stringify(window.history.state.data) === JSON.stringify(data)) {
+      return;
+    }
+    
+    window.history.pushState(state, title, url);
+  }
+
+  // 페이지 제목 가져오기
+  getPageTitle(page) {
+    const titles = {
+      home: 'R.SPHERE - 홈',
+      bestCampaigns: 'R.SPHERE - 베스트 캠페인',
+      bestReviews: 'R.SPHERE - 베스트 리뷰',
+      myPage: 'R.SPHERE - 마이페이지',
+      campaignDetail: 'R.SPHERE - 캠페인 상세',
+      login: 'R.SPHERE - 로그인',
+      register: 'R.SPHERE - 회원가입'
+    };
+    return titles[page] || 'R.SPHERE';
   }
 
   // ============================================
@@ -108,7 +176,10 @@ class ReviewSphere {
   // Page Rendering Methods
   // ============================================
 
-  async showHome() {
+  async showHome(pushHistory = true) {
+    if (pushHistory) {
+      this.pushHistory('home');
+    }
     // 홈은 항상 메인 페이지(캠페인 목록)로 이동
     const app = document.getElementById('app');
     
@@ -532,7 +603,11 @@ class ReviewSphere {
     `;
   }
 
-  showLogin() {
+  showLogin(pushHistory = true) {
+    if (pushHistory) {
+      this.pushHistory('login');
+    }
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="min-h-screen flex flex-col">
@@ -581,7 +656,11 @@ class ReviewSphere {
     `;
   }
 
-  showRegister(preselectedRole = null) {
+  showRegister(preselectedRole = null, pushHistory = true) {
+    if (pushHistory) {
+      this.pushHistory('register');
+    }
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="min-h-screen flex flex-col">
@@ -690,7 +769,11 @@ class ReviewSphere {
     this.showRegister(role);
   }
 
-  async viewCampaignDetail(campaignId) {
+  async viewCampaignDetail(campaignId, pushHistory = true) {
+    if (pushHistory) {
+      this.pushHistory('campaignDetail', { id: campaignId });
+    }
+    
     // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 바로 로그인 페이지로 이동
     if (!this.token || !this.user) {
       // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
