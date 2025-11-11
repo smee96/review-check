@@ -51,27 +51,91 @@ const UIUtils = {
             <div class="cursor-pointer" onclick="app.showHome()">
               <img src="/static/logo.png" alt="R.SPHERE" class="h-12 sm:h-14">
             </div>
-            <div class="flex items-center space-x-2 sm:space-x-4">
-              ${user ? `
-                <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 text-sm sm:text-base font-medium">
-                  <i class="fas fa-user-circle sm:mr-1"></i><span class="hidden sm:inline">마이페이지</span>
-                </button>
-                <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>
+            
+            ${user ? `
+              <!-- 로그인 시: 검색창 + 사용자 정보 -->
+              <div class="flex items-center space-x-2 sm:space-x-4 flex-1 max-w-2xl mx-4">
+                <div class="relative flex-1 max-w-md ml-auto">
+                  <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="캠페인 검색..."
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                    onkeyup="if(event.key === 'Enter') app.searchCampaigns(this.value)"
+                  >
+                  <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate hidden sm:inline">${user.nickname}</span>
                 <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
                   <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
                 </button>
-              ` : `
+              </div>
+            ` : `
+              <!-- 비로그인 시: 기존 로그인 버튼 -->
+              <div class="flex items-center space-x-2 sm:space-x-4">
                 <button onclick="app.showLogin()" class="bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm sm:text-base">
                   <i class="fas fa-sign-in-alt sm:mr-1"></i><span class="hidden sm:inline">로그인</span>
                 </button>
                 <button onclick="app.showRegister()" class="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm sm:text-base">
                   <i class="fas fa-user-plus sm:mr-1"></i><span class="hidden sm:inline">회원가입</span>
                 </button>
-              `}
-            </div>
+              </div>
+            `}
           </div>
         </div>
       </nav>
+    `;
+  },
+
+  // Render bottom navigation (only for logged-in users)
+  renderBottomNav(user, currentPage = 'home') {
+    if (!user) return '';
+    
+    return `
+      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-bottom">
+        <div class="max-w-7xl mx-auto">
+          <div class="grid grid-cols-4 h-16">
+            <button 
+              onclick="app.showHome()" 
+              class="flex flex-col items-center justify-center space-y-1 transition ${
+                currentPage === 'home' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              }">
+              <i class="fas fa-home text-xl"></i>
+              <span class="text-xs">홈</span>
+            </button>
+            
+            <button 
+              onclick="app.showBestCampaigns()" 
+              class="flex flex-col items-center justify-center space-y-1 transition ${
+                currentPage === 'best' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              }">
+              <i class="fas fa-crown text-xl"></i>
+              <span class="text-xs">베스트캠페인</span>
+            </button>
+            
+            <button 
+              onclick="app.showBestReviews()" 
+              class="flex flex-col items-center justify-center space-y-1 transition ${
+                currentPage === 'reviews' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              }">
+              <i class="fas fa-star text-xl"></i>
+              <span class="text-xs">베스트리뷰</span>
+            </button>
+            
+            <button 
+              onclick="app.showMyPage()" 
+              class="flex flex-col items-center justify-center space-y-1 transition ${
+                currentPage === 'mypage' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+              }">
+              <i class="fas fa-user-circle text-xl"></i>
+              <span class="text-xs">마이페이지</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+      
+      <!-- Bottom navigation spacer -->
+      <div class="h-16"></div>
     `;
   },
 

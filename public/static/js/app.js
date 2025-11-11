@@ -328,6 +328,158 @@ class ReviewSphere {
           </div>
         </div>
 
+        ${UIUtils.renderBottomNav(this.user, 'home')}
+        ${this.renderFooter()}
+      </div>
+    `;
+  }
+
+  // 검색 기능
+  async searchCampaigns(keyword) {
+    if (!keyword || keyword.trim() === '') {
+      this.showHome();
+      return;
+    }
+    
+    try {
+      const response = await axios.get('/api/campaigns', this.getAuthHeaders());
+      const campaigns = response.data.filter(c => 
+        c.title.toLowerCase().includes(keyword.toLowerCase()) ||
+        (c.description && c.description.toLowerCase().includes(keyword.toLowerCase()))
+      );
+      
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6">
+              <h2 class="text-2xl font-bold mb-4">검색 결과: "${keyword}"</h2>
+              <p class="text-gray-600 mb-6">${campaigns.length}개의 캠페인을 찾았습니다</p>
+              
+              ${campaigns.length === 0 ? `
+                <div class="text-center py-12">
+                  <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                  <p class="text-gray-600">검색 결과가 없습니다</p>
+                </div>
+              ` : `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  ${campaigns.map(c => `
+                    <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer">
+                      ${c.thumbnail_image ? `
+                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-48 object-cover">
+                      ` : `
+                        <div class="w-full h-48 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                          <i class="fas fa-image text-white text-6xl opacity-50"></i>
+                        </div>
+                      `}
+                      <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2 line-clamp-1">${c.title}</h3>
+                        <p class="text-gray-600 text-sm line-clamp-2">${c.description || ''}</p>
+                        ${c.point_reward > 0 ? `
+                          <div class="mt-3 bg-purple-50 px-3 py-2 rounded-lg">
+                            <span class="text-purple-700 font-bold">${c.point_reward.toLocaleString()} P</span>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'home')}
+          ${this.renderFooter()}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('검색 중 오류가 발생했습니다');
+    }
+  }
+
+  // 베스트 캠페인
+  async showBestCampaigns() {
+    try {
+      const response = await axios.get('/api/campaigns?type=best', this.getAuthHeaders());
+      const campaigns = response.data;
+      
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6">
+              <h2 class="text-2xl font-bold mb-2">
+                <i class="fas fa-crown text-yellow-500 mr-2"></i>베스트 캠페인
+              </h2>
+              <p class="text-gray-600 mb-6">지원자가 많은 인기 캠페인을 확인하세요</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${campaigns.map((c, idx) => `
+                  <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer relative">
+                    <div class="absolute top-2 left-2 z-10">
+                      <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold shadow">
+                        <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
+                      </span>
+                    </div>
+                    ${c.thumbnail_image ? `
+                      <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-48 object-cover">
+                    ` : `
+                      <div class="w-full h-48 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                        <i class="fas fa-trophy text-white text-6xl opacity-50"></i>
+                      </div>
+                    `}
+                    <div class="p-4">
+                      <h3 class="font-bold text-lg mb-2 line-clamp-1">${c.title}</h3>
+                      <p class="text-gray-600 text-sm line-clamp-2">${c.description || ''}</p>
+                      ${c.point_reward > 0 ? `
+                        <div class="mt-3 bg-purple-50 px-3 py-2 rounded-lg">
+                          <span class="text-purple-700 font-bold">${c.point_reward.toLocaleString()} P</span>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'best')}
+          ${this.renderFooter()}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load best campaigns:', error);
+    }
+  }
+
+  // 베스트 리뷰
+  async showBestReviews() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6">
+            <h2 class="text-2xl font-bold mb-2">
+              <i class="fas fa-star text-yellow-500 mr-2"></i>베스트 리뷰
+            </h2>
+            <p class="text-gray-600 mb-6">우수한 컨텐츠를 확인하세요</p>
+            
+            <div class="text-center py-12">
+              <i class="fas fa-star text-6xl text-gray-300 mb-4"></i>
+              <p class="text-gray-600 mb-2">베스트 리뷰 기능 준비 중입니다</p>
+              <p class="text-sm text-gray-500">곧 만나보실 수 있습니다</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'reviews')}
         ${this.renderFooter()}
       </div>
     `;
@@ -2332,15 +2484,20 @@ class ReviewSphere {
             </div>
 
             <div class="grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-8">
-              <button onclick="app.showAvailableCampaigns()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-search text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">캠페인 찾기</h3>
-                <p class="text-xs sm:text-sm opacity-90 mt-1">진행 중인 캠페인 보기</p>
+              <button onclick="app.showMyCampaigns()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-bullhorn text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">나의 캠페인</h3>
+                <p class="text-xs sm:text-sm opacity-90 mt-1">지원 내역 및 진행 현황</p>
               </button>
-              <button onclick="app.showMyApplications()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-clipboard-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">내 지원 내역</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">지원 상태 확인</p>
+              <button onclick="app.showFavoriteCampaigns()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-heart text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">관심 캠페인</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">찜한 캠페인 모아보기</p>
+              </button>
+              <button onclick="app.showMyContents()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
+                <i class="fas fa-pen-to-square text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg">나의 컨텐츠</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">등록한 리뷰 관리</p>
               </button>
               <button onclick="app.showInfluencerProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
                 <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
@@ -2355,9 +2512,71 @@ class ReviewSphere {
           </div>
         </div>
         
+        ${UIUtils.renderBottomNav(this.user, 'mypage')}
         ${this.renderFooter()}
       </div>
     `;
+  }
+
+  // 나의 캠페인 (지원 내역 통합)
+  async showMyCampaigns() {
+    this.showMyApplications();
+  }
+
+  // 관심 캠페인 (TODO: 구현 예정)
+  async showFavoriteCampaigns() {
+    const content = document.getElementById('influencerContent');
+    if (content) {
+      content.innerHTML = `
+        <h2 class="text-2xl font-bold mb-6">관심 캠페인</h2>
+        <div class="text-center py-12">
+          <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+          <p class="text-gray-600 mb-2">아직 관심 캠페인이 없습니다</p>
+          <p class="text-sm text-gray-500">캠페인 상세 페이지에서 ♥ 버튼을 눌러 저장하세요</p>
+        </div>
+      `;
+    }
+  }
+
+  // 나의 컨텐츠 (등록한 리뷰)
+  async showMyContents() {
+    try {
+      const response = await axios.get('/api/applications/my', this.getAuthHeaders());
+      const applications = response.data.filter(app => app.status === 'approved');
+      
+      const content = document.getElementById('influencerContent');
+      if (content) {
+        content.innerHTML = `
+          <h2 class="text-2xl font-bold mb-6">나의 컨텐츠</h2>
+          ${applications.length === 0 ? `
+            <div class="text-center py-12">
+              <i class="fas fa-pen-to-square text-6xl text-gray-300 mb-4"></i>
+              <p class="text-gray-600">등록된 컨텐츠가 없습니다</p>
+            </div>
+          ` : `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${applications.map(app => `
+                <div class="border rounded-lg p-4 hover:shadow-lg transition">
+                  <h3 class="font-bold text-lg mb-2">${app.campaign_title}</h3>
+                  ${app.review_url ? `
+                    <a href="${app.review_url}" target="_blank" class="text-purple-600 hover:text-purple-800 text-sm">
+                      <i class="fas fa-external-link-alt mr-1"></i>컨텐츠 보기
+                    </a>
+                  ` : `
+                    <p class="text-sm text-gray-500">아직 컨텐츠를 등록하지 않았습니다</p>
+                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="mt-2 text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      <i class="fas fa-plus mr-1"></i>컨텐츠 등록하기
+                    </button>
+                  `}
+                </div>
+              `).join('')}
+            </div>
+          `}
+        `;
+      }
+    } catch (error) {
+      console.error('Failed to load contents:', error);
+    }
   }
 
   async showAvailableCampaigns() {
