@@ -583,7 +583,14 @@ class ReviewSphere {
                         <i class="fas fa-bullseye mr-2"></i>미션
                       </h2>
                       <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
-                        <p class="text-orange-900 whitespace-pre-wrap">${campaign.mission}</p>
+                        <div class="text-orange-900 space-y-2">
+                          ${campaign.mission.split('\n').filter(line => line.trim()).map((line, index) => `
+                            <div class="flex">
+                              <span class="font-bold mr-2 flex-shrink-0">${index + 1}.</span>
+                              <span>${line.trim()}</span>
+                            </div>
+                          `).join('')}
+                        </div>
                       </div>
                     </div>
                   ` : ''}
@@ -641,7 +648,7 @@ class ReviewSphere {
                   ` : ''}
                   
                   <!-- 기본 정보 그리드 -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                  <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
                     ${campaign.product_name ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
                         <span class="text-sm text-gray-500">제품명</span>
