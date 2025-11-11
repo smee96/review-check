@@ -334,6 +334,50 @@ class ReviewSphere {
     `;
   }
 
+  // 검색창 토글
+  toggleSearch() {
+    const searchBox = document.getElementById('searchBox');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchBox) {
+      if (searchBox.classList.contains('hidden')) {
+        searchBox.classList.remove('hidden');
+        setTimeout(() => searchInput?.focus(), 100);
+      } else {
+        searchBox.classList.add('hidden');
+        if (searchInput) searchInput.value = '';
+      }
+    }
+  }
+
+  // 좋아요 체크
+  isFavorite(campaignId) {
+    const favorites = JSON.parse(localStorage.getItem('favoriteCampaigns') || '[]');
+    return favorites.includes(campaignId);
+  }
+
+  // 좋아요 토글
+  toggleFavorite(campaignId) {
+    let favorites = JSON.parse(localStorage.getItem('favoriteCampaigns') || '[]');
+    const btn = document.getElementById(`favoriteBtn-${campaignId}`);
+    
+    if (favorites.includes(campaignId)) {
+      // 좋아요 제거
+      favorites = favorites.filter(id => id !== campaignId);
+      if (btn) {
+        btn.innerHTML = '<i class="far fa-heart text-gray-400"></i>';
+      }
+    } else {
+      // 좋아요 추가
+      favorites.push(campaignId);
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-heart text-red-500"></i>';
+      }
+    }
+    
+    localStorage.setItem('favoriteCampaigns', JSON.stringify(favorites));
+  }
+
   // 검색 기능
   async searchCampaigns(keyword) {
     if (!keyword || keyword.trim() === '') {
@@ -690,8 +734,20 @@ class ReviewSphere {
                     </span>
                   </div>
                   
-                  <!-- 제목 -->
-                  <h1 class="text-3xl font-bold text-gray-800 mb-6">${campaign.title}</h1>
+                  <!-- 제목과 좋아요 버튼 -->
+                  <div class="flex items-start justify-between mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 flex-1">${campaign.title}</h1>
+                    <button 
+                      onclick="app.toggleFavorite(${campaign.id})" 
+                      class="ml-4 text-3xl transition-transform hover:scale-110 flex-shrink-0"
+                      id="favoriteBtn-${campaign.id}"
+                    >
+                      ${this.isFavorite(campaign.id) ? 
+                        '<i class="fas fa-heart text-red-500"></i>' : 
+                        '<i class="far fa-heart text-gray-400"></i>'
+                      }
+                    </button>
+                  </div>
                   
                   <!-- 채널 타입 -->
                   ${campaign.channel_type ? `
@@ -2525,16 +2581,71 @@ class ReviewSphere {
 
   // 관심 캠페인 (TODO: 구현 예정)
   async showFavoriteCampaigns() {
-    const content = document.getElementById('influencerContent');
-    if (content) {
+    try {
+      const favorites = JSON.parse(localStorage.getItem('favoriteCampaigns') || '[]');
+      const content = document.getElementById('influencerContent');
+      
+      if (!content) return;
+      
+      if (favorites.length === 0) {
+        content.innerHTML = `
+          <h2 class="text-2xl font-bold mb-6">관심 캠페인</h2>
+          <div class="text-center py-12">
+            <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600 mb-2">아직 관심 캠페인이 없습니다</p>
+            <p class="text-sm text-gray-500">캠페인 상세 페이지에서 ♥ 버튼을 눌러 저장하세요</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // 전체 캠페인 목록에서 좋아요한 캠페인만 필터링
+      const response = await axios.get('/api/campaigns', this.getAuthHeaders());
+      const allCampaigns = response.data;
+      const favoriteCampaigns = allCampaigns.filter(c => favorites.includes(c.id));
+      
       content.innerHTML = `
-        <h2 class="text-2xl font-bold mb-6">관심 캠페인</h2>
-        <div class="text-center py-12">
-          <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
-          <p class="text-gray-600 mb-2">아직 관심 캠페인이 없습니다</p>
-          <p class="text-sm text-gray-500">캠페인 상세 페이지에서 ♥ 버튼을 눌러 저장하세요</p>
-        </div>
+        <h2 class="text-2xl font-bold mb-6">관심 캠페인 (${favoriteCampaigns.length})</h2>
+        ${favoriteCampaigns.length === 0 ? `
+          <div class="text-center py-12">
+            <i class="fas fa-heart-broken text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600">저장한 캠페인이 더 이상 없습니다</p>
+          </div>
+        ` : `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${favoriteCampaigns.map(c => `
+              <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
+                ${c.thumbnail_image ? `
+                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-48 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                ` : `
+                  <div class="w-full h-48 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                    <i class="fas fa-image text-white text-6xl opacity-50"></i>
+                  </div>
+                `}
+                <div class="p-4">
+                  <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-lg cursor-pointer hover:text-purple-600" onclick="app.viewCampaignDetail(${c.id})">${c.title}</h3>
+                    <button onclick="app.toggleFavorite(${c.id}); app.showFavoriteCampaigns();" class="ml-2 text-xl text-red-500 hover:scale-110 transition-transform">
+                      <i class="fas fa-heart"></i>
+                    </button>
+                  </div>
+                  <p class="text-gray-600 text-sm line-clamp-2 mb-3">${c.description || ''}</p>
+                  ${c.point_reward > 0 ? `
+                    <div class="bg-purple-50 px-3 py-2 rounded-lg">
+                      <span class="text-purple-700 font-bold">${c.point_reward.toLocaleString()} P</span>
+                    </div>
+                  ` : ''}
+                  <button onclick="app.viewCampaignDetail(${c.id})" class="mt-3 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
+                    자세히 보기
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `}
       `;
+    } catch (error) {
+      console.error('Failed to load favorite campaigns:', error);
     }
   }
 
