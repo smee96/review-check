@@ -3041,22 +3041,12 @@ class ReviewSphere {
       const response = await axios.get('/api/campaigns', this.getAuthHeaders());
       const campaigns = response.data;
 
-      // 지원자 수 가져오기
-      const campaignsWithCounts = await Promise.all(campaigns.map(async (c) => {
-        try {
-          const appResponse = await axios.get(`/api/campaigns/${c.id}/applications`, this.getAuthHeaders());
-          return { ...c, applicationCount: appResponse.data.length };
-        } catch (error) {
-          return { ...c, applicationCount: 0 };
-        }
-      }));
-
       const content = document.getElementById('influencerContent');
       content.innerHTML = `
         <h2 class="text-2xl font-bold mb-6">진행 중인 캠페인</h2>
-        ${campaignsWithCounts.length === 0 ? '<p class="text-gray-600">현재 진행 중인 캠페인이 없습니다</p>' : ''}
+        ${campaigns.length === 0 ? '<p class="text-gray-600">현재 진행 중인 캠페인이 없습니다</p>' : ''}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${campaignsWithCounts.map(c => {
+          ${campaigns.map(c => {
             const channelIcon = c.channel_type === 'instagram' ? '📸' : 
                                c.channel_type === 'blog' ? '📝' : 
                                c.channel_type === 'youtube' ? '🎥' : '📱';
@@ -3103,7 +3093,7 @@ class ReviewSphere {
                   </div>
                   <div class="text-sm text-gray-600">
                     <i class="fas fa-users mr-1"></i>
-                    <span class="font-semibold text-purple-600">${c.applicationCount}</span>/${c.slots}
+                    모집 ${c.slots}명
                   </div>
                 </div>
                 
@@ -3243,8 +3233,8 @@ class ReviewSphere {
       };
 
       await axios.post(`/api/campaigns/${campaignId}/apply`, data, this.getAuthHeaders());
-      alert('캠페인에 지원되었습니다!');
-      this.showAvailableCampaigns();
+      // 저장 후 홈으로 자연스럽게 이동
+      this.showHome();
     } catch (error) {
       alert(error.response?.data?.error || '지원에 실패했습니다');
     }
