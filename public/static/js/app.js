@@ -122,7 +122,18 @@ class ReviewSphere {
         this.showHome();
       }
     } catch (error) {
-      alert(error.response?.data?.error || '로그인에 실패했습니다');
+      // 에러 메시지를 화면에 표시
+      const errorDiv = document.getElementById('loginError');
+      const errorMessage = document.getElementById('loginErrorMessage');
+      if (errorDiv && errorMessage) {
+        errorMessage.textContent = error.response?.data?.error || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
+        errorDiv.classList.remove('hidden');
+        
+        // 3초 후 에러 메시지 자동 숨김
+        setTimeout(() => {
+          errorDiv.classList.add('hidden');
+        }, 5000);
+      }
     }
   }
 
@@ -616,6 +627,14 @@ class ReviewSphere {
             <div class="text-center mb-8">
               <img src="/static/logo.png" alt="R.SPHERE" class="h-24 sm:h-28 mx-auto mb-4">
               <p class="text-gray-600 text-lg font-semibold">로그인</p>
+            </div>
+
+            <!-- 로그인 에러 메시지 -->
+            <div id="loginError" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-red-600 text-sm flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span id="loginErrorMessage"></span>
+              </p>
             </div>
 
             <form id="loginForm" onsubmit="event.preventDefault(); app.handleLogin();">
@@ -1169,7 +1188,11 @@ class ReviewSphere {
   }
 
   // 마이페이지 (기존 대시보드)
-  showMyPage() {
+  showMyPage(pushHistory = true) {
+    if (pushHistory) {
+      this.pushHistory('myPage');
+    }
+    
     switch (this.user.role) {
       case 'advertiser':
       case 'agency':
@@ -1242,6 +1265,7 @@ class ReviewSphere {
           </div>
         </div>
         
+        ${UIUtils.renderBottomNav(this.user, 'mypage')}
         ${this.renderFooter()}
       </div>
     `;
