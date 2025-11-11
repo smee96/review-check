@@ -3137,11 +3137,17 @@ class ReviewSphere {
       console.error('Failed to load profile:', error);
     }
 
-    const content = document.getElementById('influencerContent');
-    content.innerHTML = `
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow">
+          <div class="max-w-3xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">`;
       <div class="mb-4">
-        <button onclick="app.showAvailableCampaigns()" class="text-gray-600 hover:text-gray-800">
-          <i class="fas fa-arrow-left mr-2"></i>캠페인 목록으로
+        <button onclick="app.viewCampaignDetail(${campaignId})" class="text-gray-600 hover:text-gray-800">
+          <i class="fas fa-arrow-left mr-2"></i>캠페인으로 돌아가기
         </button>
       </div>
       
@@ -3215,6 +3221,13 @@ class ReviewSphere {
           지원하기
         </button>
       </form>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'home')}
+        ${this.renderFooter()}
+      </div>
     `;
   }
 
