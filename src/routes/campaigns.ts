@@ -2,7 +2,7 @@
 
 import { Hono } from 'hono';
 import type { Campaign } from '../types';
-import { getCurrentDateTime } from '../utils';
+import { getCurrentDateTime, verifyJWT } from '../utils';
 import { authMiddleware, requireRole } from '../middleware/auth';
 
 type Bindings = {
@@ -148,7 +148,7 @@ campaigns.get('/:id', async (c) => {
     if (authHeader?.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
-        const payload = await c.env.jwtVerify(token);
+        const payload = await verifyJWT(token);
         user = payload;
       } catch (err) {
         // 토큰이 유효하지 않아도 공개 조회는 가능
