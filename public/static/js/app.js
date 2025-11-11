@@ -505,11 +505,18 @@ class ReviewSphere {
   }
 
   async viewCampaignDetail(campaignId) {
-    // 로그인 없이도 캠페인 상세 조회 가능
+    // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 로그인 페이지로 이동
+    if (!this.token || !this.user) {
+      // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
+      localStorage.setItem('returnUrl', `campaign:${campaignId}`);
+      if (confirm('캠페인 상세 정보를 보려면 로그인이 필요합니다. 로그인 하시겠습니까?')) {
+        this.showLogin();
+      }
+      return;
+    }
+    
     try {
-      // 로그인한 경우 헤더 포함, 아니면 헤더 없이 요청
-      const config = this.token ? this.getAuthHeaders() : {};
-      const response = await axios.get(`/api/campaigns/${campaignId}`, config);
+      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
       const campaign = response.data;
       
       const app = document.getElementById('app');

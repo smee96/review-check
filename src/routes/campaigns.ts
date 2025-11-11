@@ -135,26 +135,12 @@ campaigns.get('/', async (c) => {
   }
 });
 
-// 캠페인 상세 조회 (공개 - 로그인 불필요)
-campaigns.get('/:id', async (c) => {
+// 캠페인 상세 조회 (로그인 필요)
+campaigns.get('/:id', authMiddleware, async (c) => {
   try {
     const campaignId = c.req.param('id');
     const { env } = c;
-    
-    // 인증 헤더가 있으면 사용자 정보 추출 (옵셔널)
-    const authHeader = c.req.header('Authorization');
-    let user = null;
-    
-    if (authHeader?.startsWith('Bearer ')) {
-      try {
-        const token = authHeader.substring(7);
-        const payload = await verifyJWT(token);
-        user = payload;
-      } catch (err) {
-        // 토큰이 유효하지 않아도 공개 조회는 가능
-        console.log('Invalid token, but allowing public access');
-      }
-    }
+    const user = c.get('user');
     
     const campaign = await env.DB.prepare(
       'SELECT * FROM campaigns WHERE id = ?'
