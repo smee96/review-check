@@ -3144,8 +3144,8 @@ class ReviewSphere {
         
         <div class="flex-grow">
           <div class="max-w-3xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">`;
-      <div class="mb-4">
+            <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+              <div class="mb-4">
         <button onclick="app.viewCampaignDetail(${campaignId})" class="text-gray-600 hover:text-gray-800">
           <i class="fas fa-arrow-left mr-2"></i>캠페인으로 돌아가기
         </button>
