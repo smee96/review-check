@@ -1237,24 +1237,16 @@ class ReviewSphere {
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
               <!-- 캠페인 등록 -->
-              <div class="bg-white rounded-lg shadow">
-                <button onclick="app.toggleAdvertiserAccordion('createCampaign')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <i class="fas fa-plus-circle text-purple-600 text-xl sm:text-2xl"></i>
-                      <div>
-                        <h3 class="font-semibold text-base sm:text-lg">캠페인 등록</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">새 캠페인 만들기</p>
-                      </div>
+              <div class="bg-purple-600 text-white rounded-lg shadow-lg">
+                <button onclick="app.showCreateCampaign()" class="w-full p-5 sm:p-6 text-left hover:bg-purple-700 transition">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-plus-circle text-2xl sm:text-3xl"></i>
+                    <div>
+                      <h3 class="font-semibold text-base sm:text-lg">캠페인 등록</h3>
+                      <p class="text-xs sm:text-sm opacity-90">새 캠페인 만들기</p>
                     </div>
-                    <i id="createCampaign-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
                   </div>
                 </button>
-                <div id="createCampaign-content" class="hidden border-t">
-                  <div class="p-4 sm:p-6">
-                    <p class="text-gray-600">로딩 중...</p>
-                  </div>
-                </div>
               </div>
 
               <!-- 내 캠페인 목록 -->
@@ -1329,7 +1321,7 @@ class ReviewSphere {
   async toggleAdvertiserAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['createCampaign', 'myCampaigns', 'profile'];
+    const allSections = ['myCampaigns', 'profile'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -1355,11 +1347,8 @@ class ReviewSphere {
 
     try {
       switch (sectionId) {
-        case 'createCampaign':
-          await this.loadCreateCampaignContent(content);
-          break;
         case 'myCampaigns':
-          await this.loadMyCampaignsContent(content);
+          await this.loadAdvertiserCampaignsContent(content);
           break;
         case 'profile':
           await this.loadAdvertiserProfileContent(content);
@@ -1371,12 +1360,7 @@ class ReviewSphere {
     }
   }
 
-  async loadCreateCampaignContent(container) {
-    // 캠페인 등록 폼을 전체 페이지로 표시
-    this.showCreateCampaign();
-  }
-
-  async loadMyCampaignsContent(container) {
+  async loadAdvertiserCampaignsContent(container) {
     try {
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
