@@ -1260,8 +1260,8 @@ class ReviewSphere {
           
           <div class="flex-grow">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>뒤로가기
+              <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>마이페이지로
               </button>
               
               <div id="campaignFormContainer"></div>
@@ -3174,8 +3174,8 @@ class ReviewSphere {
           <div class="max-w-3xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
             <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
               <div class="mb-4">
-        <button onclick="app.viewCampaignDetail(${campaignId})" class="text-gray-600 hover:text-gray-800">
-          <i class="fas fa-arrow-left mr-2"></i>캠페인으로 돌아가기
+        <button onclick="app.goBack()" class="text-gray-600 hover:text-gray-800">
+          <i class="fas fa-arrow-left mr-2"></i>뒤로가기
         </button>
       </div>
       
