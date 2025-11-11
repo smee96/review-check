@@ -109,20 +109,7 @@ class ReviewSphere {
   // ============================================
 
   async showHome() {
-    // 로그인 상태 확인 - 로그인되어 있으면 해당 역할의 대시보드로 이동
-    if (this.user) {
-      if (this.user.role === 'influencer') {
-        this.showInfluencerDashboard();
-        return;
-      } else if (['advertiser', 'agency', 'rep'].includes(this.user.role)) {
-        this.showAdvertiserDashboard();
-        return;
-      } else if (this.user.role === 'admin') {
-        this.showAdminDashboard();
-        return;
-      }
-    }
-    
+    // 홈은 항상 메인 페이지(캠페인 목록)로 이동
     const app = document.getElementById('app');
     
     // Load campaigns for display
