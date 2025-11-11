@@ -135,12 +135,26 @@ campaigns.get('/', async (c) => {
   }
 });
 
-// 캠페인 상세 조회
-campaigns.get('/:id', authMiddleware, async (c) => {
+// 캠페인 상세 조회 (공개 - 로그인 불필요)
+campaigns.get('/:id', async (c) => {
   try {
     const campaignId = c.req.param('id');
-    const user = c.get('user');
     const { env } = c;
+    
+    // 인증 헤더가 있으면 사용자 정보 추출 (옵셔널)
+    const authHeader = c.req.header('Authorization');
+    let user = null;
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7);
+        const payload = await c.env.jwtVerify(token);
+        user = payload;
+      } catch (err) {
+        // 토큰이 유효하지 않아도 공개 조회는 가능
+        console.log('Invalid token, but allowing public access');
+      }
+    }
     
     const campaign = await env.DB.prepare(
       'SELECT * FROM campaigns WHERE id = ?'
@@ -150,13 +164,24 @@ campaigns.get('/:id', authMiddleware, async (c) => {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
     
-    // 광고주/대행사/렙사는 자신의 캠페인만, 인플루언서는 승인된 캠페인만, 관리자는 모두 조회 가능
-    if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
-      return c.json({ error: '권한이 없습니다' }, 403);
-    }
-    
-    if (user.role === 'influencer' && campaign.status !== 'approved') {
-      return c.json({ error: '승인된 캠페인만 조회할 수 있습니다' }, 403);
+    // 로그인한 경우 권한 체크
+    if (user) {
+      // 광고주/대행사/렙사는 자신의 캠페인만 조회 가능
+      if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
+        return c.json({ error: '권한이 없습니다' }, 403);
+      }
+      
+      // 인플루언서는 승인되고 결제 완료된 캠페인만 조회 가능
+      if (user.role === 'influencer' && (campaign.status !== 'approved' || campaign.payment_status !== 'paid')) {
+        return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
+      }
+      
+      // 관리자는 모든 캠페인 조회 가능
+    } else {
+      // 로그인하지 않은 경우: 승인되고 결제 완료된 캠페인만 조회 가능
+      if (campaign.status !== 'approved' || campaign.payment_status !== 'paid') {
+        return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
+      }
     }
     
     return c.json(campaign);

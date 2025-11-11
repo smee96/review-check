@@ -39,7 +39,23 @@ class ReviewSphere {
       localStorage.setItem('token', this.token);
       localStorage.setItem('user', JSON.stringify(this.user));
       
-      this.showDashboard();
+      // 저장된 리턴 URL이 있으면 해당 페이지로 이동
+      const returnUrl = localStorage.getItem('returnUrl');
+      if (returnUrl) {
+        localStorage.removeItem('returnUrl');
+        
+        // campaign:123 형식으로 저장된 경우
+        if (returnUrl.startsWith('campaign:')) {
+          const campaignId = returnUrl.split(':')[1];
+          this.viewCampaignDetail(campaignId);
+        } else {
+          // 다른 형식의 URL도 처리 가능하도록 확장 가능
+          this.showDashboard();
+        }
+      } else {
+        // 리턴 URL이 없으면 대시보드로 이동
+        this.showDashboard();
+      }
     } catch (error) {
       alert(error.response?.data?.error || '로그인에 실패했습니다');
     }
@@ -492,16 +508,11 @@ class ReviewSphere {
   }
 
   async viewCampaignDetail(campaignId) {
-    // Check if user is logged in
-    if (!this.token || !this.user) {
-      if (confirm('캠페인 상세 정보를 보려면 로그인이 필요합니다. 로그인 하시겠습니까?')) {
-        this.showLogin();
-      }
-      return;
-    }
-
+    // 로그인 없이도 캠페인 상세 조회 가능
     try {
-      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      // 로그인한 경우 헤더 포함, 아니면 헤더 없이 요청
+      const config = this.token ? this.getAuthHeaders() : {};
+      const response = await axios.get(`/api/campaigns/${campaignId}`, config);
       const campaign = response.data;
       
       const app = document.getElementById('app');
@@ -597,12 +608,23 @@ class ReviewSphere {
                   </div>
                 ` : ''}
                 
-                ${this.user.role === 'influencer' && campaign.status === 'approved' ? `
+                ${campaign.status === 'approved' && campaign.payment_status === 'paid' ? `
                   <div class="mt-8">
-                    <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
-                      <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
-                    </button>
-                    <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                    ${this.user?.role === 'influencer' ? `
+                      <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                        <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                      </button>
+                      <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                    ` : !this.user ? `
+                      <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                        <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                      </button>
+                      <p class="text-sm text-gray-500 text-center mt-2">지원하려면 인플루언서 계정으로 로그인해주세요</p>
+                    ` : `
+                      <div class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg text-lg font-bold text-center">
+                        <i class="fas fa-info-circle mr-2"></i>인플루언서만 지원 가능합니다
+                      </div>
+                    `}
                   </div>
                 ` : ''}
               </div>
@@ -619,6 +641,22 @@ class ReviewSphere {
   }
 
   async applyCampaign(campaignId) {
+    // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 로그인 페이지로 이동
+    if (!this.token || !this.user) {
+      // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
+      localStorage.setItem('returnUrl', `campaign:${campaignId}`);
+      if (confirm('캠페인에 지원하려면 로그인이 필요합니다. 로그인 하시겠습니까?')) {
+        this.showLogin();
+      }
+      return;
+    }
+    
+    // 인플루언서 권한 체크
+    if (this.user.role !== 'influencer') {
+      alert('캠페인 지원은 인플루언서만 가능합니다.');
+      return;
+    }
+    
     const message = prompt('지원 메시지를 입력해주세요 (선택사항):');
     
     try {
