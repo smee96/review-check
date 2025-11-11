@@ -2531,36 +2531,102 @@ class ReviewSphere {
               </p>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-8">
-              <button onclick="app.showMyCampaigns()" class="bg-purple-600 text-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-bullhorn text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">나의 캠페인</h3>
-                <p class="text-xs sm:text-sm opacity-90 mt-1">지원 내역 및 진행 현황</p>
-              </button>
-              <button onclick="app.showFavoriteCampaigns()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-heart text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">관심 캠페인</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">찜한 캠페인 모아보기</p>
-              </button>
-              <button onclick="app.showMyContents()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-pen-to-square text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">나의 컨텐츠</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">등록한 리뷰 관리</p>
-              </button>
-              <button onclick="app.showInfluencerProfile()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95">
-                <i class="fas fa-user text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">채널 및 정산 정보</p>
-              </button>
-              <button onclick="app.logout()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
-                <i class="fas fa-sign-out-alt text-red-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
-                <h3 class="font-semibold text-base sm:text-lg text-red-600">로그아웃</h3>
-                <p class="text-xs sm:text-sm text-gray-600 mt-1">계정에서 로그아웃</p>
-              </button>
-            </div>
+            <!-- 아코디언 메뉴 -->
+            <div class="space-y-3 mb-4 sm:mb-8">
+              <!-- 나의 캠페인 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('myCampaigns')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-bullhorn text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">나의 캠페인</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">지원 내역 및 진행 현황</p>
+                      </div>
+                    </div>
+                    <i id="myCampaigns-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="myCampaigns-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
 
-            <div id="influencerContent" class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-8">
-              <p class="text-sm sm:text-base text-gray-600">위 메뉴를 선택해주세요</p>
+              <!-- 관심 캠페인 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('favoriteCampaigns')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-heart text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">관심 캠페인</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">찜한 캠페인 모아보기</p>
+                      </div>
+                    </div>
+                    <i id="favoriteCampaigns-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="favoriteCampaigns-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 나의 컨텐츠 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('myContents')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-pen-to-square text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">나의 컨텐츠</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">등록한 리뷰 관리</p>
+                      </div>
+                    </div>
+                    <i id="myContents-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="myContents-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 프로필 관리 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('profile')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-user text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">채널 및 정산 정보</p>
+                      </div>
+                    </div>
+                    <i id="profile-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="profile-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 로그아웃 -->
+              <button onclick="app.logout()" class="w-full bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-sign-out-alt text-red-600 text-xl sm:text-2xl"></i>
+                  <div class="text-left">
+                    <h3 class="font-semibold text-base sm:text-lg text-red-600">로그아웃</h3>
+                    <p class="text-xs sm:text-sm text-gray-600">계정에서 로그아웃</p>
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -2571,7 +2637,290 @@ class ReviewSphere {
     `;
   }
 
-  // 나의 캠페인 (지원 내역 통합)
+  // 아코디언 토글
+  async toggleAccordion(sectionId) {
+    const content = document.getElementById(`${sectionId}-content`);
+    const icon = document.getElementById(`${sectionId}-icon`);
+    const allSections = ['myCampaigns', 'favoriteCampaigns', 'myContents', 'profile'];
+    
+    // 현재 섹션이 열려있는지 확인
+    const isOpen = !content.classList.contains('hidden');
+    
+    // 모든 섹션 닫기
+    allSections.forEach(id => {
+      const c = document.getElementById(`${id}-content`);
+      const i = document.getElementById(`${id}-icon`);
+      if (c) c.classList.add('hidden');
+      if (i) i.classList.remove('rotate-180');
+    });
+    
+    // 현재 섹션이 닫혀있었다면 열고 내용 로드
+    if (!isOpen) {
+      content.classList.remove('hidden');
+      icon.classList.add('rotate-180');
+      
+      // 내용 로드
+      await this.loadAccordionContent(sectionId);
+    }
+  }
+
+  // 아코디언 내용 로드
+  async loadAccordionContent(sectionId) {
+    const contentDiv = document.getElementById(`${sectionId}-content`);
+    if (!contentDiv) return;
+    
+    switch(sectionId) {
+      case 'myCampaigns':
+        await this.loadMyCampaignsContent(contentDiv);
+        break;
+      case 'favoriteCampaigns':
+        await this.loadFavoriteCampaignsContent(contentDiv);
+        break;
+      case 'myContents':
+        await this.loadMyContentsContent(contentDiv);
+        break;
+      case 'profile':
+        await this.loadProfileContent(contentDiv);
+        break;
+    }
+  }
+
+  // 나의 캠페인 내용 로드
+  async loadMyCampaignsContent(contentDiv) {
+    try {
+      const response = await axios.get('/api/applications/my', this.getAuthHeaders());
+      const applications = response.data;
+      
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h3 class="text-xl font-bold mb-4">나의 캠페인</h3>
+          ${applications.length === 0 ? `
+            <div class="text-center py-8">
+              <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+              <p class="text-gray-600">아직 지원한 캠페인이 없습니다</p>
+            </div>
+          ` : `
+            <div class="space-y-4">
+              ${applications.map(app => `
+                <div class="border rounded-lg p-4 hover:shadow-md transition">
+                  <h4 class="font-bold text-lg mb-2">${app.campaign_title}</h4>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold ${
+                      app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      app.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }">
+                      ${app.status === 'pending' ? '대기중' :
+                        app.status === 'approved' ? '확정' : '거절'}
+                    </span>
+                    <button onclick="app.viewCampaignDetail(${app.campaign_id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      캠페인 보기 →
+                    </button>
+                  </div>
+                  ${app.status === 'approved' && !app.review_url ? `
+                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="mt-2 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
+                      결과 등록하기
+                    </button>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load applications:', error);
+      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">데이터를 불러오는데 실패했습니다</p></div>';
+    }
+  }
+
+  // 관심 캠페인 내용 로드
+  async loadFavoriteCampaignsContent(contentDiv) {
+    try {
+      const favorites = JSON.parse(localStorage.getItem('favoriteCampaigns') || '[]');
+      
+      if (favorites.length === 0) {
+        contentDiv.innerHTML = `
+          <div class="p-4 sm:p-6 text-center py-8">
+            <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600 mb-2">아직 관심 캠페인이 없습니다</p>
+            <p class="text-sm text-gray-500">캠페인 상세 페이지에서 ♥ 버튼을 눌러 저장하세요</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const response = await axios.get('/api/campaigns', this.getAuthHeaders());
+      const allCampaigns = response.data;
+      const favoriteCampaigns = allCampaigns.filter(c => favorites.includes(c.id));
+      
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h3 class="text-xl font-bold mb-4">관심 캠페인 (${favoriteCampaigns.length})</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${favoriteCampaigns.map(c => `
+              <div class="border rounded-lg overflow-hidden hover:shadow-md transition">
+                ${c.thumbnail_image ? `
+                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-32 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                ` : ''}
+                <div class="p-4">
+                  <div class="flex items-start justify-between mb-2">
+                    <h4 class="font-bold cursor-pointer hover:text-purple-600" onclick="app.viewCampaignDetail(${c.id})">${c.title}</h4>
+                    <button onclick="app.toggleFavorite(${c.id}); app.loadAccordionContent('favoriteCampaigns');" class="ml-2 text-red-500">
+                      <i class="fas fa-heart"></i>
+                    </button>
+                  </div>
+                  ${c.point_reward > 0 ? `<p class="text-purple-600 font-bold text-sm">${c.point_reward.toLocaleString()} P</p>` : ''}
+                  <button onclick="app.viewCampaignDetail(${c.id})" class="mt-2 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition text-sm">
+                    자세히 보기
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load favorites:', error);
+      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">데이터를 불러오는데 실패했습니다</p></div>';
+    }
+  }
+
+  // 나의 컨텐츠 내용 로드
+  async loadMyContentsContent(contentDiv) {
+    try {
+      const response = await axios.get('/api/applications/my', this.getAuthHeaders());
+      const applications = response.data.filter(app => app.status === 'approved');
+      
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h3 class="text-xl font-bold mb-4">나의 컨텐츠</h3>
+          ${applications.length === 0 ? `
+            <div class="text-center py-8">
+              <i class="fas fa-pen-to-square text-6xl text-gray-300 mb-4"></i>
+              <p class="text-gray-600">등록된 컨텐츠가 없습니다</p>
+            </div>
+          ` : `
+            <div class="space-y-4">
+              ${applications.map(app => `
+                <div class="border rounded-lg p-4">
+                  <h4 class="font-bold text-lg mb-2">${app.campaign_title}</h4>
+                  ${app.review_url ? `
+                    <a href="${app.review_url}" target="_blank" class="text-purple-600 hover:text-purple-800 text-sm">
+                      <i class="fas fa-external-link-alt mr-1"></i>컨텐츠 보기
+                    </a>
+                  ` : `
+                    <p class="text-sm text-gray-500 mb-2">아직 컨텐츠를 등록하지 않았습니다</p>
+                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      <i class="fas fa-plus mr-1"></i>컨텐츠 등록하기
+                    </button>
+                  `}
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load contents:', error);
+      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">데이터를 불러오는데 실패했습니다</p></div>';
+    }
+  }
+
+  // 프로필 내용 로드
+  async loadProfileContent(contentDiv) {
+    try {
+      const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
+      const profile = response.data;
+      
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <form id="profileForm" onsubmit="event.preventDefault(); app.saveInfluencerProfile();">
+            <h3 class="text-xl font-bold mb-4">프로필 관리</h3>
+            
+            <!-- 채널 정보 -->
+            <div class="mb-6">
+              <h4 class="font-semibold text-lg mb-3">채널 정보</h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium mb-1">Instagram</label>
+                  <input type="text" id="instagram" value="${profile.instagram_handle || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="@username">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">팔로워 수</label>
+                  <input type="number" id="followerCount" value="${profile.follower_count || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="10000">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">YouTube</label>
+                  <input type="text" id="youtube" value="${profile.youtube_channel || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="채널 URL">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">블로그</label>
+                  <input type="text" id="blog" value="${profile.blog_url || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="블로그 URL">
+                </div>
+              </div>
+            </div>
+
+            <!-- 정산 정보 -->
+            <div class="mb-6">
+              <h4 class="font-semibold text-lg mb-3">정산 정보</h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium mb-1">은행</label>
+                  <input type="text" id="bank" value="${profile.bank_name || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="국민은행">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">계좌번호</label>
+                  <input type="text" id="accountNumber" value="${profile.account_number || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="123-456-789">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">예금주</label>
+                  <input type="text" id="accountHolder" value="${profile.account_holder || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="홍길동">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
+                저장
+              </button>
+              <button type="button" onclick="app.toggleAccordion('profile')" class="px-6 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition font-semibold">
+                취소
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">데이터를 불러오는데 실패했습니다</p></div>';
+    }
+  }
+
+  // 프로필 저장
+  async saveInfluencerProfile() {
+    try {
+      const data = {
+        instagram_handle: document.getElementById('instagram').value,
+        follower_count: parseInt(document.getElementById('followerCount').value) || 0,
+        youtube_channel: document.getElementById('youtube').value,
+        blog_url: document.getElementById('blog').value,
+        bank_name: document.getElementById('bank').value,
+        account_number: document.getElementById('accountNumber').value,
+        account_holder: document.getElementById('accountHolder').value
+      };
+      
+      await axios.put('/api/profile/influencer', data, this.getAuthHeaders());
+      alert('프로필이 저장되었습니다');
+      
+      // 아코디언 닫기
+      this.toggleAccordion('profile');
+    } catch (error) {
+      alert(error.response?.data?.error || '프로필 저장에 실패했습니다');
+    }
+  }
+
+  // 나의 캠페인 (지원 내역 통합) - 구버전 호환
   async showMyCampaigns() {
     this.showMyApplications();
   }
