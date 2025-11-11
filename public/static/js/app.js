@@ -130,16 +130,7 @@ class ReviewSphere {
     
     app.innerHTML = `
       <div class="min-h-screen flex flex-col bg-gray-50">
-        <nav class="bg-white shadow-lg sticky top-0 z-50">
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-            <div class="flex justify-between items-center h-14 sm:h-16">
-              <div class="flex items-center cursor-pointer" onclick="app.showHome()">
-                <img src="/static/logo.png" alt="R.SPHERE" class="h-12 sm:h-14">
-              </div>
-              <div></div>
-            </div>
-          </div>
-        </nav>
+        ${this.renderNav()}
 
         <!-- Hero Section -->
         <div class="bg-gradient-to-br from-purple-600 to-blue-500 text-white py-12 sm:py-16">
