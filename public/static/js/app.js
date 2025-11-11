@@ -1246,12 +1246,34 @@ class ReviewSphere {
   }
 
   showCreateCampaign() {
-    // 관리자는 adminContent, 광고주는 advertiserContent 사용
-    const content = document.getElementById('adminContent') || document.getElementById('advertiserContent');
+    // 컨테이너 찾기: adminContent, advertiserContent, 또는 전체 페이지
+    let content = document.getElementById('adminContent') || document.getElementById('advertiserContent');
+    let isFullPage = false;
+    
     if (!content) {
-      console.error('Content container not found');
-      return;
+      // 컨테이너가 없으면 전체 페이지로 렌더링
+      isFullPage = true;
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+              <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>뒤로가기
+              </button>
+              
+              <div id="campaignFormContainer"></div>
+            </div>
+          </div>
+          
+          ${this.renderFooter()}
+        </div>
+      `;
+      content = document.getElementById('campaignFormContainer');
     }
+    
     content.innerHTML = `
       <h2 class="text-2xl font-bold mb-6">캠페인 등록</h2>
       <form id="createCampaignForm" onsubmit="event.preventDefault(); app.handleCreateCampaign();" class="space-y-6">
