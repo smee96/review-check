@@ -9,11 +9,8 @@ class ReviewSphere {
   }
 
   init() {
-    if (this.token && this.user) {
-      this.showDashboard();
-    } else {
-      this.showHome();
-    }
+    // 로그인 여부와 관계없이 항상 홈 페이지로 시작
+    this.showHome();
   }
 
   // ============================================
@@ -50,11 +47,11 @@ class ReviewSphere {
           this.viewCampaignDetail(campaignId);
         } else {
           // 다른 형식의 URL도 처리 가능하도록 확장 가능
-          this.showDashboard();
+          this.showHome();
         }
       } else {
-        // 리턴 URL이 없으면 대시보드로 이동
-        this.showDashboard();
+        // 리턴 URL이 없으면 홈으로 이동
+        this.showHome();
       }
     } catch (error) {
       alert(error.response?.data?.error || '로그인에 실패했습니다');
@@ -521,112 +518,277 @@ class ReviewSphere {
           ${this.renderNav()}
           
           <div class="flex-grow">
-            <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
               <button onclick="app.showHome()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>홈으로 돌아가기
               </button>
               
-              <div class="bg-white rounded-lg shadow-lg p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-4">
-                  <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getStatusBadge(campaign.status)}">
-                    ${this.getStatusText(campaign.status)}
-                  </span>
-                  <span class="text-gray-500">${campaign.slots || 1}명 모집</span>
-                </div>
+              <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <!-- 썸네일/상세 이미지 -->
+                ${campaign.thumbnail_image ? `
+                  <div class="w-full bg-gray-100">
+                    <img src="${campaign.thumbnail_image}" alt="${campaign.title}" class="w-full max-h-[500px] object-contain">
+                  </div>
+                ` : `
+                  <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                    <i class="fas fa-image text-white text-6xl opacity-50"></i>
+                  </div>
+                `}
                 
-                <h1 class="text-3xl font-bold text-gray-800 mb-4">${campaign.title}</h1>
-                
-                <div class="prose max-w-none mb-6">
-                  <p class="text-gray-600 whitespace-pre-wrap">${campaign.description || '캠페인 설명이 없습니다.'}</p>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                  ${campaign.product_name ? `
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                      <span class="text-sm text-gray-500">제품명</span>
-                      <p class="font-semibold">${campaign.product_name}</p>
+                <div class="p-6 sm:p-8">
+                  <!-- 상태와 모집인원 -->
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getStatusBadge(campaign.status)}">
+                      ${this.getStatusText(campaign.status)}
+                    </span>
+                    <span class="text-gray-500">
+                      <i class="fas fa-users mr-1"></i>${campaign.slots || 1}명 모집
+                    </span>
+                  </div>
+                  
+                  <!-- 제목 -->
+                  <h1 class="text-3xl font-bold text-gray-800 mb-6">${campaign.title}</h1>
+                  
+                  <!-- 채널 타입 -->
+                  ${campaign.channel_type ? `
+                    <div class="mb-6">
+                      <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
+                        campaign.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
+                        campaign.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
+                        campaign.channel_type === 'youtube' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }">
+                        <i class="fab fa-${campaign.channel_type} mr-2"></i>
+                        ${campaign.channel_type === 'instagram' ? '인스타그램' :
+                          campaign.channel_type === 'blog' ? '블로그' :
+                          campaign.channel_type === 'youtube' ? '유튜브' : campaign.channel_type}
+                      </span>
                     </div>
                   ` : ''}
                   
-                  ${campaign.budget ? `
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                      <span class="text-sm text-gray-500">예산</span>
-                      <p class="font-semibold text-purple-600">${campaign.budget.toLocaleString()}원</p>
+                  <!-- 설명 -->
+                  <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-3">
+                      <i class="fas fa-file-alt mr-2"></i>캠페인 설명
+                    </h2>
+                    <div class="prose max-w-none text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                      ${campaign.description || '캠페인 설명이 없습니다.'}
+                    </div>
+                  </div>
+                  
+                  <!-- 미션 -->
+                  ${campaign.mission ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-bullseye mr-2"></i>미션
+                      </h2>
+                      <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                        <p class="text-orange-900 whitespace-pre-wrap">${campaign.mission}</p>
+                      </div>
                     </div>
                   ` : ''}
                   
-                  ${campaign.start_date ? `
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                      <span class="text-sm text-gray-500">시작일</span>
-                      <p class="font-semibold">${campaign.start_date}</p>
+                  <!-- 키워드 -->
+                  ${campaign.keywords ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-tags mr-2"></i>필수 키워드
+                      </h2>
+                      <div class="flex flex-wrap gap-2">
+                        ${campaign.keywords.split(',').map(keyword => `
+                          <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                            #${keyword.trim()}
+                          </span>
+                        `).join('')}
+                      </div>
                     </div>
                   ` : ''}
                   
-                  ${campaign.end_date ? `
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                      <span class="text-sm text-gray-500">종료일</span>
-                      <p class="font-semibold">${campaign.end_date}</p>
+                  <!-- 제공 내역 -->
+                  ${campaign.provided_items ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-gift mr-2"></i>제공 내역
+                      </h2>
+                      <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                        <p class="text-green-900 whitespace-pre-wrap">${campaign.provided_items}</p>
+                      </div>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- 요구사항/가이드라인 -->
+                  ${campaign.requirements ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-list-check mr-2"></i>요구사항
+                      </h2>
+                      <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                        <p class="text-blue-900 whitespace-pre-wrap">${campaign.requirements}</p>
+                      </div>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- 유의사항 -->
+                  ${campaign.notes ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>유의사항
+                      </h2>
+                      <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
+                        <p class="text-red-900 whitespace-pre-wrap">${campaign.notes}</p>
+                      </div>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- 기본 정보 그리드 -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    ${campaign.product_name ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">제품명</span>
+                        <p class="font-semibold">${campaign.product_name}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.budget ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">예산</span>
+                        <p class="font-semibold text-purple-600">${campaign.budget.toLocaleString()}원</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.application_start_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">모집 시작일</span>
+                        <p class="font-semibold">${campaign.application_start_date}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.application_end_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">모집 종료일</span>
+                        <p class="font-semibold">${campaign.application_end_date}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.announcement_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">발표일</span>
+                        <p class="font-semibold">${campaign.announcement_date}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.content_start_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">콘텐츠 게시 시작일</span>
+                        <p class="font-semibold">${campaign.content_start_date}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.content_end_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">콘텐츠 게시 종료일</span>
+                        <p class="font-semibold">${campaign.content_end_date}</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.result_announcement_date ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">결과 발표일</span>
+                        <p class="font-semibold">${campaign.result_announcement_date}</p>
+                      </div>
+                    ` : ''}
+                  </div>
+                  
+                  <!-- 채널별 링크 정보 -->
+                  ${campaign.instagram_mention_account || campaign.blog_product_url || campaign.youtube_purchase_link ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-link mr-2"></i>링크 정보
+                      </h2>
+                      <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                        ${campaign.instagram_mention_account ? `
+                          <div>
+                            <span class="text-sm text-gray-500">인스타그램 멘션 계정</span>
+                            <p class="font-semibold text-pink-600">@${campaign.instagram_mention_account}</p>
+                          </div>
+                        ` : ''}
+                        ${campaign.blog_product_url ? `
+                          <div>
+                            <span class="text-sm text-gray-500">블로그 상품 URL</span>
+                            <p class="font-semibold">
+                              <a href="${campaign.blog_product_url}" target="_blank" class="text-green-600 hover:text-green-800">
+                                ${campaign.blog_product_url}
+                                <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                              </a>
+                            </p>
+                          </div>
+                        ` : ''}
+                        ${campaign.youtube_purchase_link ? `
+                          <div>
+                            <span class="text-sm text-gray-500">유튜브 구매 링크</span>
+                            <p class="font-semibold">
+                              <a href="${campaign.youtube_purchase_link}" target="_blank" class="text-red-600 hover:text-red-800">
+                                ${campaign.youtube_purchase_link}
+                                <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                              </a>
+                            </p>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  ` : ''}
+                  
+                  ${campaign.product_url ? `
+                    <div class="mb-8">
+                      <a href="${campaign.product_url}" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-800 font-semibold">
+                        <i class="fas fa-external-link-alt mr-2"></i>제품 페이지 바로가기
+                      </a>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- 포인트 보상 -->
+                  ${campaign.point_reward > 0 ? `
+                    <div class="bg-purple-50 p-6 rounded-lg mb-8 border-2 border-purple-200">
+                      <h3 class="font-semibold text-purple-900 mb-4 flex items-center text-lg">
+                        <i class="fas fa-coins mr-2"></i>스피어포인트 보상
+                      </h3>
+                      <div class="grid grid-cols-2 gap-4">
+                        <div>
+                          <span class="text-sm text-purple-700">인당 지급</span>
+                          <p class="text-3xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
+                        </div>
+                        <div>
+                          <span class="text-sm text-purple-700">총 포인트</span>
+                          <p class="text-3xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
+                        </div>
+                      </div>
+                      <p class="text-xs text-purple-600 mt-4">
+                        <i class="fas fa-info-circle mr-1"></i>캠페인 완료 후 자동으로 지급됩니다 (1P = 1원)
+                      </p>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- 지원하기 버튼 -->
+                  ${campaign.status === 'approved' && campaign.payment_status === 'paid' ? `
+                    <div class="mt-8">
+                      ${this.user?.role === 'influencer' ? `
+                        <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                          <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                        </button>
+                        <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                      ` : !this.user ? `
+                        <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                          <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                        </button>
+                        <p class="text-sm text-gray-500 text-center mt-2">지원하려면 인플루언서 계정으로 로그인해주세요</p>
+                      ` : `
+                        <div class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg text-lg font-bold text-center">
+                          <i class="fas fa-info-circle mr-2"></i>인플루언서만 지원 가능합니다
+                        </div>
+                      `}
                     </div>
                   ` : ''}
                 </div>
-                
-                ${campaign.point_reward > 0 ? `
-                  <div class="bg-purple-50 p-4 rounded-lg mb-6 border-2 border-purple-200">
-                    <h3 class="font-semibold text-purple-900 mb-3 flex items-center">
-                      <i class="fas fa-coins mr-2"></i>스피어포인트 보상
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <span class="text-sm text-purple-700">인당 지급</span>
-                        <p class="text-2xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
-                      </div>
-                      <div>
-                        <span class="text-sm text-purple-700">총 포인트</span>
-                        <p class="text-2xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
-                      </div>
-                    </div>
-                    <p class="text-xs text-purple-600 mt-3">
-                      <i class="fas fa-info-circle mr-1"></i>캠페인 완료 후 자동으로 지급됩니다 (1P = 1원)
-                    </p>
-                  </div>
-                ` : ''}
-                
-                ${campaign.requirements ? `
-                  <div class="bg-blue-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-blue-900 mb-2">
-                      <i class="fas fa-list-check mr-2"></i>요구사항
-                    </h3>
-                    <p class="text-blue-800 whitespace-pre-wrap">${campaign.requirements}</p>
-                  </div>
-                ` : ''}
-                
-                ${campaign.product_url ? `
-                  <div class="mb-6">
-                    <a href="${campaign.product_url}" target="_blank" class="text-purple-600 hover:text-purple-800 flex items-center">
-                      <i class="fas fa-external-link-alt mr-2"></i>제품 페이지 바로가기
-                    </a>
-                  </div>
-                ` : ''}
-                
-                ${campaign.status === 'approved' && campaign.payment_status === 'paid' ? `
-                  <div class="mt-8">
-                    ${this.user?.role === 'influencer' ? `
-                      <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
-                        <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
-                      </button>
-                      <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
-                    ` : !this.user ? `
-                      <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
-                        <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
-                      </button>
-                      <p class="text-sm text-gray-500 text-center mt-2">지원하려면 인플루언서 계정으로 로그인해주세요</p>
-                    ` : `
-                      <div class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg text-lg font-bold text-center">
-                        <i class="fas fa-info-circle mr-2"></i>인플루언서만 지원 가능합니다
-                      </div>
-                    `}
-                  </div>
-                ` : ''}
               </div>
             </div>
           </div>
@@ -713,7 +875,8 @@ class ReviewSphere {
     `;
   }
 
-  showDashboard() {
+  // 마이페이지 (기존 대시보드)
+  showMyPage() {
     switch (this.user.role) {
       case 'advertiser':
       case 'agency':
@@ -727,6 +890,11 @@ class ReviewSphere {
         this.showAdminDashboard();
         break;
     }
+  }
+  
+  // 하위 호환성을 위해 showDashboard는 showMyPage로 리다이렉트
+  showDashboard() {
+    this.showMyPage();
   }
 
   // ============================================
@@ -745,9 +913,9 @@ class ReviewSphere {
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div class="mb-4 sm:mb-8">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
-                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${roleTitle} 대시보드
+                <i class="fas fa-user-circle text-purple-600 mr-2"></i>마이페이지
               </h1>
-              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 (${roleTitle})</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-8">
@@ -2143,9 +2311,9 @@ class ReviewSphere {
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div class="mb-4 sm:mb-8">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
-                <i class="fas fa-star text-purple-600 mr-2"></i>인플루언서 대시보드
+                <i class="fas fa-user-circle text-purple-600 mr-2"></i>마이페이지
               </h1>
-              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 환영합니다</p>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 (인플루언서)</p>
             </div>
 
             <!-- 포인트 카드 -->
@@ -2694,9 +2862,9 @@ class ReviewSphere {
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="mb-8">
               <h1 class="text-3xl font-bold text-gray-800">
-                <i class="fas fa-shield-alt text-purple-600 mr-2"></i>관리자 대시보드
+                <i class="fas fa-user-circle text-purple-600 mr-2"></i>마이페이지
               </h1>
-              <p class="text-gray-600 mt-2">${this.user.nickname}님 환영합니다</p>
+              <p class="text-gray-600 mt-2">${this.user.nickname}님 (관리자)</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -3034,7 +3202,7 @@ class ReviewSphere {
         
         <div class="flex-grow">
           <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-            <button onclick="${this.token ? 'app.showDashboard()' : 'app.showHome()'}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+            <button onclick="${app.showHome()}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
               <i class="fas fa-arrow-left mr-2"></i>돌아가기
             </button>
             
@@ -3351,7 +3519,7 @@ class ReviewSphere {
         
         <div class="flex-grow">
           <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-            <button onclick="${this.token ? 'app.showDashboard()' : 'app.showHome()'}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+            <button onclick="${app.showHome()}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
               <i class="fas fa-arrow-left mr-2"></i>돌아가기
             </button>
             

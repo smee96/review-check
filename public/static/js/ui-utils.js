@@ -53,6 +53,9 @@ const UIUtils = {
             </div>
             <div class="flex items-center space-x-2 sm:space-x-4">
               ${user ? `
+                <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 text-sm sm:text-base font-medium">
+                  <i class="fas fa-user-circle sm:mr-1"></i><span class="hidden sm:inline">마이페이지</span>
+                </button>
                 <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate">${user.nickname}</span>
                 <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
                   <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
