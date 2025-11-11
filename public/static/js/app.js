@@ -505,13 +505,11 @@ class ReviewSphere {
   }
 
   async viewCampaignDetail(campaignId) {
-    // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 로그인 페이지로 이동
+    // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 바로 로그인 페이지로 이동
     if (!this.token || !this.user) {
       // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
       localStorage.setItem('returnUrl', `campaign:${campaignId}`);
-      if (confirm('캠페인 상세 정보를 보려면 로그인이 필요합니다. 로그인 하시겠습니까?')) {
-        this.showLogin();
-      }
+      this.showLogin();
       return;
     }
     
