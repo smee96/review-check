@@ -190,7 +190,7 @@ class ReviewSphere {
                       ` : ''}
                       <div class="flex items-center justify-between pt-2 border-t">
                         <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
-                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i>${c.slots}명</span>
+                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i><span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명</span>
                       </div>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ class ReviewSphere {
                       ` : ''}
                       <div class="flex items-center justify-between pt-2 border-t">
                         <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
-                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i>${c.slots}명</span>
+                        <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i><span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명</span>
                       </div>
                     </div>
                   </div>
@@ -319,6 +319,15 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+  }
+
+  // 뒤로가기
+  goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.showHome();
+    }
   }
 
   // 검색창 토글
@@ -472,6 +481,13 @@ class ReviewSphere {
                           <span class="text-purple-700 font-bold">${c.point_reward.toLocaleString()} P</span>
                         </div>
                       ` : ''}
+                      <div class="mt-3 pt-3 border-t flex items-center justify-between">
+                        <span class="text-xs text-gray-500">지원 현황</span>
+                        <span class="text-sm text-gray-600">
+                          <i class="fas fa-users mr-1"></i>
+                          <span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명
+                        </span>
+                      </div>
                     </div>
                   </div>
                 `).join('')}
@@ -554,8 +570,8 @@ class ReviewSphere {
               <div class="text-gray-600 text-sm">
                 계정이 없으신가요? <button onclick="app.showRegister()" class="text-purple-600 hover:underline font-semibold">회원가입</button>
               </div>
-              <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
-                <i class="fas fa-arrow-left mr-1"></i>홈으로
+              <button onclick="app.goBack()" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>뒤로가기
               </button>
             </div>
           </div>
@@ -627,8 +643,8 @@ class ReviewSphere {
               <div class="text-gray-600 text-sm">
                 이미 계정이 있으신가요? <button onclick="app.showLogin()" class="text-purple-600 hover:underline font-semibold">로그인</button>
               </div>
-              <button onclick="app.showHome()" class="text-gray-500 hover:text-gray-700 text-sm">
-                <i class="fas fa-arrow-left mr-1"></i>홈으로
+              <button onclick="app.goBack()" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fas fa-arrow-left mr-1"></i>뒤로가기
               </button>
             </div>
           </div>
@@ -694,8 +710,8 @@ class ReviewSphere {
           
           <div class="flex-grow">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.showHome()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>홈으로 돌아가기
+              <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>뒤로가기
               </button>
               
               <div class="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -3093,7 +3109,7 @@ class ReviewSphere {
                   </div>
                   <div class="text-sm text-gray-600">
                     <i class="fas fa-users mr-1"></i>
-                    모집 ${c.slots}명
+                    <span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명
                   </div>
                 </div>
                 

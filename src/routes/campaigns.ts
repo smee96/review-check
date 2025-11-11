@@ -122,9 +122,11 @@ campaigns.get('/', async (c) => {
       // 진행중인 캠페인: 승인되고 결제 완료된 모든 캠페인
       // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
       const campaigns = await env.DB.prepare(
-        `SELECT * FROM campaigns 
-         WHERE status = ? AND payment_status = ?
-         ORDER BY created_at DESC`
+        `SELECT c.*, 
+         (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
+         FROM campaigns c
+         WHERE c.status = ? AND c.payment_status = ?
+         ORDER BY c.created_at DESC`
       ).bind('approved', 'paid').all();
       
       return c.json(campaigns.results);
