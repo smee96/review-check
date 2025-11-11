@@ -53,8 +53,8 @@ const UIUtils = {
             </div>
             
             ${user ? `
-              <!-- 로그인 시: 검색 아이콘 + 사용자 정보 -->
-              <div class="flex items-center space-x-2 sm:space-x-4">
+              <!-- 로그인 시: 검색 아이콘만 -->
+              <div class="flex items-center space-x-3 sm:space-x-4">
                 <!-- 검색 버튼 -->
                 <button onclick="app.toggleSearch()" class="text-gray-600 hover:text-purple-600 text-xl transition">
                   <i class="fas fa-search"></i>
@@ -77,21 +77,11 @@ const UIUtils = {
                   </div>
                 </div>
                 
-                <span class="text-sm sm:text-base text-gray-700 max-w-[100px] sm:max-w-none truncate hidden sm:inline">${user.nickname}</span>
-                <button onclick="app.logout()" class="text-red-600 hover:text-red-700 text-sm sm:text-base">
-                  <i class="fas fa-sign-out-alt sm:mr-1"></i><span class="hidden sm:inline">로그아웃</span>
-                </button>
+                <span class="text-sm sm:text-base text-gray-700 truncate">${user.nickname}</span>
               </div>
             ` : `
-              <!-- 비로그인 시: 기존 로그인 버튼 -->
-              <div class="flex items-center space-x-2 sm:space-x-4">
-                <button onclick="app.showLogin()" class="bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm sm:text-base">
-                  <i class="fas fa-sign-in-alt sm:mr-1"></i><span class="hidden sm:inline">로그인</span>
-                </button>
-                <button onclick="app.showRegister()" class="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm sm:text-base">
-                  <i class="fas fa-user-plus sm:mr-1"></i><span class="hidden sm:inline">회원가입</span>
-                </button>
-              </div>
+              <!-- 비로그인 시: 아무것도 표시 안함 (어차피 클릭하면 로그인) -->
+              <div></div>
             `}
           </div>
         </div>

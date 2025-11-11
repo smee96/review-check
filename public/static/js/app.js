@@ -136,11 +136,7 @@ class ReviewSphere {
               <div class="flex items-center cursor-pointer" onclick="app.showHome()">
                 <img src="/static/logo.png" alt="R.SPHERE" class="h-12 sm:h-14">
               </div>
-              <div class="flex space-x-2 sm:space-x-4">
-                <button onclick="app.showLogin()" class="bg-purple-600 text-white hover:bg-purple-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition">
-                  시작하기
-                </button>
-              </div>
+              <div></div>
             </div>
           </div>
         </nav>
@@ -1140,6 +1136,11 @@ class ReviewSphere {
                 <i class="fas fa-list text-purple-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
                 <h3 class="font-semibold text-base sm:text-lg">새로고침</h3>
                 <p class="text-xs sm:text-sm text-gray-600 mt-1">캠페인 목록 새로고침</p>
+              </button>
+              <button onclick="app.logout()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
+                <i class="fas fa-sign-out-alt text-red-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg text-red-600">로그아웃</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">계정에서 로그아웃</p>
               </button>
             </div>
 
@@ -2560,6 +2561,11 @@ class ReviewSphere {
                 <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
                 <p class="text-xs sm:text-sm text-gray-600 mt-1">채널 및 정산 정보</p>
               </button>
+              <button onclick="app.logout()" class="bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
+                <i class="fas fa-sign-out-alt text-red-600 text-2xl sm:text-3xl mb-1 sm:mb-2"></i>
+                <h3 class="font-semibold text-base sm:text-lg text-red-600">로그아웃</h3>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">계정에서 로그아웃</p>
+              </button>
             </div>
 
             <div id="influencerContent" class="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-8">
@@ -3204,6 +3210,10 @@ class ReviewSphere {
               <button onclick="app.showSettlements()" class="bg-purple-600 text-white p-6 rounded-lg shadow hover:shadow-lg transition">
                 <i class="fas fa-file-excel text-3xl mb-2"></i>
                 <h3 class="font-semibold">정산 내역</h3>
+              </button>
+              <button onclick="app.logout()" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition border-2 border-red-200">
+                <i class="fas fa-sign-out-alt text-red-600 text-3xl mb-2"></i>
+                <h3 class="font-semibold text-red-600">로그아웃</h3>
               </button>
             </div>
 
