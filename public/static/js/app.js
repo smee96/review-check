@@ -4585,13 +4585,20 @@ class ReviewSphere {
         <div class="p-4 sm:p-6">
           <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">전체 캠페인 관리</h2>
           <div class="space-y-3 sm:space-y-4">
-            ${campaigns.map(c => `
+            ${campaigns.map(c => {
+              const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
+              const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+              
+              return `
               <div class="border rounded-lg p-3 sm:p-4">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
                   <div class="flex-1">
-                    <h3 class="font-bold text-base sm:text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
-                      <i class="fas fa-edit mr-1"></i>${c.title}
-                    </h3>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class="font-bold text-base sm:text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
+                        <i class="fas fa-edit mr-1"></i>${c.title}
+                      </h3>
+                      <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
+                    </div>
                     <p class="text-xs sm:text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
                   </div>
                   <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status)} whitespace-nowrap self-start">
@@ -4655,7 +4662,8 @@ class ReviewSphere {
                   ` : ''}
                 </div>
               </div>
-            `}).join('')}
+            `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -4687,13 +4695,20 @@ class ReviewSphere {
       content.innerHTML = `
         <h2 class="text-2xl font-bold mb-6">전체 캠페인 관리</h2>
         <div class="space-y-4">
-          ${campaigns.map(c => `
+          ${campaigns.map(c => {
+            const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
+            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+            
+            return `
             <div class="border rounded-lg p-4">
               <div class="flex justify-between items-start mb-2">
                 <div>
-                  <h3 class="font-bold text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
-                    <i class="fas fa-edit mr-1"></i>${c.title}
-                  </h3>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-bold text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
+                      <i class="fas fa-edit mr-1"></i>${c.title}
+                    </h3>
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${channelColor}">${channelIcon}</span>
+                  </div>
                   <p class="text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
                 </div>
                 <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
@@ -4761,7 +4776,8 @@ class ReviewSphere {
                 </button>
               </div>
             </div>
-          `}).join('')}
+            `;
+          }).join('')}
         </div>
       `;
     } catch (error) {
