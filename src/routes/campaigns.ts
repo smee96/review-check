@@ -19,6 +19,7 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
     const { 
       title, description, product_name, product_url, requirements, budget, slots,
       point_reward, thumbnail_image, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
+      smartstore_product_url,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
       provided_items, mission, keywords, notes
@@ -38,10 +39,10 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       `INSERT INTO campaigns (
         advertiser_id, title, description, product_name, product_url, requirements, 
         budget, slots, point_reward, thumbnail_image, channel_type, instagram_mention_account, 
-        blog_product_url, youtube_purchase_link, application_start_date, application_end_date, 
+        blog_product_url, youtube_purchase_link, smartstore_product_url, application_start_date, application_end_date, 
         announcement_date, content_start_date, content_end_date, result_announcement_date,
         provided_items, mission, keywords, notes, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
     ).bind(
       user.userId,
       title,
@@ -57,6 +58,7 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       instagram_mention_account || null,
       blog_product_url || null,
       youtube_purchase_link || null,
+      smartstore_product_url || null,
       application_start_date || null,
       application_end_date || null,
       announcement_date || null,
@@ -110,7 +112,7 @@ campaigns.get('/', async (c) => {
     const type = c.req.query('type'); // 'best' or undefined
     
     if (type === 'best') {
-      // 베스트 캠페인: 승인되고 결제 완료된 캠페인 중 지원자 수가 많은 순
+      // 베스트 캠페인: 모집중이고 결제 완료된 캠페인 중 지원자 수가 많은 순
       // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
@@ -119,11 +121,11 @@ campaigns.get('/', async (c) => {
          WHERE c.status = ? AND c.payment_status = ?
          ORDER BY application_count DESC, c.created_at DESC
          LIMIT 10`
-      ).bind('approved', 'paid').all();
+      ).bind('recruiting', 'paid').all();
       
       return c.json(campaigns.results);
     } else {
-      // 진행중인 캠페인: 승인되고 결제 완료된 모든 캠페인
+      // 진행중인 캠페인: 모집중이고 결제 완료된 모든 캠페인
       // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
@@ -131,7 +133,7 @@ campaigns.get('/', async (c) => {
          FROM campaigns c
          WHERE c.status = ? AND c.payment_status = ?
          ORDER BY c.created_at DESC`
-      ).bind('approved', 'paid').all();
+      ).bind('recruiting', 'paid').all();
       
       return c.json(campaigns.results);
     }
@@ -162,8 +164,8 @@ campaigns.get('/:id', authMiddleware, async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 인플루언서는 승인되고 결제 완료된 캠페인만 조회 가능
-    if (user.role === 'influencer' && (campaign.status !== 'approved' || campaign.payment_status !== 'paid')) {
+    // 인플루언서는 모집중이고 결제 완료된 캠페인만 조회 가능
+    if (user.role === 'influencer' && (campaign.status !== 'recruiting' || campaign.payment_status !== 'paid')) {
       return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
     }
     
@@ -233,6 +235,7 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     const { 
       title, description, product_name, product_url, requirements, budget, slots,
       point_reward, thumbnail_image, channel_type, instagram_mention_account, blog_product_url, youtube_purchase_link,
+      smartstore_product_url,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
       provided_items, mission, keywords, notes, payment_status
@@ -250,7 +253,7 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     let updateQuery = `UPDATE campaigns 
        SET title = ?, description = ?, product_name = ?, product_url = ?, requirements = ?, 
            budget = ?, slots = ?, point_reward = ?, channel_type = ?, instagram_mention_account = ?, 
-           blog_product_url = ?, youtube_purchase_link = ?, application_start_date = ?, application_end_date = ?, 
+           blog_product_url = ?, youtube_purchase_link = ?, smartstore_product_url = ?, application_start_date = ?, application_end_date = ?, 
            announcement_date = ?, content_start_date = ?, content_end_date = ?, result_announcement_date = ?,
            provided_items = ?, mission = ?, keywords = ?, notes = ?, updated_at = ?`;
     
@@ -267,6 +270,7 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       instagram_mention_account || null,
       blog_product_url || null,
       youtube_purchase_link || null,
+      smartstore_product_url || null,
       application_start_date || null,
       application_end_date || null,
       announcement_date || null,
