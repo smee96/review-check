@@ -4881,7 +4881,21 @@ class ReviewSphere {
         </div>
       `;
     } catch (error) {
-      alert('캠페인 목록을 불러오는데 실패했습니다');
+      console.error('showAllCampaigns error:', error);
+      alert('캠페인 목록을 불러오는데 실패했습니다: ' + (error.message || error));
+      const content = document.getElementById('adminContent');
+      if (content) {
+        content.innerHTML = `
+          <div class="p-4 bg-red-50 border border-red-200 rounded">
+            <h3 class="font-bold text-red-800 mb-2">오류 발생</h3>
+            <p class="text-red-600">캠페인 목록을 불러오는데 실패했습니다.</p>
+            <p class="text-sm text-gray-600 mt-2">에러: ${error.message || error}</p>
+            <button onclick="app.showAllCampaigns()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              다시 시도
+            </button>
+          </div>
+        `;
+      }
     }
   }
 
