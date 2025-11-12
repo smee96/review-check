@@ -44,7 +44,9 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
       // 정산 정보
       account_holder_name, bank_name, account_number, business_number,
       // 배송 정보
-      shipping_name, shipping_phone, shipping_postal_code, shipping_address, shipping_address_detail
+      shipping_name, shipping_phone, shipping_postal_code, shipping_address, shipping_address_detail,
+      // 동의 정보
+      portrait_rights_consent, personal_info_consent, content_usage_consent, third_party_provision_consent
     } = data;
     
     const { env } = c;
@@ -58,6 +60,8 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
            business_number = ?,
            shipping_name = ?, shipping_phone = ?, shipping_postal_code = ?, 
            shipping_address = ?, shipping_address_detail = ?,
+           portrait_rights_consent = ?, personal_info_consent = ?, 
+           content_usage_consent = ?, third_party_provision_consent = ?,
            updated_at = ?
        WHERE user_id = ?`
     ).bind(
@@ -80,6 +84,10 @@ profiles.put('/influencer', requireRole('influencer'), async (c) => {
       shipping_postal_code || null,
       shipping_address || null,
       shipping_address_detail || null,
+      portrait_rights_consent ? 1 : 0,
+      personal_info_consent ? 1 : 0,
+      content_usage_consent ? 1 : 0,
+      third_party_provision_consent ? 1 : 0,
       getCurrentDateTime(),
       user.userId
     ).run();

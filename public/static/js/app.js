@@ -4256,6 +4256,52 @@ class ReviewSphere {
             </div>
           </div>
 
+          <!-- 개인정보 동의 섹션 -->
+          <div class="bg-white border-2 border-blue-200 rounded-lg p-4">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-shield-alt text-blue-600 mr-2"></i>개인정보 처리 동의
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">캠페인 지원 시와 동일한 내용입니다. 프로필 저장 시 동의가 필요합니다.</p>
+            
+            <div class="space-y-3">
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="portraitRightsConsent" ${profile.portrait_rights_consent ? 'checked' : ''} required
+                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+                <div class="flex-1">
+                  <span class="text-sm font-medium text-gray-900">초상권 사용 동의 <span class="text-red-600">*</span></span>
+                  <p class="text-xs text-gray-600 mt-1">캠페인 홍보 및 마케팅 목적으로 내 초상(사진, 영상)이 사용되는 것에 동의합니다.</p>
+                </div>
+              </label>
+
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="personalInfoConsent" ${profile.personal_info_consent ? 'checked' : ''} required
+                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+                <div class="flex-1">
+                  <span class="text-sm font-medium text-gray-900">개인정보 수집 및 이용 동의 <span class="text-red-600">*</span></span>
+                  <p class="text-xs text-gray-600 mt-1">이름, 연락처, 배송지 등 개인정보를 수집 및 이용하는 것에 동의합니다. (목적: 캠페인 진행, 상품 배송, 정산)</p>
+                </div>
+              </label>
+
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="contentUsageConsent" ${profile.content_usage_consent ? 'checked' : ''} required
+                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+                <div class="flex-1">
+                  <span class="text-sm font-medium text-gray-900">콘텐츠 사용 동의 <span class="text-red-600">*</span></span>
+                  <p class="text-xs text-gray-600 mt-1">내가 제작한 콘텐츠(리뷰, 포스팅)를 플랫폼 및 광고주가 사용하는 것에 동의합니다.</p>
+                </div>
+              </label>
+
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="thirdPartyProvisionConsent" ${profile.third_party_provision_consent ? 'checked' : ''} required
+                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+                <div class="flex-1">
+                  <span class="text-sm font-medium text-gray-900">개인정보 제3자 제공 동의 <span class="text-red-600">*</span></span>
+                  <p class="text-xs text-gray-600 mt-1">캠페인 진행을 위해 광고주에게 내 개인정보(이름, 연락처, 배송지, SNS 정보)가 제공되는 것에 동의합니다.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
             저장
           </button>
@@ -4295,6 +4341,12 @@ class ReviewSphere {
         shipping_postal_code: document.getElementById('shippingPostalCode').value,
         shipping_address: document.getElementById('shippingAddress').value,
         shipping_address_detail: document.getElementById('shippingAddressDetail').value,
+        
+        // 동의 정보
+        portrait_rights_consent: document.getElementById('portraitRightsConsent').checked,
+        personal_info_consent: document.getElementById('personalInfoConsent').checked,
+        content_usage_consent: document.getElementById('contentUsageConsent').checked,
+        third_party_provision_consent: document.getElementById('thirdPartyProvisionConsent').checked,
       };
 
       await axios.put('/api/profile/influencer', data, this.getAuthHeaders());
