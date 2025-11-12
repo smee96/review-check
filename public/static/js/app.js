@@ -1,12 +1,9 @@
 // ReviewSphere Frontend Application
-console.log('[DEBUG] app.js loaded successfully - v9');
 
 class ReviewSphere {
   constructor() {
-    console.log('[DEBUG] ReviewSphere constructor called');
     this.token = localStorage.getItem('token');
     this.user = JSON.parse(localStorage.getItem('user') || 'null');
-    console.log('[DEBUG] Current user:', this.user);
     this.currentPage = 'home';
     this.init();
   }
@@ -1383,12 +1380,9 @@ class ReviewSphere {
   }
 
   async loadAdvertiserCampaignsContent(container) {
-    console.log('[DEBUG] loadAdvertiserCampaignsContent() called');
     try {
-      console.log('[DEBUG] Fetching campaigns from /api/campaigns/my');
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
-      console.log('[DEBUG] Campaigns loaded:', campaigns);
 
       container.innerHTML = `
         <div class="p-4 sm:p-6">
@@ -1464,17 +1458,67 @@ class ReviewSphere {
   }
 
   async loadAdvertiserProfileContent(container) {
-    // 프로필 관리를 전체 페이지로 표시
-    this.showAdvertiserProfile();
+    try {
+      const response = await axios.get('/api/profile/advertiser', this.getAuthHeaders());
+      const profile = response.data;
+
+      container.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">사업자 정보 관리</h2>
+          <form id="advertiserProfileForm" onsubmit="event.preventDefault(); app.handleUpdateAdvertiserProfile();" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">회사명</label>
+              <input type="text" id="companyName" value="${profile.company_name || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호</label>
+              <input type="text" id="businessNumber" value="${profile.business_number || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">대표자명</label>
+              <input type="text" id="representativeName" value="${profile.representative_name || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">사업자 주소</label>
+              <input type="text" id="businessAddress" value="${profile.business_address || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
+                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당자 이메일</label>
+                <input type="email" id="contactEmail" value="${profile.contact_email || ''}"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+              저장
+            </button>
+          </form>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load advertiser profile:', error);
+      container.innerHTML = '<p class="text-red-600 p-4">프로필을 불러오는데 실패했습니다</p>';
+    }
   }
 
   async showMyCampaigns() {
-    console.log('[DEBUG] showMyCampaigns() called');
     try {
-      console.log('[DEBUG] Fetching campaigns from API...');
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
-      console.log('[DEBUG] My campaigns:', campaigns);
 
       const content = document.getElementById('advertiserContent');
       content.innerHTML = `
