@@ -73,9 +73,9 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
         <!-- Daum 우편번호 API -->
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script src="/static/js/api.js?v=4"></script>
-        <script src="/static/js/ui-utils.js?v=4"></script>
-        <script src="/static/js/app.js?v=4"></script>
+        <script src="/static/js/api.js?v=5"></script>
+        <script src="/static/js/ui-utils.js?v=5"></script>
+        <script src="/static/js/app.js?v=5"></script>
     </body>
     </html>
   `);

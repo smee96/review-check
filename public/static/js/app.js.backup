@@ -2689,30 +2689,7 @@ class ReviewSphere {
               <h2 class="text-2xl sm:text-3xl font-bold mb-6">지원자 목록</h2>
         ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : ''}
         <div class="space-y-3 sm:space-y-4">
-          ${applications.map(a => {
-            // SNS URL 생성 함수
-            const makeChannelUrl = (type, handle) => {
-              if (!handle || handle === '-') return null;
-              switch(type) {
-                case 'instagram':
-                  return handle.startsWith('http') ? handle : `https://instagram.com/${handle.replace('@', '')}`;
-                case 'youtube':
-                  return handle.startsWith('http') ? handle : `https://youtube.com/@${handle.replace('@', '')}`;
-                case 'blog':
-                  return handle.startsWith('http') ? handle : null;
-                case 'tiktok':
-                  return handle.startsWith('http') ? handle : `https://tiktok.com/@${handle.replace('@', '')}`;
-                default:
-                  return null;
-              }
-            };
-            
-            const instagramUrl = makeChannelUrl('instagram', a.instagram_handle);
-            const youtubeUrl = makeChannelUrl('youtube', a.youtube_channel);
-            const blogUrl = makeChannelUrl('blog', a.blog_url);
-            const tiktokUrl = makeChannelUrl('tiktok', a.tiktok_handle);
-            
-            return `
+          ${applications.map(a => `
             <div class="bg-white border rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition">
               <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
                 <div class="flex-1">
@@ -2725,65 +2702,15 @@ class ReviewSphere {
                 </span>
               </div>
 
-              <!-- 개인 정보 섹션 -->
-              <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                <h4 class="font-semibold text-purple-900 mb-3 flex items-center">
-                  <i class="fas fa-user mr-2"></i>개인 정보
-                </h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                  <p><strong>이름:</strong> ${a.real_name || '-'}</p>
-                  <p><strong>생년월일:</strong> ${a.birth_date || '-'}</p>
-                  <p><strong>성별:</strong> ${a.gender === 'male' ? '남성' : a.gender === 'female' ? '여성' : a.gender === 'other' ? '기타' : '-'}</p>
-                  <p><strong>연락처:</strong> ${a.contact_phone || '-'}</p>
-                </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 text-sm">
+                <p><strong>📸 인스타그램:</strong> ${a.instagram_handle || '-'}</p>
+                <p><strong>🎥 유튜브:</strong> ${a.youtube_channel || '-'}</p>
+                <p><strong>📝 블로그:</strong> ${a.blog_url || '-'}</p>
+                <p><strong>📱 틱톡:</strong> ${a.tiktok_handle || '-'}</p>
+                <p><strong>👥 팔로워:</strong> ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
+                <p><strong>🏷️ 카테고리:</strong> ${a.category || '-'}</p>
               </div>
 
-              <!-- SNS 채널 섹션 -->
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 class="font-semibold text-blue-900 mb-3 flex items-center">
-                  <i class="fas fa-share-alt mr-2"></i>SNS 채널
-                </h4>
-                <div class="grid grid-cols-1 gap-2 text-sm">
-                  <p class="flex items-center justify-between">
-                    <strong>📸 인스타그램:</strong> 
-                    ${instagramUrl ? `<a href="${instagramUrl}" target="_blank" class="text-pink-600 hover:text-pink-800 hover:underline">${a.instagram_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>🎥 유튜브:</strong> 
-                    ${youtubeUrl ? `<a href="${youtubeUrl}" target="_blank" class="text-red-600 hover:text-red-800 hover:underline">${a.youtube_channel} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>📝 블로그:</strong> 
-                    ${blogUrl ? `<a href="${blogUrl}" target="_blank" class="text-green-600 hover:text-green-800 hover:underline break-all">${a.blog_url} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>📱 틱톡:</strong> 
-                    ${tiktokUrl ? `<a href="${tiktokUrl}" target="_blank" class="text-gray-600 hover:text-gray-800 hover:underline">${a.tiktok_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-3 pt-3 border-t border-blue-300">
-                  <p><strong>👥 팔로워:</strong> ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
-                  <p><strong>🏷️ 카테고리:</strong> ${a.category || '-'}</p>
-                </div>
-              </div>
-
-              <!-- 배송 정보 섹션 -->
-              ${a.shipping_recipient ? `
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                  <h4 class="font-semibold text-green-900 mb-3 flex items-center">
-                    <i class="fas fa-truck mr-2"></i>배송 정보
-                  </h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                    <p><strong>수령인:</strong> ${a.shipping_recipient}</p>
-                    <p><strong>연락처:</strong> ${a.shipping_phone || '-'}</p>
-                    <p class="sm:col-span-2"><strong>우편번호:</strong> ${a.shipping_zipcode || '-'}</p>
-                    <p class="sm:col-span-2"><strong>주소:</strong> ${a.shipping_address || '-'}</p>
-                    ${a.shipping_detail ? `<p class="sm:col-span-2"><strong>상세주소:</strong> ${a.shipping_detail}</p>` : ''}
-                  </div>
-                </div>
-              ` : ''}
-
-              <!-- 지원 메시지 -->
               ${a.message ? `
                 <div class="bg-gray-50 p-3 rounded-lg mb-3">
                   <p class="text-sm font-semibold mb-1">💬 지원 메시지:</p>
@@ -2791,7 +2718,6 @@ class ReviewSphere {
                 </div>
               ` : ''}
 
-              <!-- 액션 버튼 -->
               ${a.status === 'pending' ? `
                 <div class="flex flex-wrap gap-2 pt-3 border-t">
                   <button onclick="app.updateApplicationStatus(${a.id}, 'approved', ${campaignId})" 
@@ -2805,7 +2731,7 @@ class ReviewSphere {
                 </div>
               ` : ''}
             </div>
-          `}).join('')}
+          `).join('')}
         </div>
             </div>
           </div>
