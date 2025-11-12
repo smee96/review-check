@@ -1463,7 +1463,9 @@ class ReviewSphere {
   }
 
   async showMyCampaigns() {
+    console.log('[DEBUG] showMyCampaigns() called');
     try {
+      console.log('[DEBUG] Fetching campaigns from API...');
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
       console.log('[DEBUG] My campaigns:', campaigns);
@@ -3398,11 +3400,6 @@ class ReviewSphere {
     } catch (error) {
       alert(error.response?.data?.error || '프로필 저장에 실패했습니다');
     }
-  }
-
-  // 나의 캠페인 (지원 내역 통합) - 구버전 호환
-  async showMyCampaigns() {
-    this.showMyApplications();
   }
 
   // 관심 캠페인 (TODO: 구현 예정)
