@@ -327,13 +327,13 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
     } = await c.req.json();
     const { env } = c;
     
-    // Check if campaign exists and is approved
+    // Check if campaign exists and is recruiting
     const campaign = await env.DB.prepare(
       'SELECT * FROM campaigns WHERE id = ? AND status = ?'
-    ).bind(campaignId, 'approved').first();
+    ).bind(campaignId, 'recruiting').first();
     
     if (!campaign) {
-      return c.json({ error: '승인된 캠페인을 찾을 수 없습니다' }, 404);
+      return c.json({ error: '모집 중인 캠페인을 찾을 수 없습니다' }, 404);
     }
     
     // Check if already applied
