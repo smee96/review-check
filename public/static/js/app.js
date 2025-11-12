@@ -1462,11 +1462,13 @@ class ReviewSphere {
                           <span class="px-2 py-1 rounded text-xs font-semibold ${
                             c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
                             c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
-                            c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : ''
+                            c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' :
+                            c.channel_type === 'smartstore' ? 'bg-green-100 text-green-800' : ''
                           }">
-                            ${c.channel_type === 'instagram' ? '📸 인스타그램' :
-                              c.channel_type === 'blog' ? '📝 블로그' :
-                              c.channel_type === 'youtube' ? '🎥 유튜브' : ''}
+                            ${c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block mr-1"> 인스타그램' :
+                              c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block mr-1"> 블로그' :
+                              c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block mr-1"> 유튜브' :
+                              c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="스마트스토어"> 스마트스토어' : ''}
                           </span>
                         ` : ''}
                       </div>
