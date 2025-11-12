@@ -208,5 +208,28 @@ const UIUtils = {
     link.href = URL.createObjectURL(blob);
     link.download = filename || `settlements_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
+  },
+
+  // 사업자등록번호 자동 하이픈 (XXX-XX-XXXXX)
+  formatBusinessNumber(value) {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 5) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 5)}-${numbers.slice(5, 10)}`;
+  },
+
+  // 전화번호 자동 하이픈 (XXX-XXXX-XXXX 또는 XX-XXXX-XXXX)
+  formatPhoneNumber(value) {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    }
+    if (numbers.startsWith('02')) {
+      // 서울 지역번호 (02-XXXX-XXXX)
+      return `${numbers.slice(0, 2)}-${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
+    }
+    // 일반 (XXX-XXXX-XXXX)
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
   }
 };

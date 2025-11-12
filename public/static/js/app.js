@@ -1237,6 +1237,21 @@ class ReviewSphere {
   // ============================================
 
   async showAdvertiserDashboard() {
+    // 프로필 완성도 체크
+    let profileIncomplete = false;
+    let profileData = null;
+    try {
+      const response = await axios.get('/api/profile/advertiser', this.getAuthHeaders());
+      profileData = response.data;
+      // 필수 항목 체크: 회사명, 사업자등록번호, 대표자명, 연락처
+      if (!profileData.company_name || !profileData.business_number || 
+          !profileData.representative_name || !profileData.contact_phone) {
+        profileIncomplete = true;
+      }
+    } catch (error) {
+      console.error('Failed to check profile:', error);
+    }
+
     const app = document.getElementById('app');
     const roleTitle = this.user.role === 'advertiser' ? '광고주' : 
                       this.user.role === 'agency' ? '대행사' : '렙사';
@@ -1290,14 +1305,16 @@ class ReviewSphere {
               </div>
 
               <!-- 프로필 관리 -->
-              <div class="bg-white rounded-lg shadow">
+              <div class="bg-white rounded-lg shadow ${profileIncomplete ? 'border-2 border-orange-400' : ''}">
                 <button onclick="app.toggleAdvertiserAccordion('profile')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                      <i class="fas fa-user text-purple-600 text-xl sm:text-2xl"></i>
+                      <i class="fas fa-user ${profileIncomplete ? 'text-orange-500' : 'text-purple-600'} text-xl sm:text-2xl"></i>
                       <div>
-                        <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">사업자 정보 관리</p>
+                        <h3 class="font-semibold text-base sm:text-lg ${profileIncomplete ? 'text-orange-600' : ''}">프로필 관리 ${profileIncomplete ? '<span class="text-red-600">*</span>' : ''}</h3>
+                        <p class="text-xs sm:text-sm ${profileIncomplete ? 'text-orange-600 font-semibold' : 'text-gray-600'}">
+                          ${profileIncomplete ? '⚠️ 필수 정보를 입력해주세요 (세금계산서 발행용)' : '사업자 정보 관리'}
+                        </p>
                       </div>
                     </div>
                     <i id="profile-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
@@ -1464,41 +1481,72 @@ class ReviewSphere {
 
       container.innerHTML = `
         <div class="p-4 sm:p-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+              <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-3"></i>
+              <div class="text-sm text-blue-800">
+                <p class="font-semibold mb-1">캠페인 결제를 위한 필수 정보입니다</p>
+                <p class="text-xs">• 캠페인 등록 후 입금 시 <strong>세금계산서 발행</strong>에 필요한 정보입니다</p>
+                <p class="text-xs">• <span class="text-red-600">*</span> 표시는 필수 입력 항목입니다</p>
+              </div>
+            </div>
+          </div>
+
           <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">사업자 정보 관리</h2>
           <form id="advertiserProfileForm" onsubmit="event.preventDefault(); app.handleUpdateAdvertiserProfile();" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">회사명</label>
-              <input type="text" id="companyName" value="${profile.company_name || ''}"
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                회사명 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="companyName" value="${profile.company_name || ''}" required
+                placeholder="예: (주)모빈"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호</label>
-              <input type="text" id="businessNumber" value="${profile.business_number || ''}"
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                사업자등록번호 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="businessNumber" value="${profile.business_number || ''}" required
+                placeholder="222-88-96904"
+                maxlength="12"
+                oninput="this.value = UIUtils.formatBusinessNumber(this.value)"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              <p class="text-xs text-gray-500 mt-1">형식: XXX-XX-XXXXX (자동으로 하이픈이 입력됩니다)</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">대표자명</label>
-              <input type="text" id="representativeName" value="${profile.representative_name || ''}"
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                대표자명 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="representativeName" value="${profile.representative_name || ''}" required
+                placeholder="예: 홍길동"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">사업자 주소</label>
               <input type="text" id="businessAddress" value="${profile.business_address || ''}"
+                placeholder="예: 서울시 구로구 디지털로31길 12"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}"
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  연락처 <span class="text-red-600">*</span>
+                </label>
+                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}" required
+                  placeholder="010-1234-5678"
+                  maxlength="13"
+                  oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <p class="text-xs text-gray-500 mt-1">자동으로 하이픈이 입력됩니다</p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">담당자 이메일</label>
                 <input type="email" id="contactEmail" value="${profile.contact_email || ''}"
+                  placeholder="example@company.com"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               </div>
             </div>
