@@ -3075,13 +3075,24 @@ class ReviewSphere {
   // ============================================
 
   async showInfluencerDashboard() {
-    // Load profile to get points balance
+    // Load profile to get points balance and check completeness
     let pointsBalance = 0;
+    let profileIncomplete = false;
+    let profileData = null;
     try {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
-      pointsBalance = response.data.points_balance || 0;
+      profileData = response.data;
+      pointsBalance = profileData.points_balance || 0;
+      
+      // 필수 항목 체크: 실명, 생년월일, 성별, 연락처, 은행명, 계좌번호, 예금주명, 배송지 정보
+      if (!profileData.real_name || !profileData.birth_date || !profileData.gender || 
+          !profileData.contact_phone || !profileData.bank_name || !profileData.account_number || 
+          !profileData.account_holder_name || !profileData.shipping_name || 
+          !profileData.shipping_phone || !profileData.shipping_postal_code || !profileData.shipping_address) {
+        profileIncomplete = true;
+      }
     } catch (error) {
-      console.error('Failed to load points:', error);
+      console.error('Failed to load profile:', error);
     }
 
     const app = document.getElementById('app');
@@ -3180,14 +3191,16 @@ class ReviewSphere {
               </div>
 
               <!-- 프로필 관리 -->
-              <div class="bg-white rounded-lg shadow">
+              <div class="bg-white rounded-lg shadow ${profileIncomplete ? 'border-2 border-orange-400' : ''}">
                 <button onclick="app.toggleAccordion('profile')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                      <i class="fas fa-user text-purple-600 text-xl sm:text-2xl"></i>
+                      <i class="fas fa-user ${profileIncomplete ? 'text-orange-500' : 'text-purple-600'} text-xl sm:text-2xl"></i>
                       <div>
-                        <h3 class="font-semibold text-base sm:text-lg">프로필 관리</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">채널 및 정산 정보</p>
+                        <h3 class="font-semibold text-base sm:text-lg ${profileIncomplete ? 'text-orange-600' : ''}">프로필 관리 ${profileIncomplete ? '<span class="text-red-600">*</span>' : ''}</h3>
+                        <p class="text-xs sm:text-sm ${profileIncomplete ? 'text-orange-600 font-semibold' : 'text-gray-600'}">
+                          ${profileIncomplete ? '⚠️ 필수 정보를 입력해주세요 (정산 및 배송용)' : '채널 및 정산 정보'}
+                        </p>
                       </div>
                     </div>
                     <i id="profile-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
@@ -4029,6 +4042,18 @@ class ReviewSphere {
 
       const content = document.getElementById('influencerContent');
       content.innerHTML = `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-3"></i>
+            <div class="text-sm text-blue-800">
+              <p class="font-semibold mb-1">캠페인 지원 및 정산을 위한 필수 정보입니다</p>
+              <p class="text-xs">• 캠페인 지원 시 배송 정보가 자동으로 입력됩니다</p>
+              <p class="text-xs">• 정산 시 <strong>입금 계좌 정보</strong>가 필요합니다</p>
+              <p class="text-xs">• <span class="text-red-600">*</span> 표시는 필수 입력 항목입니다</p>
+            </div>
+          </div>
+        </div>
+
         <h2 class="text-2xl font-bold mb-6">프로필 관리</h2>
         <form id="influencerProfileForm" onsubmit="event.preventDefault(); app.handleUpdateInfluencerProfile();" class="space-y-6">
           
@@ -4040,22 +4065,28 @@ class ReviewSphere {
             
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">실명</label>
-                <input type="text" id="realName" value="${profile.real_name || ''}" placeholder="본명을 입력해주세요"
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  실명 <span class="text-red-600">*</span>
+                </label>
+                <input type="text" id="realName" value="${profile.real_name || ''}" placeholder="본명을 입력해주세요" required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 <p class="text-xs text-gray-500 mt-1">상품 배송 및 정산을 위해 필요합니다</p>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">생년월일</label>
-                  <input type="date" id="birthDate" value="${profile.birth_date || ''}"
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    생년월일 <span class="text-red-600">*</span>
+                  </label>
+                  <input type="date" id="birthDate" value="${profile.birth_date || ''}" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">성별</label>
-                  <select id="gender" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                    <option value="">선택 안함</option>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    성별 <span class="text-red-600">*</span>
+                  </label>
+                  <select id="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    <option value="">선택하세요</option>
                     <option value="male" ${profile.gender === 'male' ? 'selected' : ''}>남성</option>
                     <option value="female" ${profile.gender === 'female' ? 'selected' : ''}>여성</option>
                     <option value="other" ${profile.gender === 'other' ? 'selected' : ''}>기타</option>
@@ -4064,9 +4095,14 @@ class ReviewSphere {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}" placeholder="010-1234-5678"
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  연락처 <span class="text-red-600">*</span>
+                </label>
+                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}" placeholder="010-1234-5678" required
+                  maxlength="13"
+                  oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <p class="text-xs text-gray-500 mt-1">자동으로 하이픈이 입력됩니다</p>
               </div>
             </div>
           </div>
@@ -4127,20 +4163,27 @@ class ReviewSphere {
             
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">예금주명</label>
-                <input type="text" id="accountHolderName" value="${profile.account_holder_name || ''}"
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  예금주명 <span class="text-red-600">*</span>
+                </label>
+                <input type="text" id="accountHolderName" value="${profile.account_holder_name || ''}" placeholder="예: 홍길동" required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <p class="text-xs text-gray-500 mt-1">실명과 동일해야 합니다</p>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">은행명</label>
-                  <input type="text" id="bankName" value="${profile.bank_name || ''}"
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    은행명 <span class="text-red-600">*</span>
+                  </label>
+                  <input type="text" id="bankName" value="${profile.bank_name || ''}" placeholder="예: 국민은행" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">계좌번호</label>
-                  <input type="text" id="accountNumber" value="${profile.account_number || ''}"
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    계좌번호 <span class="text-red-600">*</span>
+                  </label>
+                  <input type="text" id="accountNumber" value="${profile.account_number || ''}" placeholder="하이픈 없이 입력" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 </div>
               </div>
@@ -4148,7 +4191,10 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호 (선택)</label>
                 <input type="text" id="businessNumber" value="${profile.business_number || ''}" placeholder="사업자인 경우 입력"
+                  maxlength="12"
+                  oninput="this.value = UIUtils.formatBusinessNumber(this.value)"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <p class="text-xs text-gray-500 mt-1">형식: XXX-XX-XXXXX (자동 입력)</p>
               </div>
             </div>
           </div>
@@ -4163,21 +4209,29 @@ class ReviewSphere {
             <div class="space-y-4">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">수령인</label>
-                  <input type="text" id="shippingName" value="${profile.shipping_name || ''}" placeholder="받으실 분 성함"
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    수령인 <span class="text-red-600">*</span>
+                  </label>
+                  <input type="text" id="shippingName" value="${profile.shipping_name || ''}" placeholder="받으실 분 성함" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                  <input type="tel" id="shippingPhone" value="${profile.shipping_phone || ''}" placeholder="010-1234-5678"
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    연락처 <span class="text-red-600">*</span>
+                  </label>
+                  <input type="tel" id="shippingPhone" value="${profile.shipping_phone || ''}" placeholder="010-1234-5678" required
+                    maxlength="13"
+                    oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">우편번호</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  우편번호 <span class="text-red-600">*</span>
+                </label>
                 <div class="flex gap-2">
-                  <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345" readonly
+                  <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345" readonly required
                     class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
                   <button type="button" onclick="app.searchAddress('profile')" 
                     class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
@@ -4187,8 +4241,10 @@ class ReviewSphere {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
-                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="주소 검색 버튼을 클릭하세요" readonly
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  주소 <span class="text-red-600">*</span>
+                </label>
+                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="주소 검색 버튼을 클릭하세요" readonly required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
               </div>
 
@@ -4243,6 +4299,9 @@ class ReviewSphere {
 
       await axios.put('/api/profile/influencer', data, this.getAuthHeaders());
       alert('프로필이 업데이트되었습니다');
+      
+      // 마이페이지로 이동 (프로필 완성도 재확인)
+      this.showMyPage();
     } catch (error) {
       alert(error.response?.data?.error || '프로필 업데이트에 실패했습니다');
     }
