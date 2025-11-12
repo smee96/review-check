@@ -5,9 +5,10 @@ const UIUtils = {
   getStatusBadge(status) {
     const badges = {
       pending: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
+      recruiting: 'bg-blue-100 text-blue-800',
+      in_progress: 'bg-green-100 text-green-800',
       suspended: 'bg-red-100 text-red-800',
-      completed: 'bg-blue-100 text-blue-800',
+      completed: 'bg-purple-100 text-purple-800',
       cancelled: 'bg-gray-100 text-gray-800'
     };
     return badges[status] || 'bg-gray-100 text-gray-800';
@@ -16,9 +17,10 @@ const UIUtils = {
   getStatusText(status) {
     const texts = {
       pending: '승인대기',
-      approved: '진행중',
+      recruiting: '모집중',
+      in_progress: '진행중',
       suspended: '일시중지',
-      completed: '완료',
+      completed: '성공종료',
       cancelled: '취소'
     };
     return texts[status] || status;

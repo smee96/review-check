@@ -34,6 +34,39 @@ applications.get('/my', requireRole('influencer'), async (c) => {
   }
 });
 
+// 지원 취소 (인플루언서)
+applications.delete('/:id', requireRole('influencer'), async (c) => {
+  try {
+    const applicationId = c.req.param('id');
+    const user = c.get('user');
+    const { env } = c;
+    
+    // Check if application exists and belongs to user
+    const application = await env.DB.prepare(
+      'SELECT * FROM applications WHERE id = ? AND influencer_id = ?'
+    ).bind(applicationId, user.userId).first();
+    
+    if (!application) {
+      return c.json({ error: '지원 내역을 찾을 수 없습니다' }, 404);
+    }
+    
+    // Can only cancel pending applications
+    if (application.status !== 'pending') {
+      return c.json({ error: '대기중인 지원만 취소할 수 있습니다' }, 400);
+    }
+    
+    // Delete application
+    await env.DB.prepare(
+      'DELETE FROM applications WHERE id = ?'
+    ).bind(applicationId).run();
+    
+    return c.json({ success: true, message: '지원이 취소되었습니다' });
+  } catch (error) {
+    console.error('Cancel application error:', error);
+    return c.json({ error: '지원 취소 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 // 지원자 확정/거절 (광고주/대행사/렙사)
 applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
