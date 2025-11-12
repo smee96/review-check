@@ -254,7 +254,7 @@ class ReviewSphere {
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
                 ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => {
-                  const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.svg" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
+                  const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
@@ -310,7 +310,7 @@ class ReviewSphere {
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
                 ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => {
-                  const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.svg" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
+                  const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
@@ -4005,7 +4005,7 @@ class ReviewSphere {
           ${campaigns.map(c => {
             const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : 
                                c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : 
-                               c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.svg" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
+                               c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
             const channelName = c.channel_type === 'instagram' ? '인스타그램' : 
                                c.channel_type === 'blog' ? '블로그' : 
                                c.channel_type === 'youtube' ? '유튜브' : '기타';
@@ -4688,7 +4688,7 @@ class ReviewSphere {
           <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">전체 캠페인 관리</h2>
           <div class="space-y-3 sm:space-y-4">
             ${campaigns.map(c => {
-              const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.svg" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
+              const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
               
               return `
               <div class="border rounded-lg p-3 sm:p-4">
@@ -4797,7 +4797,7 @@ class ReviewSphere {
         <h2 class="text-2xl font-bold mb-6">전체 캠페인 관리</h2>
         <div class="space-y-4">
           ${campaigns.map(c => {
-            const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.svg" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
+            const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : '<i class="fas fa-mobile-alt text-gray-500"></i>';
             
             return `
             <div class="border rounded-lg p-4">
