@@ -3062,6 +3062,9 @@ class ReviewSphere {
 
       await axios.put('/api/profile/advertiser', data, this.getAuthHeaders());
       alert('프로필이 업데이트되었습니다');
+      
+      // 마이페이지로 이동 (프로필 완성도 재확인)
+      this.showMyPage();
     } catch (error) {
       alert(error.response?.data?.error || '프로필 업데이트에 실패했습니다');
     }
