@@ -226,8 +226,9 @@ campaigns.put('/:id', authMiddleware, async (c) => {
         return c.json({ error: '승인된 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
       }
       
-      const today = new Date().toISOString().split('T')[0];
-      if (campaign.application_start_date && campaign.application_start_date <= today) {
+      const now = new Date();
+      const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0]; // 한국 시간
+      if (campaign.application_start_date && campaign.application_start_date <= koreaDate) {
         return c.json({ error: '신청 시작일 이후에는 캠페인을 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
       }
     }

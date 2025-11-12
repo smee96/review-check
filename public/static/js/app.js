@@ -1019,21 +1019,21 @@ class ReviewSphere {
                     
                     ${campaign.announcement_date ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
-                        <span class="text-sm text-gray-500">발표일</span>
+                        <span class="text-sm text-gray-500">인플루언서 선정 발표일</span>
                         <p class="font-semibold">${campaign.announcement_date}</p>
                       </div>
                     ` : ''}
                     
                     ${campaign.content_start_date ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
-                        <span class="text-sm text-gray-500">콘텐츠 게시 시작일</span>
+                        <span class="text-sm text-gray-500">컨텐츠 등록 시작일</span>
                         <p class="font-semibold">${campaign.content_start_date}</p>
                       </div>
                     ` : ''}
                     
                     ${campaign.content_end_date ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
-                        <span class="text-sm text-gray-500">콘텐츠 게시 종료일</span>
+                        <span class="text-sm text-gray-500">컨텐츠 등록 종료일</span>
                         <p class="font-semibold">${campaign.content_end_date}</p>
                       </div>
                     ` : ''}
@@ -1743,13 +1743,13 @@ class ReviewSphere {
           <div class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 시작일 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">모집 시작일 *</label>
                 <input type="text" id="campaignApplicationStartDate" required readonly
                   placeholder="날짜를 선택하세요"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">캠페인 신청 마감일 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">모집 종료일 *</label>
                 <input type="text" id="campaignApplicationEndDate" required readonly
                   placeholder="날짜를 선택하세요"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
@@ -1771,7 +1771,7 @@ class ReviewSphere {
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 마감일 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">컨텐츠 등록 종료일 *</label>
                 <input type="text" id="campaignContentEndDate" required readonly
                   placeholder="날짜를 선택하세요"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-white cursor-pointer">
