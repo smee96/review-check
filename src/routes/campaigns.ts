@@ -366,6 +366,8 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
             return profile.youtube_channel;
           case 'tiktok':
             return profile.tiktok_handle;
+          case 'smartstore':
+            return true; // 스마트스토어는 모든 인플루언서 지원 가능
           default:
             return true;
         }
