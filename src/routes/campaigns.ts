@@ -141,7 +141,7 @@ campaigns.get('/', async (c) => {
   }
 });
 
-// 캠페인 상세 조회 (로그인 필요)
+// 캠페인 상세 조회 (로그인 필수)
 campaigns.get('/:id', authMiddleware, async (c) => {
   try {
     const campaignId = c.req.param('id');
@@ -156,27 +156,41 @@ campaigns.get('/:id', authMiddleware, async (c) => {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
     
-    // 로그인한 경우 권한 체크
-    if (user) {
-      // 광고주/대행사/렙사는 자신의 캠페인만 조회 가능
-      if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
-        return c.json({ error: '권한이 없습니다' }, 403);
-      }
+    // 권한 체크
+    // 광고주/대행사/렙사는 자신의 캠페인만 조회 가능
+    if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+    
+    // 인플루언서는 승인되고 결제 완료된 캠페인만 조회 가능
+    if (user.role === 'influencer' && (campaign.status !== 'approved' || campaign.payment_status !== 'paid')) {
+      return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
+    }
+    
+    // 인플루언서인 경우 지원 여부 및 신청 가능 여부 확인
+    let has_applied = false;
+    let can_apply = true;
+    if (user.role === 'influencer') {
+      const application = await env.DB.prepare(
+        'SELECT id FROM applications WHERE campaign_id = ? AND influencer_id = ?'
+      ).bind(campaignId, user.userId).first();
+      has_applied = !!application;
       
-      // 인플루언서는 승인되고 결제 완료된 캠페인만 조회 가능
-      if (user.role === 'influencer' && (campaign.status !== 'approved' || campaign.payment_status !== 'paid')) {
-        return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
+      // 신청 기간 체크
+      const now = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      if (campaign.application_start_date && now < campaign.application_start_date) {
+        can_apply = false; // 신청 시작 전
       }
-      
-      // 관리자는 모든 캠페인 조회 가능
-    } else {
-      // 로그인하지 않은 경우: 승인되고 결제 완료된 캠페인만 조회 가능
-      if (campaign.status !== 'approved' || campaign.payment_status !== 'paid') {
-        return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
+      if (campaign.application_end_date && now > campaign.application_end_date) {
+        can_apply = false; // 신청 마감
       }
     }
     
-    return c.json(campaign);
+    return c.json({
+      ...campaign,
+      has_applied,
+      can_apply
+    });
   } catch (error) {
     console.error('Get campaign error:', error);
     return c.json({ error: '캠페인 조회 중 오류가 발생했습니다' }, 500);
@@ -325,6 +339,40 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
       return c.json({ error: '이미 지원한 캠페인입니다' }, 400);
     }
     
+    // Check if influencer has required channel
+    const profile = await env.DB.prepare(
+      'SELECT instagram_handle, blog_url, youtube_channel, tiktok_handle FROM influencer_profiles WHERE user_id = ?'
+    ).bind(user.userId).first() as any;
+    
+    if (profile && campaign.channel_type) {
+      const channelNames: { [key: string]: string } = {
+        'instagram': '인스타그램',
+        'blog': '블로그',
+        'youtube': '유튜브',
+        'tiktok': '틱톡'
+      };
+      
+      const hasRequiredChannel = () => {
+        switch(campaign.channel_type) {
+          case 'instagram':
+            return profile.instagram_handle;
+          case 'blog':
+            return profile.blog_url;
+          case 'youtube':
+            return profile.youtube_channel;
+          case 'tiktok':
+            return profile.tiktok_handle;
+          default:
+            return true;
+        }
+      };
+      
+      if (!hasRequiredChannel()) {
+        const channelName = channelNames[campaign.channel_type] || campaign.channel_type;
+        return c.json({ error: `이 캠페인은 ${channelName} 채널이 필요합니다. 프로필에서 ${channelName} 채널을 먼저 등록해주세요.` }, 400);
+      }
+    }
+    
     // Validate required personal information
     if (!real_name || !birth_date || !gender || !contact_phone) {
       return c.json({ error: '개인 정보를 모두 입력해주세요' }, 400);
@@ -368,6 +416,11 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
       getCurrentDateTime()
     ).run();
     
+    // 첫 지원자가 생기면 캠페인 환불 불가 처리
+    await env.DB.prepare(
+      'UPDATE campaigns SET refundable = 0 WHERE id = ?'
+    ).bind(campaignId).run();
+    
     return c.json({ success: true, message: '캠페인에 지원되었습니다' }, 201);
   } catch (error) {
     console.error('Apply campaign error:', error);
@@ -400,11 +453,13 @@ campaigns.get('/:id/applications', authMiddleware, async (c) => {
       return c.json({ error: '승인된 캠페인만 지원자를 조회할 수 있습니다' }, 403);
     }
     
-    // Get applications with influencer info and shipping details
+    // Get applications with influencer info (채널 정보만 공개, 개인정보는 마스킹)
     const applications = await env.DB.prepare(
-      `SELECT a.*, u.email, u.nickname,
+      `SELECT a.id, a.campaign_id, a.influencer_id, a.status, a.applied_at, a.reviewed_at,
               ip.instagram_handle, ip.youtube_channel, ip.blog_url, ip.tiktok_handle, 
-              ip.follower_count, ip.category, ip.real_name, ip.contact_phone
+              ip.follower_count, ip.category,
+              a.shipping_recipient, a.shipping_phone, a.shipping_zipcode, 
+              a.shipping_address, a.shipping_detail
        FROM applications a
        JOIN users u ON a.influencer_id = u.id
        LEFT JOIN influencer_profiles ip ON u.id = ip.user_id
@@ -412,10 +467,59 @@ campaigns.get('/:id/applications', authMiddleware, async (c) => {
        ORDER BY a.applied_at DESC`
     ).bind(campaignId).all();
     
-    return c.json(applications.results);
+    // 모든 개인정보 마스킹 처리 (배송 정보는 별도 API에서만 제공)
+    const maskedApplications = applications.results.map((app: any) => ({
+      ...app,
+      // 배송 정보도 모두 마스킹 (별도 API로만 조회 가능)
+      shipping_recipient: '***',
+      shipping_phone: '***-****-****',
+      shipping_zipcode: '*****',
+      shipping_address: '***************',
+      shipping_detail: '***',
+      nickname: '익명' + app.id // 닉네임 익명 처리
+    }));
+    
+    return c.json(maskedApplications);
   } catch (error) {
     console.error('Get applications error:', error);
     return c.json({ error: '지원자 목록 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 선정된 지원자 배송 정보 조회 (광고주 전용)
+campaigns.get('/:id/shipping-info', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
+  try {
+    const campaignId = c.req.param('id');
+    const user = c.get('user');
+    const { env } = c;
+    
+    // 캠페인 소유 권한 확인
+    const campaign = await env.DB.prepare(
+      'SELECT advertiser_id FROM campaigns WHERE id = ?'
+    ).bind(campaignId).first() as { advertiser_id: number } | null;
+    
+    if (!campaign) {
+      return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
+    }
+    
+    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+    
+    // 승인된 지원자들의 배송 정보만 조회 (채널 정보와 매칭 방지)
+    const shippingInfo = await env.DB.prepare(
+      `SELECT a.id as application_id,
+              a.shipping_recipient, a.shipping_phone, 
+              a.shipping_zipcode, a.shipping_address, a.shipping_detail
+       FROM applications a
+       WHERE a.campaign_id = ? AND a.status = 'approved'
+       ORDER BY a.applied_at DESC`
+    ).bind(campaignId).all();
+    
+    return c.json(shippingInfo.results);
+  } catch (error) {
+    console.error('Get shipping info error:', error);
+    return c.json({ error: '배송 정보 조회 중 오류가 발생했습니다' }, 500);
   }
 });
 

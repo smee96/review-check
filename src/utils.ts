@@ -43,8 +43,16 @@ export async function signJWT(payload: JWTPayload): Promise<string> {
 
 export async function verifyJWT(token: string): Promise<JWTPayload | null> {
   try {
+    if (!token || typeof token !== 'string') {
+      console.error('Invalid token: token is empty or not a string');
+      return null;
+    }
+    
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) {
+      console.error('Invalid token: JWT must have 3 parts');
+      return null;
+    }
     
     const [encodedHeader, encodedPayload, encodedSignature] = parts;
     const message = `${encodedHeader}.${encodedPayload}`;
@@ -61,17 +69,22 @@ export async function verifyJWT(token: string): Promise<JWTPayload | null> {
     const signature = Uint8Array.from(atob(encodedSignature), c => c.charCodeAt(0));
     const isValid = await crypto.subtle.verify('HMAC', key, signature, encoder.encode(message));
     
-    if (!isValid) return null;
+    if (!isValid) {
+      console.error('Invalid token: signature verification failed');
+      return null;
+    }
     
     const payload = JSON.parse(atob(encodedPayload)) as JWTPayload;
     
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      console.error('Invalid token: token expired');
       return null;
     }
     
     return payload;
   } catch (error) {
+    console.error('JWT verification error:', error);
     return null;
   }
 }

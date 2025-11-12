@@ -268,7 +268,12 @@ class ReviewSphere {
                       </div>
                     `}
                     <div class="p-4">
-                      <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                      <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-bold text-lg line-clamp-2 flex-1">${c.title}</h4>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status)} ml-2 whitespace-nowrap">
+                          ${this.getStatusText(c.status)}
+                        </span>
+                      </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
                       ${c.point_reward > 0 ? `
                         <div class="bg-purple-50 px-3 py-2 rounded-lg mb-3">
@@ -332,7 +337,12 @@ class ReviewSphere {
                       </div>
                     `}
                     <div class="p-4">
-                      <h4 class="font-bold text-lg mb-2 line-clamp-2">${c.title}</h4>
+                      <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-bold text-lg line-clamp-2 flex-1">${c.title}</h4>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status)} ml-2 whitespace-nowrap">
+                          ${this.getStatusText(c.status)}
+                        </span>
+                      </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2">${c.description || '캠페인 설명이 없습니다'}</p>
                       ${c.point_reward > 0 ? `
                         <div class="bg-purple-50 px-3 py-2 rounded-lg mb-3">
@@ -831,9 +841,15 @@ class ReviewSphere {
           
           <div class="flex-grow">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>뒤로가기
-              </button>
+              <!-- 로고 -->
+              <div class="mb-4 flex items-center justify-between">
+                <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 flex items-center">
+                  <i class="fas fa-arrow-left mr-2"></i>뒤로가기
+                </button>
+                <div class="text-2xl font-bold text-purple-600">
+                  리뷰스피어
+                </div>
+              </div>
               
               <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- 썸네일/상세 이미지 -->
@@ -895,7 +911,7 @@ class ReviewSphere {
                     <h2 class="text-xl font-bold text-gray-800 mb-3">
                       <i class="fas fa-file-alt mr-2"></i>캠페인 설명
                     </h2>
-                    <div class="prose max-w-none text-gray-600 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                    <div class="text-gray-700 whitespace-pre-line bg-gray-50 p-4 rounded-lg text-left leading-relaxed">
                       ${campaign.description || '캠페인 설명이 없습니다.'}
                     </div>
                   </div>
@@ -982,7 +998,7 @@ class ReviewSphere {
                     
                     ${campaign.budget ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
-                        <span class="text-sm text-gray-500">예산</span>
+                        <span class="text-sm text-gray-500">판매가</span>
                         <p class="font-semibold text-purple-600">${campaign.budget.toLocaleString()}원</p>
                       </div>
                     ` : ''}
@@ -1040,7 +1056,7 @@ class ReviewSphere {
                         ${campaign.instagram_mention_account ? `
                           <div>
                             <span class="text-sm text-gray-500">인스타그램 멘션 계정</span>
-                            <p class="font-semibold text-pink-600">@${campaign.instagram_mention_account}</p>
+                            <p class="font-semibold text-pink-600">${campaign.instagram_mention_account.startsWith('@') ? campaign.instagram_mention_account : '@' + campaign.instagram_mention_account}</p>
                           </div>
                         ` : ''}
                         ${campaign.blog_product_url ? `
@@ -1086,11 +1102,11 @@ class ReviewSphere {
                       <div class="grid grid-cols-2 gap-4">
                         <div>
                           <span class="text-sm text-purple-700">인당 지급</span>
-                          <p class="text-3xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
+                          <p class="text-2xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
                         </div>
                         <div>
                           <span class="text-sm text-purple-700">총 포인트</span>
-                          <p class="text-3xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
+                          <p class="text-2xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
                         </div>
                       </div>
                       <p class="text-xs text-purple-600 mt-4">
@@ -1103,10 +1119,24 @@ class ReviewSphere {
                   ${campaign.status === 'approved' && campaign.payment_status === 'paid' ? `
                     <div class="mt-8">
                       ${this.user?.role === 'influencer' ? `
-                        <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
-                          <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
-                        </button>
-                        <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                        ${campaign.has_applied ? `
+                          <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
+                            <i class="fas fa-check-circle mr-2"></i>지원 완료
+                          </div>
+                          <p class="text-sm text-gray-500 text-center mt-2">이미 지원한 캠페인입니다</p>
+                        ` : campaign.can_apply === false ? `
+                          <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
+                            <i class="fas fa-calendar-times mr-2"></i>신청 기간이 아닙니다
+                          </div>
+                          <p class="text-sm text-gray-500 text-center mt-2">
+                            ${campaign.application_start_date ? `신청 기간: ${campaign.application_start_date} ~ ${campaign.application_end_date || '미정'}` : '신청 기간이 설정되지 않았습니다'}
+                          </p>
+                        ` : `
+                          <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                            <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                          </button>
+                          <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
+                        `}
                       ` : !this.user ? `
                         <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
                           <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
@@ -1128,9 +1158,12 @@ class ReviewSphere {
         </div>
       `;
     } catch (error) {
-      console.error('Campaign detail error:', error);
-      console.error('Error response:', error.response);
-      console.error('Error message:', error.message);
+      // 401 에러면 토큰 만료 또는 유효하지 않음 - 다시 로그인
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        this.logout();
+        return;
+      }
       
       const errorMsg = error.response?.data?.error || error.message || '캠페인 정보를 불러오는데 실패했습니다';
       alert(`캠페인 정보를 불러오는데 실패했습니다\n\n에러: ${errorMsg}`);
@@ -1560,82 +1593,6 @@ class ReviewSphere {
     } catch (error) {
       console.error('Failed to load advertiser profile:', error);
       container.innerHTML = '<p class="text-red-600 p-4">프로필을 불러오는데 실패했습니다</p>';
-    }
-  }
-
-  async showMyCampaigns() {
-    try {
-      const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
-      const campaigns = response.data;
-
-      const content = document.getElementById('advertiserContent');
-      content.innerHTML = `
-        <h2 class="text-2xl font-bold mb-6">내 캠페인 목록</h2>
-        ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
-        <div class="space-y-4">
-          ${campaigns.map(c => `
-            <div class="border rounded-lg hover:shadow-md transition overflow-hidden">
-              <div class="flex">
-                <!-- 썸네일 이미지 -->
-                ${c.thumbnail_image ? `
-                  <div class="w-32 h-32 flex-shrink-0">
-                    <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
-                  </div>
-                ` : `
-                  <div class="w-32 h-32 flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                    <i class="fas fa-image text-gray-400 text-3xl"></i>
-                  </div>
-                `}
-                
-                <!-- 캠페인 정보 -->
-                <div class="flex-1 p-4">
-                  <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center gap-2">
-                      <h3 class="font-bold text-lg">${c.title}</h3>
-                      ${c.channel_type ? `
-                        <span class="px-2 py-1 rounded text-xs font-semibold ${
-                          c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
-                          c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
-                          c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : ''
-                        }">
-                          ${c.channel_type === 'instagram' ? '📸 인스타그램' :
-                            c.channel_type === 'blog' ? '📝 블로그' :
-                            c.channel_type === 'youtube' ? '🎥 유튜브' : ''}
-                        </span>
-                      ` : ''}
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
-                      ${this.getStatusText(c.status)}
-                    </span>
-                  </div>
-                  <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
-                  <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
-                    <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                    <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
-                    ${c.point_reward > 0 ? `
-                      <span class="col-span-2 text-purple-600 font-semibold">
-                        <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
-                      </span>
-                    ` : ''}
-                  </div>
-                  <div class="mt-4 flex space-x-2">
-                    <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-sm" id="editBtn${c.id}">
-                      <i class="fas fa-edit mr-1"></i>수정
-                    </button>
-                    ${c.status === 'approved' ? `
-                      <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-sm">
-                        <i class="fas fa-users mr-1"></i>지원자 보기
-                      </button>
-                    ` : ''}
-                  </div>
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    } catch (error) {
-      alert('캠페인 목록을 불러오는데 실패했습니다');
     }
   }
 
@@ -2363,7 +2320,7 @@ class ReviewSphere {
 
       const response = await axios.post('/api/campaigns', data, this.getAuthHeaders());
       alert('캠페인 등록 신청이 완료되었습니다.\n관리자 승인 후 진행됩니다.');
-      this.showMyCampaigns();
+      this.showAdvertiserDashboard();
     } catch (error) {
       alert(error.response?.data?.error || '캠페인 등록에 실패했습니다');
     }
@@ -2602,11 +2559,11 @@ class ReviewSphere {
       const response = await axios.put(`/api/campaigns/${campaignId}`, data, this.getAuthHeaders());
       alert('캠페인이 수정되었습니다.');
       
-      // 관리자는 관리자 대시보드로, 광고주는 내 캠페인으로
+      // 관리자는 관리자 대시보드로, 광고주는 광고주 대시보드로
       if (this.user.role === 'admin') {
         this.showAdminDashboard();
       } else {
-        this.showMyCampaigns();
+        this.showAdvertiserDashboard();
       }
     } catch (error) {
       console.error('Update campaign error:', error);
@@ -2791,31 +2748,122 @@ class ReviewSphere {
               </button>
 
               <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl sm:text-3xl font-bold">지원자 목록</h2>
-                <span class="text-sm text-gray-600">총 <span class="font-bold text-purple-600">${applications.length}</span>명</span>
+                <div>
+                  <h2 class="text-2xl sm:text-3xl font-bold">지원자 목록</h2>
+                  <span class="text-sm text-gray-600">총 <span class="font-bold text-purple-600">${applications.length}</span>명</span>
+                </div>
+                ${applications.some(a => a.status === 'approved') ? `
+                  <button onclick="app.viewShippingInfo(${this.currentCampaignId})" 
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center text-sm">
+                    <i class="fas fa-shipping-fast mr-2"></i>배송정보 보기
+                  </button>
+                ` : ''}
               </div>
         
         ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : `
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          ${applications.map(a => `
-            <div onclick="app.viewApplicationDetail(${a.id})" class="bg-white border-2 rounded-lg p-4 cursor-pointer hover:border-purple-600 hover:shadow-lg transition">
+          ${applications.map(a => {
+            // 채널 URL 생성
+            const makeChannelUrl = (type, handle) => {
+              if (!handle) return null;
+              switch(type) {
+                case 'instagram':
+                  return handle.startsWith('http') ? handle : `https://instagram.com/${handle.replace('@', '')}`;
+                case 'youtube':
+                  return handle.startsWith('http') ? handle : `https://youtube.com/@${handle.replace('@', '')}`;
+                case 'blog':
+                  return handle.startsWith('http') ? handle : null;
+                case 'tiktok':
+                  return handle.startsWith('http') ? handle : `https://tiktok.com/@${handle.replace('@', '')}`;
+                default:
+                  return null;
+              }
+            };
+            
+            const instagramUrl = makeChannelUrl('instagram', a.instagram_handle);
+            const youtubeUrl = makeChannelUrl('youtube', a.youtube_channel);
+            const blogUrl = makeChannelUrl('blog', a.blog_url);
+            const tiktokUrl = makeChannelUrl('tiktok', a.tiktok_handle);
+            
+            return `
+            <div class="bg-white border-2 rounded-lg p-4 hover:border-purple-300 hover:shadow-lg transition">
               <div class="flex justify-between items-start mb-3">
-                <h3 class="font-bold text-lg">${a.nickname}</h3>
+                <h3 class="font-bold text-lg">${a.nickname.replace('익명', '지원자')}</h3>
                 <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getApplicationStatusBadge(a.status)}">
                   ${this.getApplicationStatusText(a.status)}
                 </span>
               </div>
-              <p class="text-sm text-gray-600 mb-2">${a.real_name || '-'}</p>
-              <div class="text-xs text-gray-500 space-y-1">
-                <p>📞 ${a.contact_phone || '-'}</p>
+              
+              <!-- 채널 링크 (클릭 시 새 탭에서 열림) -->
+              <div class="text-sm space-y-2 mb-3">
+                ${a.instagram_handle ? `
+                  <a href="${instagramUrl}" target="_blank" onclick="event.stopPropagation()" 
+                    class="flex items-center text-pink-600 hover:text-pink-800 hover:underline">
+                    <i class="fab fa-instagram mr-2"></i>
+                    <span class="break-all">${a.instagram_handle}</span>
+                    <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                  </a>
+                ` : ''}
+                ${a.blog_url ? `
+                  <a href="${blogUrl}" target="_blank" onclick="event.stopPropagation()" 
+                    class="flex items-center text-green-600 hover:text-green-800 hover:underline">
+                    <i class="fas fa-blog mr-2"></i>
+                    <span class="break-all">${a.blog_url}</span>
+                    <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                  </a>
+                ` : ''}
+                ${a.youtube_channel ? `
+                  <a href="${youtubeUrl}" target="_blank" onclick="event.stopPropagation()" 
+                    class="flex items-center text-red-600 hover:text-red-800 hover:underline">
+                    <i class="fab fa-youtube mr-2"></i>
+                    <span class="break-all">${a.youtube_channel}</span>
+                    <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                  </a>
+                ` : ''}
+                ${a.tiktok_handle ? `
+                  <a href="${tiktokUrl}" target="_blank" onclick="event.stopPropagation()" 
+                    class="flex items-center text-purple-600 hover:text-purple-800 hover:underline">
+                    <i class="fab fa-tiktok mr-2"></i>
+                    <span class="break-all">${a.tiktok_handle}</span>
+                    <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                  </a>
+                ` : ''}
+              </div>
+              
+              <div class="text-xs text-gray-500 space-y-1 mb-3">
                 <p>👥 팔로워: ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
+                <p>📂 카테고리: ${a.category || '미설정'}</p>
                 <p>📅 ${new Date(a.applied_at).toLocaleDateString('ko-KR')}</p>
               </div>
-              <div class="mt-3 pt-3 border-t flex items-center justify-between">
-                <span class="text-xs text-purple-600 font-semibold">자세히 보기 →</span>
+              
+              <!-- 액션 버튼 -->
+              <div class="mt-3 pt-3 border-t">
+                ${a.status === 'pending' ? `
+                  <div class="flex gap-2">
+                    <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'approved', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
+                      class="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 text-sm font-semibold transition">
+                      <i class="fas fa-check mr-1"></i>선정
+                    </button>
+                    <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'rejected', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
+                      class="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 text-sm font-semibold transition">
+                      <i class="fas fa-times mr-1"></i>거절
+                    </button>
+                  </div>
+                ` : a.status === 'approved' ? `
+                  <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'pending', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
+                    class="w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 text-sm font-semibold transition">
+                    <i class="fas fa-undo mr-1"></i>선정 취소
+                  </button>
+                ` : a.status === 'rejected' ? `
+                  <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'pending', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
+                    class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold transition">
+                    <i class="fas fa-redo mr-1"></i>재검토
+                  </button>
+                ` : ''}
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
           </div>
         `}
             </div>
@@ -2877,24 +2925,24 @@ class ReviewSphere {
               <div class="bg-white border-2 rounded-lg p-6 shadow-lg">
                 <div class="flex justify-between items-start mb-6">
                   <div>
-                    <h2 class="text-2xl font-bold">${application.nickname}</h2>
-                    <p class="text-gray-600">${application.email}</p>
+                    <h2 class="text-2xl font-bold">${application.nickname.replace('익명', '지원자')}</h2>
                   </div>
                   <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getApplicationStatusBadge(application.status)}">
                     ${this.getApplicationStatusText(application.status)}
                   </span>
                 </div>
 
-                <!-- 개인 정보 -->
+                <!-- 개인 정보 (보호) -->
                 <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
                   <h4 class="font-semibold text-purple-900 mb-3 flex items-center">
-                    <i class="fas fa-user mr-2"></i>개인 정보
+                    <i class="fas fa-user-shield mr-2"></i>개인정보 보호
                   </h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <p><strong>이름:</strong> ${application.real_name || '-'}</p>
-                    <p><strong>생년월일:</strong> ${application.birth_date || '-'}</p>
-                    <p><strong>성별:</strong> ${application.gender === 'male' ? '남성' : application.gender === 'female' ? '여성' : application.gender === 'other' ? '기타' : '-'}</p>
-                    <p><strong>연락처:</strong> ${application.contact_phone || '-'}</p>
+                  <div class="text-sm text-gray-600">
+                    <p class="flex items-center mb-2">
+                      <i class="fas fa-lock mr-2 text-gray-400"></i>
+                      인플루언서의 개인정보는 보호됩니다
+                    </p>
+                    <p class="text-xs text-gray-500">채널 정보를 기반으로 선정해주세요. 제품 발송은 배송 정보만으로 가능합니다.</p>
                   </div>
                 </div>
 
@@ -2927,29 +2975,21 @@ class ReviewSphere {
                   </div>
                 </div>
 
-                <!-- 배송 정보 -->
-                ${application.shipping_recipient ? `
-                  <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                    <h4 class="font-semibold text-green-900 mb-3 flex items-center">
-                      <i class="fas fa-truck mr-2"></i>배송 정보
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                      <p><strong>수령인:</strong> ${application.shipping_recipient}</p>
-                      <p><strong>연락처:</strong> ${application.shipping_phone || '-'}</p>
-                      <p class="sm:col-span-2"><strong>우편번호:</strong> ${application.shipping_zipcode || '-'}</p>
-                      <p class="sm:col-span-2"><strong>주소:</strong> ${application.shipping_address || '-'}</p>
-                      ${application.shipping_detail ? `<p class="sm:col-span-2"><strong>상세주소:</strong> ${application.shipping_detail}</p>` : ''}
-                    </div>
+                <!-- 배송 정보 (보호) -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <h4 class="font-semibold text-green-900 mb-3 flex items-center">
+                    <i class="fas fa-truck mr-2"></i>배송 정보
+                  </h4>
+                  <div class="text-sm text-gray-600">
+                    <p class="flex items-center mb-2">
+                      <i class="fas fa-lock mr-2 text-gray-400"></i>
+                      배송 정보는 보호됩니다
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      선정된 지원자의 배송 정보는 <strong>"배송정보 보기"</strong> 버튼을 통해 일괄 확인 가능합니다.
+                    </p>
                   </div>
-                ` : ''}
-
-                <!-- 지원 메시지 -->
-                ${application.message ? `
-                  <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                    <p class="text-sm font-semibold mb-2">💬 지원 메시지:</p>
-                    <p class="text-sm text-gray-700">${application.message}</p>
-                  </div>
-                ` : ''}
+                </div>
 
                 <!-- 지원 정보 -->
                 <div class="bg-gray-50 p-4 rounded-lg mb-4">
@@ -2961,12 +3001,32 @@ class ReviewSphere {
                   <div class="flex gap-3">
                     <button onclick="app.updateApplicationStatus(${application.id}, 'approved', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
                       class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold transition">
-                      <i class="fas fa-check mr-2"></i>확정
+                      <i class="fas fa-check mr-2"></i>선정 확정
                     </button>
                     <button onclick="app.updateApplicationStatus(${application.id}, 'rejected', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
                       class="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-semibold transition">
                       <i class="fas fa-times mr-2"></i>거절
                     </button>
+                  </div>
+                ` : application.status === 'approved' ? `
+                  <div class="space-y-3">
+                    <button onclick="app.updateApplicationStatus(${application.id}, 'pending', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
+                      class="w-full bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 font-semibold transition">
+                      <i class="fas fa-undo mr-2"></i>선정 취소
+                    </button>
+                    <p class="text-xs text-gray-500 text-center">
+                      <i class="fas fa-info-circle mr-1"></i>선정을 취소하면 대기 상태로 되돌아갑니다
+                    </p>
+                  </div>
+                ` : application.status === 'rejected' ? `
+                  <div class="space-y-3">
+                    <button onclick="app.updateApplicationStatus(${application.id}, 'pending', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
+                      class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition">
+                      <i class="fas fa-redo mr-2"></i>재검토
+                    </button>
+                    <p class="text-xs text-gray-500 text-center">
+                      <i class="fas fa-info-circle mr-1"></i>대기 상태로 되돌려 다시 검토할 수 있습니다
+                    </p>
                   </div>
                 ` : ''}
               </div>
@@ -2993,59 +3053,66 @@ class ReviewSphere {
     }
   }
 
-  async showAdvertiserProfile() {
+  async viewShippingInfo(campaignId) {
     try {
-      const response = await axios.get('/api/profile/advertiser', this.getAuthHeaders());
-      const profile = response.data;
+      const response = await axios.get(`/api/campaigns/${campaignId}/shipping-info`, this.getAuthHeaders());
+      const shippingList = response.data;
+      
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+              <button onclick="app.viewApplications(${campaignId})" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>지원자 목록으로
+              </button>
 
-      const content = document.getElementById('advertiserContent');
-      content.innerHTML = `
-        <h2 class="text-2xl font-bold mb-6">사업자 정보 관리</h2>
-        <form id="advertiserProfileForm" onsubmit="event.preventDefault(); app.handleUpdateAdvertiserProfile();" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">회사명</label>
-            <input type="text" id="companyName" value="${profile.company_name || ''}"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-          </div>
+              <div class="bg-white border-2 rounded-lg p-6 shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                  <i class="fas fa-shipping-fast mr-3 text-green-600"></i>
+                  선정된 지원자 배송 정보
+                </h2>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                  <p class="text-sm text-yellow-800 flex items-start">
+                    <i class="fas fa-exclamation-triangle mr-2 mt-1"></i>
+                    <span>아래 정보는 선정 확정된 지원자들의 배송 정보만 표시됩니다. 채널 정보와 매칭되지 않도록 별도로 관리해주세요.</span>
+                  </p>
+                </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호</label>
-            <input type="text" id="businessNumber" value="${profile.business_number || ''}"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">대표자명</label>
-            <input type="text" id="representativeName" value="${profile.representative_name || ''}"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">사업자 주소</label>
-            <input type="text" id="businessAddress" value="${profile.business_address || ''}"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-              <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                ${shippingList.length === 0 ? `
+                  <p class="text-gray-600 text-center py-8">아직 선정된 지원자가 없습니다</p>
+                ` : `
+                  <div class="space-y-4">
+                    ${shippingList.map((shipping, index) => `
+                      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                          <h3 class="font-bold text-lg text-purple-600">배송지 ${index + 1}</h3>
+                          <span class="text-xs text-gray-500">지원번호: #${shipping.application_id}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                          <p><strong>수령인:</strong> ${shipping.shipping_recipient}</p>
+                          <p><strong>연락처:</strong> ${shipping.shipping_phone}</p>
+                          <p><strong>우편번호:</strong> ${shipping.shipping_zipcode}</p>
+                          <p class="md:col-span-2"><strong>주소:</strong> ${shipping.shipping_address}</p>
+                          ${shipping.shipping_detail ? `<p class="md:col-span-2"><strong>상세주소:</strong> ${shipping.shipping_detail}</p>` : ''}
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                `}
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">담당자 이메일</label>
-              <input type="email" id="contactEmail" value="${profile.contact_email || ''}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-            </div>
           </div>
-
-          <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-            저장
-          </button>
-        </form>
+          
+          ${UIUtils.renderBottomNav(this.user, 'mypage')}
+          ${this.renderFooter()}
+        </div>
       `;
     } catch (error) {
-      alert('프로필을 불러오는데 실패했습니다');
+      alert(error.response?.data?.error || '배송 정보를 불러오는데 실패했습니다');
     }
   }
 
@@ -3429,53 +3496,24 @@ class ReviewSphere {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
       const profile = response.data;
       
+      // showInfluencerProfile의 내용을 사용하되 contentDiv에 직접 삽입
       contentDiv.innerHTML = `
         <div class="p-4 sm:p-6">
-          <form id="profileForm" onsubmit="event.preventDefault(); app.saveInfluencerProfile();">
-            <h3 class="text-xl font-bold mb-4">프로필 관리</h3>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+              <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-3"></i>
+              <div class="text-sm text-blue-800">
+                <p class="font-semibold mb-1">캠페인 지원 및 정산을 위한 필수 정보입니다</p>
+                <p class="text-xs">• 캠페인 지원 시 배송 정보가 자동으로 입력됩니다</p>
+                <p class="text-xs">• 정산 시 <strong>입금 계좌 정보</strong>가 필요합니다</p>
+                <p class="text-xs">• <span class="text-red-600">*</span> 표시는 필수 입력 항목입니다</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="influencerProfileForm" onsubmit="event.preventDefault(); app.handleUpdateInfluencerProfile();" class="space-y-6">
+            ${this.buildInfluencerProfileForm(profile)}
             
-            <!-- 채널 정보 -->
-            <div class="mb-6">
-              <h4 class="font-semibold text-lg mb-3">채널 정보</h4>
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium mb-1">Instagram</label>
-                  <input type="text" id="instagram" value="${profile.instagram_handle || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="@username">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">팔로워 수</label>
-                  <input type="number" id="followerCount" value="${profile.follower_count || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="10000">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">YouTube</label>
-                  <input type="text" id="youtube" value="${profile.youtube_channel || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="채널 URL">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">블로그</label>
-                  <input type="text" id="blog" value="${profile.blog_url || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="블로그 URL">
-                </div>
-              </div>
-            </div>
-
-            <!-- 정산 정보 -->
-            <div class="mb-6">
-              <h4 class="font-semibold text-lg mb-3">정산 정보</h4>
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium mb-1">은행</label>
-                  <input type="text" id="bank" value="${profile.bank_name || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="국민은행">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">계좌번호</label>
-                  <input type="text" id="accountNumber" value="${profile.account_number || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="123-456-789">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">예금주</label>
-                  <input type="text" id="accountHolder" value="${profile.account_holder || ''}" class="w-full border rounded-lg px-3 py-2" placeholder="홍길동">
-                </div>
-              </div>
-            </div>
-
             <div class="flex gap-2">
               <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
                 저장
@@ -3493,27 +3531,272 @@ class ReviewSphere {
     }
   }
 
-  // 프로필 저장
-  async saveInfluencerProfile() {
-    try {
-      const data = {
-        instagram_handle: document.getElementById('instagram').value,
-        follower_count: parseInt(document.getElementById('followerCount').value) || 0,
-        youtube_channel: document.getElementById('youtube').value,
-        blog_url: document.getElementById('blog').value,
-        bank_name: document.getElementById('bank').value,
-        account_number: document.getElementById('accountNumber').value,
-        account_holder: document.getElementById('accountHolder').value
-      };
-      
-      await axios.put('/api/profile/influencer', data, this.getAuthHeaders());
-      alert('프로필이 저장되었습니다');
-      
-      // 아코디언 닫기
-      this.toggleAccordion('profile');
-    } catch (error) {
-      alert(error.response?.data?.error || '프로필 저장에 실패했습니다');
-    }
+  // 인플루언서 프로필 폼 HTML 생성 (재사용 가능)
+  buildInfluencerProfileForm(profile) {
+    return `
+      <!-- 개인 정보 섹션 -->
+      <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-id-card text-blue-600 mr-2"></i>개인 정보
+        </h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              실명 <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="realName" value="${profile.real_name || ''}" placeholder="본명을 입력해주세요" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">상품 배송 및 정산을 위해 필요합니다</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                생년월일 <span class="text-red-600">*</span>
+              </label>
+              <input type="date" id="birthDate" value="${profile.birth_date || ''}" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                성별 <span class="text-red-600">*</span>
+              </label>
+              <select id="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <option value="">선택하세요</option>
+                <option value="male" ${profile.gender === 'male' ? 'selected' : ''}>남성</option>
+                <option value="female" ${profile.gender === 'female' ? 'selected' : ''}>여성</option>
+                <option value="other" ${profile.gender === 'other' ? 'selected' : ''}>기타</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              연락처 <span class="text-red-600">*</span>
+            </label>
+            <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}" placeholder="010-1234-5678" required
+              maxlength="13"
+              oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">자동으로 하이픈이 입력됩니다</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 채널 정보 섹션 -->
+      <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-hashtag text-purple-600 mr-2"></i>채널 정보
+        </h3>
+        
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">인스타그램 핸들</label>
+              <input type="text" id="instagramHandle" value="${profile.instagram_handle || ''}" placeholder="@username"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">유튜브 채널</label>
+              <input type="text" id="youtubeChannel" value="${profile.youtube_channel || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">블로그 URL</label>
+              <input type="url" id="blogUrl" value="${profile.blog_url || ''}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">틱톡 핸들</label>
+              <input type="text" id="tiktokHandle" value="${profile.tiktok_handle || ''}" placeholder="@username"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">팔로워 수</label>
+              <input type="number" id="followerCount" value="${profile.follower_count || 0}"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+              <input type="text" id="category" value="${profile.category || ''}" placeholder="예: 뷰티, 패션, 푸드"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 정산 정보 섹션 -->
+      <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-won-sign text-green-600 mr-2"></i>정산 정보
+        </h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              예금주명 <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="accountHolderName" value="${profile.account_holder_name || ''}" placeholder="예: 홍길동" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">실명과 동일해야 합니다</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                은행명 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="bankName" value="${profile.bank_name || ''}" placeholder="예: 국민은행" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                계좌번호 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="accountNumber" value="${profile.account_number || ''}" placeholder="하이픈 없이 입력" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호 (선택)</label>
+            <input type="text" id="businessNumber" value="${profile.business_number || ''}" placeholder="사업자인 경우 입력"
+              maxlength="12"
+              oninput="this.value = UIUtils.formatBusinessNumber(this.value)"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">형식: XXX-XX-XXXXX (자동 입력)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 배송 정보 섹션 -->
+      <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-truck text-orange-600 mr-2"></i>기본 배송 정보
+        </h3>
+        <p class="text-sm text-gray-600 mb-4">캠페인 지원 시 자동으로 입력됩니다</p>
+        
+        <div class="space-y-4">
+          <!-- 위의 정보와 동일 체크박스 -->
+          <label class="flex items-center cursor-pointer bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <input type="checkbox" id="sameAsPersonalInfo" onchange="app.toggleShippingSameAsPersonal(this.checked)"
+              class="mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+            <span class="text-sm font-medium text-purple-900">
+              <i class="fas fa-copy mr-1"></i>위의 개인정보와 동일 (이름, 연락처 자동 입력)
+            </span>
+          </label>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                수령인 <span class="text-red-600">*</span>
+              </label>
+              <input type="text" id="shippingName" value="${profile.shipping_name || ''}" placeholder="받으실 분 성함" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                연락처 <span class="text-red-600">*</span>
+              </label>
+              <input type="tel" id="shippingPhone" value="${profile.shipping_phone || ''}" placeholder="010-1234-5678" required
+                maxlength="13"
+                oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              우편번호 <span class="text-red-600">*</span>
+            </label>
+            <div class="flex gap-2">
+              <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345" readonly required
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
+              <button type="button" onclick="app.searchAddress('profile')" 
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                <i class="fas fa-search mr-1"></i>주소 검색
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              주소 <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="주소 검색 버튼을 클릭하세요" readonly required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">상세주소</label>
+            <input type="text" id="shippingAddressDetail" value="${profile.shipping_address_detail || ''}" placeholder="아파트 동/호수, 건물명 등"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+          </div>
+        </div>
+      </div>
+
+      <!-- 개인정보 동의 섹션 -->
+      <div class="bg-white border-2 border-blue-200 rounded-lg p-4">
+        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-shield-alt text-blue-600 mr-2"></i>개인정보 처리 동의
+        </h3>
+        <p class="text-sm text-gray-600 mb-4">캠페인 지원 시와 동일한 내용입니다. 프로필 저장 시 동의가 필요합니다.</p>
+        
+        <div class="space-y-3">
+          <!-- 전체 동의 체크박스 -->
+          <label class="flex items-center cursor-pointer bg-blue-50 border-2 border-blue-300 rounded-lg p-3 mb-3">
+            <input type="checkbox" id="agreeAll" onchange="app.toggleAllConsents(this.checked)"
+              class="mr-3 w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-600">
+            <span class="text-base font-bold text-blue-900">
+              <i class="fas fa-check-double mr-2"></i>전체 동의
+            </span>
+          </label>
+
+          <label class="flex items-start cursor-pointer">
+            <input type="checkbox" id="portraitRightsConsent" ${profile.portrait_rights_consent ? 'checked' : ''} required
+              class="consent-checkbox mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+            <div class="flex-1">
+              <span class="text-sm font-medium text-gray-900">초상권 사용 동의 <span class="text-red-600">*</span></span>
+              <p class="text-xs text-gray-600 mt-1">캠페인 홍보 및 마케팅 목적으로 내 초상(사진, 영상)이 사용되는 것에 동의합니다.</p>
+            </div>
+          </label>
+
+          <label class="flex items-start cursor-pointer">
+            <input type="checkbox" id="personalInfoConsent" ${profile.personal_info_consent ? 'checked' : ''} required
+              class="consent-checkbox mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+            <div class="flex-1">
+              <span class="text-sm font-medium text-gray-900">개인정보 수집 및 이용 동의 <span class="text-red-600">*</span></span>
+              <p class="text-xs text-gray-600 mt-1">이름, 연락처, 배송지 등 개인정보를 수집 및 이용하는 것에 동의합니다. (목적: 캠페인 진행, 상품 배송, 정산)</p>
+            </div>
+          </label>
+
+          <label class="flex items-start cursor-pointer">
+            <input type="checkbox" id="contentUsageConsent" ${profile.content_usage_consent ? 'checked' : ''} required
+              class="consent-checkbox mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+            <div class="flex-1">
+              <span class="text-sm font-medium text-gray-900">콘텐츠 사용 동의 <span class="text-red-600">*</span></span>
+              <p class="text-xs text-gray-600 mt-1">내가 제작한 콘텐츠(리뷰, 포스팅)를 플랫폼 및 광고주가 사용하는 것에 동의합니다.</p>
+            </div>
+          </label>
+
+          <label class="flex items-start cursor-pointer">
+            <input type="checkbox" id="thirdPartyProvisionConsent" ${profile.third_party_provision_consent ? 'checked' : ''} required
+              class="consent-checkbox mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
+            <div class="flex-1">
+              <span class="text-sm font-medium text-gray-900">개인정보 제3자 제공 동의 <span class="text-red-600">*</span></span>
+              <p class="text-xs text-gray-600 mt-1">캠페인 진행을 위해 광고주에게 내 개인정보(이름, 연락처, 배송지, SNS 정보)가 제공되는 것에 동의합니다.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+    `;
   }
 
   // 관심 캠페인 (TODO: 구현 예정)
@@ -3709,13 +3992,53 @@ class ReviewSphere {
   }
 
   async showApplyCampaignForm(campaignId) {
-    // Load saved shipping info from profile
+    // Load campaign info to check channel type
+    let campaign = null;
+    try {
+      const campaignResponse = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      campaign = campaignResponse.data;
+    } catch (error) {
+      alert('캠페인 정보를 불러오는데 실패했습니다');
+      return;
+    }
+    
+    // Load saved profile info
     let profile = {};
     try {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
       profile = response.data;
     } catch (error) {
       console.error('Failed to load profile:', error);
+    }
+    
+    // 채널 타입에 맞는 채널이 있는지 체크
+    const channelType = campaign.channel_type;
+    const channelNames = {
+      'instagram': '인스타그램',
+      'blog': '블로그',
+      'youtube': '유튜브',
+      'tiktok': '틱톡'
+    };
+    
+    const hasRequiredChannel = () => {
+      switch(channelType) {
+        case 'instagram':
+          return profile.instagram_handle;
+        case 'blog':
+          return profile.blog_url;
+        case 'youtube':
+          return profile.youtube_channel;
+        case 'tiktok':
+          return profile.tiktok_handle;
+        default:
+          return true; // 채널 타입이 없으면 허용
+      }
+    };
+    
+    if (!hasRequiredChannel()) {
+      alert(`이 캠페인은 ${channelNames[channelType] || channelType} 채널이 필요합니다.\n\n프로필에서 ${channelNames[channelType] || channelType} 채널을 먼저 등록해주세요.`);
+      this.showMyPage();
+      return;
     }
 
     const app = document.getElementById('app');
@@ -3740,12 +4063,15 @@ class ReviewSphere {
           <h3 class="font-bold text-gray-800 mb-4 flex items-center">
             <i class="fas fa-user text-purple-600 mr-2"></i>개인 정보
           </h3>
-          <p class="text-sm text-gray-600 mb-4">캠페인 진행을 위한 필수 정보입니다</p>
+          <p class="text-sm text-gray-600 mb-4">
+            ${profile.real_name ? '<i class="fas fa-check-circle text-green-600 mr-1"></i>프로필에서 자동으로 불러왔습니다' : '캠페인 진행을 위한 필수 정보입니다'}
+          </p>
           
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">이름 *</label>
               <input type="text" id="realName" required placeholder="실명을 입력해주세요"
+                value="${profile.real_name || ''}"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
             
@@ -3753,6 +4079,7 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">생년월일 *</label>
                 <input type="date" id="birthDate" required
+                  value="${profile.birth_date || ''}"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               </div>
               <div>
@@ -3760,9 +4087,9 @@ class ReviewSphere {
                 <select id="gender" required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                   <option value="">선택하세요</option>
-                  <option value="male">남성</option>
-                  <option value="female">여성</option>
-                  <option value="other">기타</option>
+                  <option value="male" ${profile.gender === 'male' ? 'selected' : ''}>남성</option>
+                  <option value="female" ${profile.gender === 'female' ? 'selected' : ''}>여성</option>
+                  <option value="other" ${profile.gender === 'other' ? 'selected' : ''}>기타</option>
                 </select>
               </div>
             </div>
@@ -3770,6 +4097,7 @@ class ReviewSphere {
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">연락처 *</label>
               <input type="tel" id="contactPhone" required placeholder="010-1234-5678"
+                value="${profile.contact_phone || ''}"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
           </div>
@@ -4035,281 +4363,27 @@ class ReviewSphere {
     }
   }
 
-  async showInfluencerProfile() {
-    try {
-      const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
-      const profile = response.data;
-
-      const content = document.getElementById('influencerContent');
-      content.innerHTML = `
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div class="flex items-start">
-            <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-3"></i>
-            <div class="text-sm text-blue-800">
-              <p class="font-semibold mb-1">캠페인 지원 및 정산을 위한 필수 정보입니다</p>
-              <p class="text-xs">• 캠페인 지원 시 배송 정보가 자동으로 입력됩니다</p>
-              <p class="text-xs">• 정산 시 <strong>입금 계좌 정보</strong>가 필요합니다</p>
-              <p class="text-xs">• <span class="text-red-600">*</span> 표시는 필수 입력 항목입니다</p>
-            </div>
-          </div>
-        </div>
-
-        <h2 class="text-2xl font-bold mb-6">프로필 관리</h2>
-        <form id="influencerProfileForm" onsubmit="event.preventDefault(); app.handleUpdateInfluencerProfile();" class="space-y-6">
-          
-          <!-- 개인 정보 섹션 -->
-          <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-id-card text-blue-600 mr-2"></i>개인 정보
-            </h3>
-            
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  실명 <span class="text-red-600">*</span>
-                </label>
-                <input type="text" id="realName" value="${profile.real_name || ''}" placeholder="본명을 입력해주세요" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                <p class="text-xs text-gray-500 mt-1">상품 배송 및 정산을 위해 필요합니다</p>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    생년월일 <span class="text-red-600">*</span>
-                  </label>
-                  <input type="date" id="birthDate" value="${profile.birth_date || ''}" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    성별 <span class="text-red-600">*</span>
-                  </label>
-                  <select id="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                    <option value="">선택하세요</option>
-                    <option value="male" ${profile.gender === 'male' ? 'selected' : ''}>남성</option>
-                    <option value="female" ${profile.gender === 'female' ? 'selected' : ''}>여성</option>
-                    <option value="other" ${profile.gender === 'other' ? 'selected' : ''}>기타</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  연락처 <span class="text-red-600">*</span>
-                </label>
-                <input type="tel" id="contactPhone" value="${profile.contact_phone || ''}" placeholder="010-1234-5678" required
-                  maxlength="13"
-                  oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                <p class="text-xs text-gray-500 mt-1">자동으로 하이픈이 입력됩니다</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 채널 정보 섹션 -->
-          <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-hashtag text-purple-600 mr-2"></i>채널 정보
-            </h3>
-            
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">인스타그램 핸들</label>
-                  <input type="text" id="instagramHandle" value="${profile.instagram_handle || ''}" placeholder="@username"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">유튜브 채널</label>
-                  <input type="text" id="youtubeChannel" value="${profile.youtube_channel || ''}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">블로그 URL</label>
-                  <input type="url" id="blogUrl" value="${profile.blog_url || ''}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">틱톡 핸들</label>
-                  <input type="text" id="tiktokHandle" value="${profile.tiktok_handle || ''}" placeholder="@username"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">팔로워 수</label>
-                  <input type="number" id="followerCount" value="${profile.follower_count || 0}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
-                  <input type="text" id="category" value="${profile.category || ''}" placeholder="예: 뷰티, 패션, 푸드"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 정산 정보 섹션 -->
-          <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-won-sign text-green-600 mr-2"></i>정산 정보
-            </h3>
-            
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  예금주명 <span class="text-red-600">*</span>
-                </label>
-                <input type="text" id="accountHolderName" value="${profile.account_holder_name || ''}" placeholder="예: 홍길동" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                <p class="text-xs text-gray-500 mt-1">실명과 동일해야 합니다</p>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    은행명 <span class="text-red-600">*</span>
-                  </label>
-                  <input type="text" id="bankName" value="${profile.bank_name || ''}" placeholder="예: 국민은행" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    계좌번호 <span class="text-red-600">*</span>
-                  </label>
-                  <input type="text" id="accountNumber" value="${profile.account_number || ''}" placeholder="하이픈 없이 입력" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">사업자등록번호 (선택)</label>
-                <input type="text" id="businessNumber" value="${profile.business_number || ''}" placeholder="사업자인 경우 입력"
-                  maxlength="12"
-                  oninput="this.value = UIUtils.formatBusinessNumber(this.value)"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                <p class="text-xs text-gray-500 mt-1">형식: XXX-XX-XXXXX (자동 입력)</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 배송 정보 섹션 -->
-          <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-truck text-orange-600 mr-2"></i>기본 배송 정보
-            </h3>
-            <p class="text-sm text-gray-600 mb-4">캠페인 지원 시 자동으로 입력됩니다</p>
-            
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    수령인 <span class="text-red-600">*</span>
-                  </label>
-                  <input type="text" id="shippingName" value="${profile.shipping_name || ''}" placeholder="받으실 분 성함" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    연락처 <span class="text-red-600">*</span>
-                  </label>
-                  <input type="tel" id="shippingPhone" value="${profile.shipping_phone || ''}" placeholder="010-1234-5678" required
-                    maxlength="13"
-                    oninput="this.value = UIUtils.formatPhoneNumber(this.value)"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  우편번호 <span class="text-red-600">*</span>
-                </label>
-                <div class="flex gap-2">
-                  <input type="text" id="shippingPostalCode" value="${profile.shipping_postal_code || ''}" placeholder="12345" readonly required
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
-                  <button type="button" onclick="app.searchAddress('profile')" 
-                    class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
-                    <i class="fas fa-search mr-1"></i>주소 검색
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  주소 <span class="text-red-600">*</span>
-                </label>
-                <input type="text" id="shippingAddress" value="${profile.shipping_address || ''}" placeholder="주소 검색 버튼을 클릭하세요" readonly required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 bg-gray-50">
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">상세주소</label>
-                <input type="text" id="shippingAddressDetail" value="${profile.shipping_address_detail || ''}" placeholder="아파트 동/호수, 건물명 등"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-              </div>
-            </div>
-          </div>
-
-          <!-- 개인정보 동의 섹션 -->
-          <div class="bg-white border-2 border-blue-200 rounded-lg p-4">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-shield-alt text-blue-600 mr-2"></i>개인정보 처리 동의
-            </h3>
-            <p class="text-sm text-gray-600 mb-4">캠페인 지원 시와 동일한 내용입니다. 프로필 저장 시 동의가 필요합니다.</p>
-            
-            <div class="space-y-3">
-              <label class="flex items-start cursor-pointer">
-                <input type="checkbox" id="portraitRightsConsent" ${profile.portrait_rights_consent ? 'checked' : ''} required
-                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
-                <div class="flex-1">
-                  <span class="text-sm font-medium text-gray-900">초상권 사용 동의 <span class="text-red-600">*</span></span>
-                  <p class="text-xs text-gray-600 mt-1">캠페인 홍보 및 마케팅 목적으로 내 초상(사진, 영상)이 사용되는 것에 동의합니다.</p>
-                </div>
-              </label>
-
-              <label class="flex items-start cursor-pointer">
-                <input type="checkbox" id="personalInfoConsent" ${profile.personal_info_consent ? 'checked' : ''} required
-                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
-                <div class="flex-1">
-                  <span class="text-sm font-medium text-gray-900">개인정보 수집 및 이용 동의 <span class="text-red-600">*</span></span>
-                  <p class="text-xs text-gray-600 mt-1">이름, 연락처, 배송지 등 개인정보를 수집 및 이용하는 것에 동의합니다. (목적: 캠페인 진행, 상품 배송, 정산)</p>
-                </div>
-              </label>
-
-              <label class="flex items-start cursor-pointer">
-                <input type="checkbox" id="contentUsageConsent" ${profile.content_usage_consent ? 'checked' : ''} required
-                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
-                <div class="flex-1">
-                  <span class="text-sm font-medium text-gray-900">콘텐츠 사용 동의 <span class="text-red-600">*</span></span>
-                  <p class="text-xs text-gray-600 mt-1">내가 제작한 콘텐츠(리뷰, 포스팅)를 플랫폼 및 광고주가 사용하는 것에 동의합니다.</p>
-                </div>
-              </label>
-
-              <label class="flex items-start cursor-pointer">
-                <input type="checkbox" id="thirdPartyProvisionConsent" ${profile.third_party_provision_consent ? 'checked' : ''} required
-                  class="mt-1 mr-3 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-600">
-                <div class="flex-1">
-                  <span class="text-sm font-medium text-gray-900">개인정보 제3자 제공 동의 <span class="text-red-600">*</span></span>
-                  <p class="text-xs text-gray-600 mt-1">캠페인 진행을 위해 광고주에게 내 개인정보(이름, 연락처, 배송지, SNS 정보)가 제공되는 것에 동의합니다.</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-            저장
-          </button>
-        </form>
-      `;
-    } catch (error) {
-      alert('프로필을 불러오는데 실패했습니다');
+  // 배송지 정보를 개인정보와 동일하게 채우기
+  toggleShippingSameAsPersonal(checked) {
+    if (checked) {
+      const realName = document.getElementById('realName').value;
+      const contactPhone = document.getElementById('contactPhone').value;
+      
+      if (realName) {
+        document.getElementById('shippingName').value = realName;
+      }
+      if (contactPhone) {
+        document.getElementById('shippingPhone').value = contactPhone;
+      }
     }
+  }
+
+  // 전체 동의 체크박스 토글
+  toggleAllConsents(checked) {
+    const consentCheckboxes = document.querySelectorAll('.consent-checkbox');
+    consentCheckboxes.forEach(checkbox => {
+      checkbox.checked = checked;
+    });
   }
 
   async handleUpdateInfluencerProfile() {
@@ -4581,7 +4655,7 @@ class ReviewSphere {
                   ` : ''}
                 </div>
               </div>
-            `).join('')}
+            `}).join('')}
           </div>
         </div>
       `;
@@ -4687,7 +4761,7 @@ class ReviewSphere {
                 </button>
               </div>
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
       `;
     } catch (error) {

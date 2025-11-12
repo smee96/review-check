@@ -62,6 +62,50 @@ app.get('/', (c) => {
             -webkit-box-orient: vertical;
             overflow: hidden;
           }
+          /* Flatpickr 모바일 최적화 - 연도/월 선택 크게 */
+          .flatpickr-months {
+            padding: 8px 0;
+          }
+          .flatpickr-current-month {
+            font-size: 120%;
+            padding: 8px 0;
+            height: auto;
+          }
+          .flatpickr-current-month .flatpickr-monthDropdown-months {
+            font-size: 16px;
+            padding: 8px 12px;
+            min-height: 44px;
+            appearance: none;
+            -webkit-appearance: none;
+          }
+          .numInputWrapper {
+            width: 80px !important;
+          }
+          .numInputWrapper input.cur-year {
+            font-size: 16px !important;
+            padding: 8px 4px !important;
+            min-height: 44px;
+          }
+          .flatpickr-months .flatpickr-month {
+            height: auto;
+          }
+          .flatpickr-months .flatpickr-prev-month,
+          .flatpickr-months .flatpickr-next-month {
+            padding: 12px;
+            height: 44px;
+            width: 44px;
+          }
+          .flatpickr-months .flatpickr-prev-month svg,
+          .flatpickr-months .flatpickr-next-month svg {
+            width: 16px;
+            height: 16px;
+          }
+          /* 날짜 선택 버튼 크기 조정 */
+          .flatpickr-day {
+            height: 44px;
+            line-height: 44px;
+            max-width: 44px;
+          }
         </style>
     </head>
     <body class="bg-gray-50">
@@ -73,9 +117,9 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
         <!-- Daum 우편번호 API -->
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script src="/static/js/api.js?v=15"></script>
-        <script src="/static/js/ui-utils.js?v=15"></script>
-        <script src="/static/js/app.js?v=15"></script>
+        <script src="/static/js/api.js?v=17"></script>
+        <script src="/static/js/ui-utils.js?v=17"></script>
+        <script src="/static/js/app.js?v=17"></script>
     </body>
     </html>
   `);

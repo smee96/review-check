@@ -41,7 +41,7 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
     const user = c.get('user');
     const { status } = await c.req.json();
     
-    if (!['approved', 'rejected'].includes(status)) {
+    if (!['approved', 'rejected', 'pending'].includes(status)) {
       return c.json({ error: '유효하지 않은 상태입니다' }, 400);
     }
     
@@ -68,20 +68,22 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
       'UPDATE applications SET status = ?, reviewed_at = ? WHERE id = ?'
     ).bind(status, getCurrentDateTime(), applicationId).run();
     
-    // Create notification for influencer
-    const message = status === 'approved' 
-      ? '지원하신 캠페인이 확정되었습니다!' 
-      : '지원하신 캠페인이 거절되었습니다.';
-    
-    await env.DB.prepare(
-      'INSERT INTO notifications (user_id, title, message, type, created_at) VALUES (?, ?, ?, ?, ?)'
-    ).bind(
-      application.influencer_id,
-      '지원 결과 알림',
-      message,
-      'application_status',
-      getCurrentDateTime()
-    ).run();
+    // Create notification for influencer (pending으로 되돌릴 때는 알림 안 보냄)
+    if (status !== 'pending') {
+      const message = status === 'approved' 
+        ? '지원하신 캠페인이 확정되었습니다!' 
+        : '지원하신 캠페인이 거절되었습니다.';
+      
+      await env.DB.prepare(
+        'INSERT INTO notifications (user_id, title, message, type, created_at) VALUES (?, ?, ?, ?, ?)'
+      ).bind(
+        application.influencer_id,
+        '지원 결과 알림',
+        message,
+        'application_status',
+        getCurrentDateTime()
+      ).run();
+    }
     
     return c.json({ success: true, message: '처리가 완료되었습니다' });
   } catch (error) {

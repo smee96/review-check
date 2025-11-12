@@ -44,6 +44,7 @@ export interface InfluencerProfile {
 }
 
 export type CampaignStatus = 'pending' | 'approved' | 'suspended' | 'completed' | 'cancelled';
+export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
 
 export interface Campaign {
   id: number;
@@ -60,6 +61,24 @@ export interface Campaign {
   status: CampaignStatus;
   created_at: string;
   updated_at: string;
+  point_reward: number;
+  application_start_date?: string;
+  application_end_date?: string;
+  announcement_date?: string;
+  content_start_date?: string;
+  content_end_date?: string;
+  result_announcement_date?: string;
+  provided_items?: string;
+  mission?: string;
+  keywords?: string;
+  notes?: string;
+  channel_type?: string;
+  instagram_mention_account?: string;
+  blog_product_url?: string;
+  youtube_purchase_link?: string;
+  thumbnail_image?: string;
+  payment_status: PaymentStatus;
+  refundable: number; // 1 = 환불 가능, 0 = 환불 불가
 }
 
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
