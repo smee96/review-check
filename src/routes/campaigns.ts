@@ -439,22 +439,26 @@ campaigns.get('/:id/applications', authMiddleware, async (c) => {
     const user = c.get('user');
     const { env } = c;
     
-    // Check campaign ownership and status
+    // Check campaign ownership and application end date
     const campaign = await env.DB.prepare(
-      'SELECT advertiser_id, status FROM campaigns WHERE id = ?'
+      'SELECT advertiser_id, status, application_end_date FROM campaigns WHERE id = ?'
     ).bind(campaignId).first();
     
     if (!campaign) {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
     
+    // 권한 체크: 관리자 또는 캠페인 소유자만
     if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 승인된 캠페인만 지원자 조회 가능
-    if (campaign.status !== 'approved') {
-      return c.json({ error: '승인된 캠페인만 지원자를 조회할 수 있습니다' }, 403);
+    // 모집 기간 체크: 광고주는 모집 기간이 끝난 후에만 지원자 조회 가능 (관리자는 언제든 가능)
+    if (user.role !== 'admin') {
+      const now = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      if (campaign.application_end_date && now <= campaign.application_end_date) {
+        return c.json({ error: '모집 기간이 종료된 후 지원자를 확인할 수 있습니다' }, 403);
+      }
     }
     
     // Get applications with influencer info (채널 정보만 공개, 개인정보는 마스킹)

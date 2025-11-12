@@ -1655,6 +1655,7 @@ class ReviewSphere {
                 <option value="instagram">인스타그램</option>
                 <option value="blog">네이버 블로그</option>
                 <option value="youtube">유튜브</option>
+                <option value="smartstore">스마트스토어</option>
               </select>
               <p class="text-xs text-gray-500 mt-1">⚠️ 한 캠페인은 하나의 채널만 선택 가능합니다. 여러 채널을 진행하려면 캠페인을 따로 등록해주세요.</p>
             </div>
@@ -2005,6 +2006,17 @@ class ReviewSphere {
             <p class="text-xs text-gray-500 mt-1">영상 설명란에 포함될 구매 링크를 입력해주세요</p>
           </div>
         `
+      },
+      smartstore: {
+        title: '스마트스토어 상세 정보',
+        fields: `
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">스마트스토어 상품 URL *</label>
+            <input type="url" id="smartstoreProductUrl" required placeholder="https://smartstore.naver.com/..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            <p class="text-xs text-gray-500 mt-1">리뷰를 남길 스마트스토어 상품 링크를 입력해주세요</p>
+          </div>
+        `
       }
     };
     
@@ -2301,6 +2313,7 @@ class ReviewSphere {
         instagram_mention_account: channelType === 'instagram' ? document.getElementById('instagramMentionAccount')?.value : null,
         blog_product_url: channelType === 'blog' ? document.getElementById('blogProductUrl')?.value : null,
         youtube_purchase_link: channelType === 'youtube' ? document.getElementById('youtubePurchaseLink')?.value : null,
+        smartstore_product_url: channelType === 'smartstore' ? document.getElementById('smartstoreProductUrl')?.value : null,
         
         // 일정 관리
         application_start_date: document.getElementById('campaignApplicationStartDate').value || null,
@@ -2577,6 +2590,7 @@ class ReviewSphere {
         instagram_mention_account: channelType === 'instagram' ? document.getElementById('instagramMentionAccount')?.value : null,
         blog_product_url: channelType === 'blog' ? document.getElementById('blogProductUrl')?.value : null,
         youtube_purchase_link: channelType === 'youtube' ? document.getElementById('youtubePurchaseLink')?.value : null,
+        smartstore_product_url: channelType === 'smartstore' ? document.getElementById('smartstoreProductUrl')?.value : null,
         
         // 일정 관리
         application_start_date: document.getElementById('campaignApplicationStartDate').value || null,
