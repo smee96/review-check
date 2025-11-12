@@ -43,7 +43,7 @@ export interface InfluencerProfile {
   updated_at: string;
 }
 
-export type CampaignStatus = 'pending' | 'approved' | 'suspended' | 'completed' | 'cancelled';
+export type CampaignStatus = 'pending' | 'recruiting' | 'in_progress' | 'suspended' | 'completed' | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
 
 export interface Campaign {

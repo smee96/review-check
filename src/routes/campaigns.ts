@@ -220,10 +220,10 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 광고주 권한 체크: 승인된 캠페인이거나 신청 시작일 이후면 수정 불가
+    // 광고주 권한 체크: 모집 중이거나 진행 중인 캠페인, 또는 신청 시작일 이후면 수정 불가
     if (user.role !== 'admin') {
-      if (campaign.status === 'approved' || campaign.status === 'active' || campaign.status === 'suspended') {
-        return c.json({ error: '승인된 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
+      if (campaign.status === 'recruiting' || campaign.status === 'in_progress' || campaign.status === 'suspended') {
+        return c.json({ error: '모집 중이거나 진행 중인 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
       }
       
       const now = new Date();
