@@ -89,7 +89,11 @@ campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 
     const { env } = c;
     
     const campaigns = await env.DB.prepare(
-      'SELECT * FROM campaigns WHERE advertiser_id = ? ORDER BY created_at DESC'
+      `SELECT c.*, 
+       (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
+       FROM campaigns c
+       WHERE c.advertiser_id = ? 
+       ORDER BY c.created_at DESC`
     ).bind(user.userId).all();
     
     return c.json(campaigns.results);

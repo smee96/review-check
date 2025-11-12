@@ -1510,7 +1510,7 @@ class ReviewSphere {
                   <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
                   <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
                     <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                    <span>모집인원: ${c.slots}명</span>
+                    <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
                     ${c.point_reward > 0 ? `
                       <span class="col-span-2 text-purple-600 font-semibold">
                         <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
@@ -2674,6 +2674,9 @@ class ReviewSphere {
     try {
       const response = await axios.get(`/api/campaigns/${campaignId}/applications`, this.getAuthHeaders());
       const applications = response.data;
+      
+      // Store current campaign ID for detail view
+      this.currentCampaignId = campaignId;
 
       const app = document.getElementById('app');
       app.innerHTML = `
@@ -2686,127 +2689,34 @@ class ReviewSphere {
                 <i class="fas fa-arrow-left mr-2"></i>마이페이지로
               </button>
 
-              <h2 class="text-2xl sm:text-3xl font-bold mb-6">지원자 목록</h2>
-        ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : ''}
-        <div class="space-y-3 sm:space-y-4">
-          ${applications.map(a => {
-            // SNS URL 생성 함수
-            const makeChannelUrl = (type, handle) => {
-              if (!handle || handle === '-') return null;
-              switch(type) {
-                case 'instagram':
-                  return handle.startsWith('http') ? handle : `https://instagram.com/${handle.replace('@', '')}`;
-                case 'youtube':
-                  return handle.startsWith('http') ? handle : `https://youtube.com/@${handle.replace('@', '')}`;
-                case 'blog':
-                  return handle.startsWith('http') ? handle : null;
-                case 'tiktok':
-                  return handle.startsWith('http') ? handle : `https://tiktok.com/@${handle.replace('@', '')}`;
-                default:
-                  return null;
-              }
-            };
-            
-            const instagramUrl = makeChannelUrl('instagram', a.instagram_handle);
-            const youtubeUrl = makeChannelUrl('youtube', a.youtube_channel);
-            const blogUrl = makeChannelUrl('blog', a.blog_url);
-            const tiktokUrl = makeChannelUrl('tiktok', a.tiktok_handle);
-            
-            return `
-            <div class="bg-white border rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition">
-              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
-                <div class="flex-1">
-                  <h3 class="font-bold text-lg">${a.nickname}</h3>
-                  <p class="text-sm text-gray-600">${a.email}</p>
-                  <p class="text-xs text-gray-500 mt-1">지원일: ${new Date(a.applied_at).toLocaleDateString('ko-KR')}</p>
-                </div>
-                <span class="px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${this.getApplicationStatusBadge(a.status)} self-start">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl sm:text-3xl font-bold">지원자 목록</h2>
+                <span class="text-sm text-gray-600">총 <span class="font-bold text-purple-600">${applications.length}</span>명</span>
+              </div>
+        
+        ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : `
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          ${applications.map(a => `
+            <div onclick="app.viewApplicationDetail(${a.id})" class="bg-white border-2 rounded-lg p-4 cursor-pointer hover:border-purple-600 hover:shadow-lg transition">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="font-bold text-lg">${a.nickname}</h3>
+                <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getApplicationStatusBadge(a.status)}">
                   ${this.getApplicationStatusText(a.status)}
                 </span>
               </div>
-
-              <!-- 개인 정보 섹션 -->
-              <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                <h4 class="font-semibold text-purple-900 mb-3 flex items-center">
-                  <i class="fas fa-user mr-2"></i>개인 정보
-                </h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                  <p><strong>이름:</strong> ${a.real_name || '-'}</p>
-                  <p><strong>생년월일:</strong> ${a.birth_date || '-'}</p>
-                  <p><strong>성별:</strong> ${a.gender === 'male' ? '남성' : a.gender === 'female' ? '여성' : a.gender === 'other' ? '기타' : '-'}</p>
-                  <p><strong>연락처:</strong> ${a.contact_phone || '-'}</p>
-                </div>
+              <p class="text-sm text-gray-600 mb-2">${a.real_name || '-'}</p>
+              <div class="text-xs text-gray-500 space-y-1">
+                <p>📞 ${a.contact_phone || '-'}</p>
+                <p>👥 팔로워: ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
+                <p>📅 ${new Date(a.applied_at).toLocaleDateString('ko-KR')}</p>
               </div>
-
-              <!-- SNS 채널 섹션 -->
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 class="font-semibold text-blue-900 mb-3 flex items-center">
-                  <i class="fas fa-share-alt mr-2"></i>SNS 채널
-                </h4>
-                <div class="grid grid-cols-1 gap-2 text-sm">
-                  <p class="flex items-center justify-between">
-                    <strong>📸 인스타그램:</strong> 
-                    ${instagramUrl ? `<a href="${instagramUrl}" target="_blank" class="text-pink-600 hover:text-pink-800 hover:underline">${a.instagram_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>🎥 유튜브:</strong> 
-                    ${youtubeUrl ? `<a href="${youtubeUrl}" target="_blank" class="text-red-600 hover:text-red-800 hover:underline">${a.youtube_channel} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>📝 블로그:</strong> 
-                    ${blogUrl ? `<a href="${blogUrl}" target="_blank" class="text-green-600 hover:text-green-800 hover:underline break-all">${a.blog_url} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                  <p class="flex items-center justify-between">
-                    <strong>📱 틱톡:</strong> 
-                    ${tiktokUrl ? `<a href="${tiktokUrl}" target="_blank" class="text-gray-600 hover:text-gray-800 hover:underline">${a.tiktok_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
-                  </p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-3 pt-3 border-t border-blue-300">
-                  <p><strong>👥 팔로워:</strong> ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
-                  <p><strong>🏷️ 카테고리:</strong> ${a.category || '-'}</p>
-                </div>
+              <div class="mt-3 pt-3 border-t flex items-center justify-between">
+                <span class="text-xs text-purple-600 font-semibold">자세히 보기 →</span>
               </div>
-
-              <!-- 배송 정보 섹션 -->
-              ${a.shipping_recipient ? `
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                  <h4 class="font-semibold text-green-900 mb-3 flex items-center">
-                    <i class="fas fa-truck mr-2"></i>배송 정보
-                  </h4>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                    <p><strong>수령인:</strong> ${a.shipping_recipient}</p>
-                    <p><strong>연락처:</strong> ${a.shipping_phone || '-'}</p>
-                    <p class="sm:col-span-2"><strong>우편번호:</strong> ${a.shipping_zipcode || '-'}</p>
-                    <p class="sm:col-span-2"><strong>주소:</strong> ${a.shipping_address || '-'}</p>
-                    ${a.shipping_detail ? `<p class="sm:col-span-2"><strong>상세주소:</strong> ${a.shipping_detail}</p>` : ''}
-                  </div>
-                </div>
-              ` : ''}
-
-              <!-- 지원 메시지 -->
-              ${a.message ? `
-                <div class="bg-gray-50 p-3 rounded-lg mb-3">
-                  <p class="text-sm font-semibold mb-1">💬 지원 메시지:</p>
-                  <p class="text-sm text-gray-700">${a.message}</p>
-                </div>
-              ` : ''}
-
-              <!-- 액션 버튼 -->
-              ${a.status === 'pending' ? `
-                <div class="flex flex-wrap gap-2 pt-3 border-t">
-                  <button onclick="app.updateApplicationStatus(${a.id}, 'approved', ${campaignId})" 
-                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-semibold transition">
-                    <i class="fas fa-check mr-1"></i>확정
-                  </button>
-                  <button onclick="app.updateApplicationStatus(${a.id}, 'rejected', ${campaignId})" 
-                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-semibold transition">
-                    <i class="fas fa-times mr-1"></i>거절
-                  </button>
-                </div>
-              ` : ''}
             </div>
-          `}).join('')}
-        </div>
+          `).join('')}
+          </div>
+        `}
             </div>
           </div>
           
@@ -2819,14 +2729,166 @@ class ReviewSphere {
     }
   }
 
+  async viewApplicationDetail(applicationId) {
+    try {
+      const response = await axios.get(`/api/campaigns/${this.currentCampaignId}/applications`, this.getAuthHeaders());
+      const applications = response.data;
+      const application = applications.find(a => a.id === applicationId);
+      
+      if (!application) {
+        alert('지원자 정보를 찾을 수 없습니다');
+        return;
+      }
+
+      // SNS URL 생성 함수
+      const makeChannelUrl = (type, handle) => {
+        if (!handle || handle === '-') return null;
+        switch(type) {
+          case 'instagram':
+            return handle.startsWith('http') ? handle : `https://instagram.com/${handle.replace('@', '')}`;
+          case 'youtube':
+            return handle.startsWith('http') ? handle : `https://youtube.com/@${handle.replace('@', '')}`;
+          case 'blog':
+            return handle.startsWith('http') ? handle : null;
+          case 'tiktok':
+            return handle.startsWith('http') ? handle : `https://tiktok.com/@${handle.replace('@', '')}`;
+          default:
+            return null;
+        }
+      };
+      
+      const instagramUrl = makeChannelUrl('instagram', application.instagram_handle);
+      const youtubeUrl = makeChannelUrl('youtube', application.youtube_channel);
+      const blogUrl = makeChannelUrl('blog', application.blog_url);
+      const tiktokUrl = makeChannelUrl('tiktok', application.tiktok_handle);
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+              <button onclick="app.viewApplications(${this.currentCampaignId})" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>목록으로
+              </button>
+
+              <div class="bg-white border-2 rounded-lg p-6 shadow-lg">
+                <div class="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 class="text-2xl font-bold">${application.nickname}</h2>
+                    <p class="text-gray-600">${application.email}</p>
+                  </div>
+                  <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getApplicationStatusBadge(application.status)}">
+                    ${this.getApplicationStatusText(application.status)}
+                  </span>
+                </div>
+
+                <!-- 개인 정보 -->
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                  <h4 class="font-semibold text-purple-900 mb-3 flex items-center">
+                    <i class="fas fa-user mr-2"></i>개인 정보
+                  </h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <p><strong>이름:</strong> ${application.real_name || '-'}</p>
+                    <p><strong>생년월일:</strong> ${application.birth_date || '-'}</p>
+                    <p><strong>성별:</strong> ${application.gender === 'male' ? '남성' : application.gender === 'female' ? '여성' : application.gender === 'other' ? '기타' : '-'}</p>
+                    <p><strong>연락처:</strong> ${application.contact_phone || '-'}</p>
+                  </div>
+                </div>
+
+                <!-- SNS 채널 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <h4 class="font-semibold text-blue-900 mb-3 flex items-center">
+                    <i class="fas fa-share-alt mr-2"></i>SNS 채널
+                  </h4>
+                  <div class="space-y-2 text-sm">
+                    <p class="flex items-center justify-between">
+                      <strong>📸 인스타그램:</strong> 
+                      ${instagramUrl ? `<a href="${instagramUrl}" target="_blank" class="text-pink-600 hover:text-pink-800 hover:underline">${application.instagram_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
+                    </p>
+                    <p class="flex items-center justify-between">
+                      <strong>🎥 유튜브:</strong> 
+                      ${youtubeUrl ? `<a href="${youtubeUrl}" target="_blank" class="text-red-600 hover:text-red-800 hover:underline">${application.youtube_channel} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
+                    </p>
+                    <p class="flex items-center justify-between">
+                      <strong>📝 블로그:</strong> 
+                      ${blogUrl ? `<a href="${blogUrl}" target="_blank" class="text-green-600 hover:text-green-800 hover:underline break-all">${application.blog_url} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
+                    </p>
+                    <p class="flex items-center justify-between">
+                      <strong>📱 틱톡:</strong> 
+                      ${tiktokUrl ? `<a href="${tiktokUrl}" target="_blank" class="text-gray-600 hover:text-gray-800 hover:underline">${application.tiktok_handle} <i class="fas fa-external-link-alt text-xs ml-1"></i></a>` : '-'}
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-blue-300">
+                      <p><strong>👥 팔로워:</strong> ${application.follower_count ? application.follower_count.toLocaleString() : '0'}명</p>
+                      <p><strong>🏷️ 카테고리:</strong> ${application.category || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 배송 정보 -->
+                ${application.shipping_recipient ? `
+                  <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <h4 class="font-semibold text-green-900 mb-3 flex items-center">
+                      <i class="fas fa-truck mr-2"></i>배송 정보
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                      <p><strong>수령인:</strong> ${application.shipping_recipient}</p>
+                      <p><strong>연락처:</strong> ${application.shipping_phone || '-'}</p>
+                      <p class="sm:col-span-2"><strong>우편번호:</strong> ${application.shipping_zipcode || '-'}</p>
+                      <p class="sm:col-span-2"><strong>주소:</strong> ${application.shipping_address || '-'}</p>
+                      ${application.shipping_detail ? `<p class="sm:col-span-2"><strong>상세주소:</strong> ${application.shipping_detail}</p>` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+
+                <!-- 지원 메시지 -->
+                ${application.message ? `
+                  <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <p class="text-sm font-semibold mb-2">💬 지원 메시지:</p>
+                    <p class="text-sm text-gray-700">${application.message}</p>
+                  </div>
+                ` : ''}
+
+                <!-- 지원 정보 -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                  <p class="text-xs text-gray-500">지원일: ${new Date(application.applied_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+
+                <!-- 액션 버튼 -->
+                ${application.status === 'pending' ? `
+                  <div class="flex gap-3">
+                    <button onclick="app.updateApplicationStatus(${application.id}, 'approved', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
+                      class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold transition">
+                      <i class="fas fa-check mr-2"></i>확정
+                    </button>
+                    <button onclick="app.updateApplicationStatus(${application.id}, 'rejected', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
+                      class="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-semibold transition">
+                      <i class="fas fa-times mr-2"></i>거절
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'mypage')}
+          ${this.renderFooter()}
+        </div>
+      `;
+    } catch (error) {
+      alert(error.response?.data?.error || '지원자 상세 정보를 불러오는데 실패했습니다');
+    }
+  }
+
   async updateApplicationStatus(applicationId, status, campaignId) {
     try {
       await axios.put(`/api/applications/${applicationId}/status`, { status }, this.getAuthHeaders());
-      alert('처리되었습니다');
-      // Reload current view
-      this.viewApplications(campaignId);
+      // Don't alert, just silently update
+      return true;
     } catch (error) {
       alert(error.response?.data?.error || '처리에 실패했습니다');
+      return false;
     }
   }
 
