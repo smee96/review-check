@@ -1,9 +1,12 @@
 // ReviewSphere Frontend Application
+console.log('[DEBUG] app.js loaded successfully - v9');
 
 class ReviewSphere {
   constructor() {
+    console.log('[DEBUG] ReviewSphere constructor called');
     this.token = localStorage.getItem('token');
     this.user = JSON.parse(localStorage.getItem('user') || 'null');
+    console.log('[DEBUG] Current user:', this.user);
     this.currentPage = 'home';
     this.init();
   }
@@ -1380,9 +1383,12 @@ class ReviewSphere {
   }
 
   async loadAdvertiserCampaignsContent(container) {
+    console.log('[DEBUG] loadAdvertiserCampaignsContent() called');
     try {
+      console.log('[DEBUG] Fetching campaigns from /api/campaigns/my');
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
+      console.log('[DEBUG] Campaigns loaded:', campaigns);
 
       container.innerHTML = `
         <div class="p-4 sm:p-6">
@@ -1427,7 +1433,7 @@ class ReviewSphere {
                     <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
                     <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-500 mb-2">
                       <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                      <span>모집인원: ${c.slots}명</span>
+                      <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
                       ${c.point_reward > 0 ? `
                         <span class="col-span-2 text-purple-600 font-semibold">
                           <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
