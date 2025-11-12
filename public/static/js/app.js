@@ -2656,48 +2656,57 @@ class ReviewSphere {
       const response = await axios.get(`/api/campaigns/${campaignId}/applications`, this.getAuthHeaders());
       const applications = response.data;
 
-      const content = document.getElementById('advertiserContent');
-      content.innerHTML = `
-        <div class="mb-4">
-          <button onclick="app.showMyCampaigns()" class="text-gray-600 hover:text-gray-800">
-            <i class="fas fa-arrow-left mr-2"></i>캠페인 목록으로
-          </button>
-        </div>
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+              <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>마이페이지로
+              </button>
 
-        <h2 class="text-2xl font-bold mb-6">지원자 목록</h2>
-        ${applications.length === 0 ? '<p class="text-gray-600">지원자가 없습니다</p>' : ''}
-        <div class="space-y-4">
+              <h2 class="text-2xl sm:text-3xl font-bold mb-6">지원자 목록</h2>
+        ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : ''}
+        <div class="space-y-3 sm:space-y-4">
           ${applications.map(a => `
-            <div class="border rounded-lg p-4">
-              <div class="flex justify-between items-start mb-3">
-                <div>
-                  <h3 class="font-bold">${a.nickname} (${a.email})</h3>
-                  <p class="text-sm text-gray-600">지원일: ${new Date(a.applied_at).toLocaleDateString()}</p>
+            <div class="bg-white border rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition">
+              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
+                <div class="flex-1">
+                  <h3 class="font-bold text-lg">${a.nickname}</h3>
+                  <p class="text-sm text-gray-600">${a.email}</p>
+                  <p class="text-xs text-gray-500 mt-1">지원일: ${new Date(a.applied_at).toLocaleDateString('ko-KR')}</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm ${this.getApplicationStatusBadge(a.status)}">
+                <span class="px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${this.getApplicationStatusBadge(a.status)} self-start">
                   ${this.getApplicationStatusText(a.status)}
                 </span>
               </div>
 
-              <div class="mb-3 text-sm">
-                <p><strong>인스타그램:</strong> ${a.instagram_handle || '-'}</p>
-                <p><strong>유튜브:</strong> ${a.youtube_channel || '-'}</p>
-                <p><strong>블로그:</strong> ${a.blog_url || '-'}</p>
-                <p><strong>틱톡:</strong> ${a.tiktok_handle || '-'}</p>
-                <p><strong>팔로워:</strong> ${a.follower_count ? a.follower_count.toLocaleString() : '0'}</p>
-                <p><strong>카테고리:</strong> ${a.category || '-'}</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 text-sm">
+                <p><strong>📸 인스타그램:</strong> ${a.instagram_handle || '-'}</p>
+                <p><strong>🎥 유튜브:</strong> ${a.youtube_channel || '-'}</p>
+                <p><strong>📝 블로그:</strong> ${a.blog_url || '-'}</p>
+                <p><strong>📱 틱톡:</strong> ${a.tiktok_handle || '-'}</p>
+                <p><strong>👥 팔로워:</strong> ${a.follower_count ? a.follower_count.toLocaleString() : '0'}명</p>
+                <p><strong>🏷️ 카테고리:</strong> ${a.category || '-'}</p>
               </div>
 
-              ${a.message ? `<p class="text-sm text-gray-700 mb-3"><strong>지원 메시지:</strong> ${a.message}</p>` : ''}
+              ${a.message ? `
+                <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                  <p class="text-sm font-semibold mb-1">💬 지원 메시지:</p>
+                  <p class="text-sm text-gray-700">${a.message}</p>
+                </div>
+              ` : ''}
 
               ${a.status === 'pending' ? `
-                <div class="flex space-x-2">
-                  <button onclick="app.updateApplicationStatus(${a.id}, 'approved')" 
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                <div class="flex flex-wrap gap-2 pt-3 border-t">
+                  <button onclick="app.updateApplicationStatus(${a.id}, 'approved', ${campaignId})" 
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-semibold transition">
                     <i class="fas fa-check mr-1"></i>확정
                   </button>
-                  <button onclick="app.updateApplicationStatus(${a.id}, 'rejected')" 
-                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                  <button onclick="app.updateApplicationStatus(${a.id}, 'rejected', ${campaignId})" 
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-semibold transition">
                     <i class="fas fa-times mr-1"></i>거절
                   </button>
                 </div>
@@ -2705,21 +2714,24 @@ class ReviewSphere {
             </div>
           `).join('')}
         </div>
+            </div>
+          </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'mypage')}
+          ${this.renderFooter()}
+        </div>
       `;
     } catch (error) {
       alert(error.response?.data?.error || '지원자 목록을 불러오는데 실패했습니다');
     }
   }
 
-  async updateApplicationStatus(applicationId, status) {
+  async updateApplicationStatus(applicationId, status, campaignId) {
     try {
       await axios.put(`/api/applications/${applicationId}/status`, { status }, this.getAuthHeaders());
       alert('처리되었습니다');
       // Reload current view
-      const campaignId = prompt('캠페인 ID를 입력하세요 (개선 필요)');
-      if (campaignId) {
-        this.viewApplications(campaignId);
-      }
+      this.viewApplications(campaignId);
     } catch (error) {
       alert(error.response?.data?.error || '처리에 실패했습니다');
     }
