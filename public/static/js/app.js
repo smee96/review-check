@@ -1466,6 +1466,7 @@ class ReviewSphere {
     try {
       const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
       const campaigns = response.data;
+      console.log('[DEBUG] My campaigns:', campaigns);
 
       const content = document.getElementById('advertiserContent');
       content.innerHTML = `
