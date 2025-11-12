@@ -38,7 +38,8 @@ admin.put('/campaigns/:id/status', async (c) => {
     const campaignId = c.req.param('id');
     const { status } = await c.req.json();
     
-    if (!['pending', 'approved', 'suspended', 'completed', 'cancelled'].includes(status)) {
+    // 유효한 상태값: pending, recruiting, in_progress, suspended, completed, cancelled
+    if (!['pending', 'recruiting', 'in_progress', 'suspended', 'completed', 'cancelled'].includes(status)) {
       return c.json({ error: '유효하지 않은 상태입니다' }, 400);
     }
     
