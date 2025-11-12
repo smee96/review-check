@@ -13,11 +13,17 @@ class ReviewSphere {
     window.addEventListener('popstate', (event) => {
       if (event.state) {
         this.handleHistoryState(event.state);
+      } else {
+        // 상태가 없으면 홈으로
+        this.showHome(false);
       }
     });
 
     // 로그인 여부와 관계없이 항상 홈 페이지로 시작
-    this.showHome();
+    // 초기 히스토리 상태 설정
+    const state = { page: 'home', data: {} };
+    window.history.replaceState(state, 'R.SPHERE - 홈', '#home');
+    this.showHome(false);
   }
 
   // 히스토리 상태 처리
@@ -41,10 +47,12 @@ class ReviewSphere {
         await this.viewCampaignDetail(data.id, false);
         break;
       case 'login':
-        this.showLogin(false);
+        // 로그인 페이지로 뒤로가기 하는 경우 홈으로 리다이렉트
+        await this.showHome(false);
         break;
       case 'register':
-        this.showRegister(false);
+        // 회원가입 페이지로 뒤로가기 하는 경우 홈으로 리다이렉트
+        await this.showHome(false);
         break;
       default:
         await this.showHome(false);
@@ -405,6 +413,16 @@ class ReviewSphere {
 
   // 뒤로가기
   goBack() {
+    // 현재 상태 확인
+    const currentState = window.history.state;
+    
+    // 로그인이나 회원가입 페이지에서는 무조건 홈으로
+    if (currentState && (currentState.page === 'login' || currentState.page === 'register')) {
+      this.showHome();
+      return;
+    }
+    
+    // 그 외의 경우 히스토리 back
     if (window.history.length > 1) {
       window.history.back();
     } else {
@@ -662,9 +680,9 @@ class ReviewSphere {
                 비밀번호를 잊으셨나요?
               </button>
               <div class="text-gray-600 text-sm">
-                계정이 없으신가요? <button onclick="app.showRegister()" class="text-purple-600 hover:underline font-semibold">회원가입</button>
+                계정이 없으신가요? <button onclick="app.showRegister(null, false)" class="text-purple-600 hover:underline font-semibold">회원가입</button>
               </div>
-              <button onclick="app.goBack()" class="text-gray-500 hover:text-gray-700 text-sm">
+              <button onclick="window.history.back();" class="text-gray-500 hover:text-gray-700 text-sm">
                 <i class="fas fa-arrow-left mr-1"></i>뒤로가기
               </button>
             </div>
@@ -739,9 +757,9 @@ class ReviewSphere {
 
             <div class="mt-6 text-center space-y-2">
               <div class="text-gray-600 text-sm">
-                이미 계정이 있으신가요? <button onclick="app.showLogin()" class="text-purple-600 hover:underline font-semibold">로그인</button>
+                이미 계정이 있으신가요? <button onclick="app.showLogin(false)" class="text-purple-600 hover:underline font-semibold">로그인</button>
               </div>
-              <button onclick="app.goBack()" class="text-gray-500 hover:text-gray-700 text-sm">
+              <button onclick="window.history.back();" class="text-gray-500 hover:text-gray-700 text-sm">
                 <i class="fas fa-arrow-left mr-1"></i>뒤로가기
               </button>
             </div>
@@ -789,16 +807,17 @@ class ReviewSphere {
   }
 
   async viewCampaignDetail(campaignId, pushHistory = true) {
-    if (pushHistory) {
-      this.pushHistory('campaignDetail', { id: campaignId });
-    }
-    
     // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 바로 로그인 페이지로 이동
     if (!this.token || !this.user) {
       // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
       localStorage.setItem('returnUrl', `campaign:${campaignId}`);
+      // 히스토리에 campaignDetail을 추가하지 않고 바로 로그인 페이지로
       this.showLogin();
       return;
+    }
+    
+    if (pushHistory) {
+      this.pushHistory('campaignDetail', { id: campaignId });
     }
     
     try {
@@ -3468,6 +3487,97 @@ class ReviewSphere {
       <h2 class="text-2xl font-bold mb-6">캠페인 지원하기</h2>
       <form id="applyCampaignForm" onsubmit="event.preventDefault(); app.handleApplyCampaign(${campaignId});" class="space-y-6">
         
+        <!-- 개인 정보 -->
+        <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-user text-purple-600 mr-2"></i>개인 정보
+          </h3>
+          <p class="text-sm text-gray-600 mb-4">캠페인 진행을 위한 필수 정보입니다</p>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이름 *</label>
+              <input type="text" id="realName" required placeholder="실명을 입력해주세요"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">생년월일 *</label>
+                <input type="date" id="birthDate" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
+                <select id="gender" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                  <option value="">선택하세요</option>
+                  <option value="male">남성</option>
+                  <option value="female">여성</option>
+                  <option value="other">기타</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">연락처 *</label>
+              <input type="tel" id="contactPhone" required placeholder="010-1234-5678"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+            </div>
+          </div>
+        </div>
+
+        <!-- 동의 사항 -->
+        <div class="bg-white border-2 border-red-200 rounded-lg p-4">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-shield-alt text-red-600 mr-2"></i>필수 동의 사항
+          </h3>
+          
+          <div class="space-y-3">
+            <!-- 전체 동의 -->
+            <div class="bg-purple-50 p-3 rounded-lg">
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="allConsent" onchange="app.toggleAllConsent()"
+                  class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                <span class="ml-3">
+                  <span class="font-semibold text-purple-900">전체 동의</span>
+                  <p class="text-xs text-gray-600 mt-1">아래 모든 필수 동의 항목에 동의합니다</p>
+                </span>
+              </label>
+            </div>
+            
+            <!-- 개별 동의 항목 -->
+            <div class="border-t pt-3 space-y-3">
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="portraitRightsConsent" required onchange="app.checkAllConsent()"
+                  class="consent-checkbox mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                <span class="ml-3 text-sm">
+                  <span class="font-medium">[필수] 초상권 사용 동의</span>
+                  <p class="text-xs text-gray-600 mt-1">캠페인 진행 및 홍보를 위한 초상권 사용에 동의합니다</p>
+                </span>
+              </label>
+              
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="personalInfoConsent" required onchange="app.checkAllConsent()"
+                  class="consent-checkbox mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                <span class="ml-3 text-sm">
+                  <span class="font-medium">[필수] 개인정보 제3자 제공 동의</span>
+                  <p class="text-xs text-gray-600 mt-1">캠페인 진행을 위해 광고주에게 개인정보를 제공하는 것에 동의합니다</p>
+                </span>
+              </label>
+              
+              <label class="flex items-start cursor-pointer">
+                <input type="checkbox" id="contentUsageConsent" required onchange="app.checkAllConsent()"
+                  class="consent-checkbox mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                <span class="ml-3 text-sm">
+                  <span class="font-medium">[필수] 저작물 이용 동의</span>
+                  <p class="text-xs text-gray-600 mt-1">생성한 콘텐츠를 광고주가 활용하는 것에 동의합니다</p>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
         <!-- 지원 메시지 -->
         <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
           <h3 class="font-bold text-gray-800 mb-4 flex items-center">
@@ -3545,9 +3655,61 @@ class ReviewSphere {
     `;
   }
 
+  // 전체 동의 체크박스 토글
+  toggleAllConsent() {
+    const allConsent = document.getElementById('allConsent');
+    const consentCheckboxes = document.querySelectorAll('.consent-checkbox');
+    
+    consentCheckboxes.forEach(checkbox => {
+      checkbox.checked = allConsent.checked;
+    });
+  }
+
+  // 개별 체크박스 확인 후 전체 동의 자동 체크
+  checkAllConsent() {
+    const allConsent = document.getElementById('allConsent');
+    const consentCheckboxes = document.querySelectorAll('.consent-checkbox');
+    const allChecked = Array.from(consentCheckboxes).every(checkbox => checkbox.checked);
+    
+    allConsent.checked = allChecked;
+  }
+
   async handleApplyCampaign(campaignId) {
     try {
+      // 개인 정보 수집
+      const realName = document.getElementById('realName').value.trim();
+      const birthDate = document.getElementById('birthDate').value;
+      const gender = document.getElementById('gender').value;
+      const contactPhone = document.getElementById('contactPhone').value.trim();
+
+      // 동의 항목 확인
+      const portraitRightsConsent = document.getElementById('portraitRightsConsent').checked;
+      const personalInfoConsent = document.getElementById('personalInfoConsent').checked;
+      const contentUsageConsent = document.getElementById('contentUsageConsent').checked;
+
+      // 필수 정보 확인
+      if (!realName || !birthDate || !gender || !contactPhone) {
+        alert('개인 정보를 모두 입력해주세요');
+        return;
+      }
+
+      // 필수 동의 확인
+      if (!portraitRightsConsent || !personalInfoConsent || !contentUsageConsent) {
+        alert('모든 필수 동의 항목에 동의해주세요');
+        return;
+      }
+
       const data = {
+        // 개인 정보
+        real_name: realName,
+        birth_date: birthDate,
+        gender: gender,
+        contact_phone: contactPhone,
+        // 동의 항목
+        portrait_rights_consent: portraitRightsConsent,
+        personal_info_consent: personalInfoConsent,
+        content_usage_consent: contentUsageConsent,
+        // 기존 필드들
         message: document.getElementById('applyMessage').value,
         shipping_recipient: document.getElementById('shippingRecipient').value,
         shipping_phone: document.getElementById('shippingPhone').value,
@@ -3557,6 +3719,7 @@ class ReviewSphere {
       };
 
       await axios.post(`/api/campaigns/${campaignId}/apply`, data, this.getAuthHeaders());
+      alert('캠페인 지원이 완료되었습니다!');
       // 저장 후 홈으로 자연스럽게 이동
       this.showHome();
     } catch (error) {

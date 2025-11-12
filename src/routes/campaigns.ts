@@ -296,6 +296,8 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
     const user = c.get('user');
     const { 
       message, 
+      real_name, birth_date, gender, contact_phone,
+      portrait_rights_consent, personal_info_consent, content_usage_consent,
       shipping_recipient, shipping_phone, shipping_zipcode, 
       shipping_address, shipping_detail 
     } = await c.req.json();
@@ -319,22 +321,41 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
       return c.json({ error: '이미 지원한 캠페인입니다' }, 400);
     }
     
+    // Validate required personal information
+    if (!real_name || !birth_date || !gender || !contact_phone) {
+      return c.json({ error: '개인 정보를 모두 입력해주세요' }, 400);
+    }
+    
+    // Validate required consents
+    if (!portrait_rights_consent || !personal_info_consent || !content_usage_consent) {
+      return c.json({ error: '모든 필수 동의 항목에 동의해주세요' }, 400);
+    }
+    
     // Validate required shipping information
     if (!shipping_recipient || !shipping_phone || !shipping_zipcode || !shipping_address) {
       return c.json({ error: '배송 정보를 모두 입력해주세요' }, 400);
     }
     
-    // Create application with shipping info
+    // Create application with all information
     await env.DB.prepare(
       `INSERT INTO applications (
         campaign_id, influencer_id, message, 
+        real_name, birth_date, gender, contact_phone,
+        portrait_rights_consent, personal_info_consent, content_usage_consent,
         shipping_recipient, shipping_phone, shipping_zipcode, shipping_address, shipping_detail,
         applied_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       campaignId, 
       user.userId, 
       message || null,
+      real_name,
+      birth_date,
+      gender,
+      contact_phone,
+      portrait_rights_consent ? 1 : 0,
+      personal_info_consent ? 1 : 0,
+      content_usage_consent ? 1 : 0,
       shipping_recipient,
       shipping_phone,
       shipping_zipcode,
