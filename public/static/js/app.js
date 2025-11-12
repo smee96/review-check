@@ -1459,12 +1459,7 @@ class ReviewSphere {
                       <div class="flex items-center gap-2 flex-wrap">
                         <h3 class="font-bold text-base sm:text-lg">${c.title}</h3>
                         ${c.channel_type ? `
-                          <span class="px-2 py-1 rounded text-xs font-semibold ${
-                            c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' :
-                            c.channel_type === 'blog' ? 'bg-green-100 text-green-800' :
-                            c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' :
-                            c.channel_type === 'smartstore' ? 'bg-green-100 text-green-800' : ''
-                          }">
+                          <span class="text-xs font-semibold text-gray-700 flex items-center">
                             ${c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block mr-1"> 인스타그램' :
                               c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block mr-1"> 블로그' :
                               c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block mr-1"> 유튜브' :
