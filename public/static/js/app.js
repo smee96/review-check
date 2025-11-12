@@ -254,8 +254,8 @@ class ReviewSphere {
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
                 ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => {
-                  const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
-                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                  const channelIcon = c.channel_type === 'instagram' ? '<i class="fab fa-instagram"></i>' : c.channel_type === 'blog' ? '<i class="fas fa-blog"></i>' : c.channel_type === 'youtube' ? '<i class="fab fa-youtube"></i>' : '<i class="fas fa-mobile-alt"></i>';
+                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-500 text-white' : c.channel_type === 'blog' ? 'bg-green-500 text-white' : c.channel_type === 'youtube' ? 'bg-red-500 text-white' : 'bg-gray-500 text-white';
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
@@ -313,8 +313,8 @@ class ReviewSphere {
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
                 ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => {
-                  const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
-                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                  const channelIcon = c.channel_type === 'instagram' ? '<i class="fab fa-instagram"></i>' : c.channel_type === 'blog' ? '<i class="fas fa-blog"></i>' : c.channel_type === 'youtube' ? '<i class="fab fa-youtube"></i>' : '<i class="fas fa-mobile-alt"></i>';
+                  const channelColor = c.channel_type === 'instagram' ? 'bg-pink-500 text-white' : c.channel_type === 'blog' ? 'bg-green-500 text-white' : c.channel_type === 'youtube' ? 'bg-red-500 text-white' : 'bg-gray-500 text-white';
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
@@ -3921,15 +3921,15 @@ class ReviewSphere {
         ${campaigns.length === 0 ? '<p class="text-gray-600">현재 진행 중인 캠페인이 없습니다</p>' : ''}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           ${campaigns.map(c => {
-            const channelIcon = c.channel_type === 'instagram' ? '📸' : 
-                               c.channel_type === 'blog' ? '📝' : 
-                               c.channel_type === 'youtube' ? '🎥' : '📱';
+            const channelIcon = c.channel_type === 'instagram' ? '<i class="fab fa-instagram"></i>' : 
+                               c.channel_type === 'blog' ? '<i class="fas fa-blog"></i>' : 
+                               c.channel_type === 'youtube' ? '<i class="fab fa-youtube"></i>' : '<i class="fas fa-mobile-alt"></i>';
             const channelName = c.channel_type === 'instagram' ? '인스타그램' : 
                                c.channel_type === 'blog' ? '블로그' : 
                                c.channel_type === 'youtube' ? '유튜브' : '기타';
-            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : 
-                                c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : 
-                                c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-500 text-white' : 
+                                c.channel_type === 'blog' ? 'bg-green-500 text-white' : 
+                                c.channel_type === 'youtube' ? 'bg-red-500 text-white' : 'bg-gray-500 text-white';
             
             return `
             <div class="border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
@@ -4586,8 +4586,8 @@ class ReviewSphere {
           <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">전체 캠페인 관리</h2>
           <div class="space-y-3 sm:space-y-4">
             ${campaigns.map(c => {
-              const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
-              const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+              const channelIcon = c.channel_type === 'instagram' ? '<i class="fab fa-instagram"></i>' : c.channel_type === 'blog' ? '<i class="fas fa-blog"></i>' : c.channel_type === 'youtube' ? '<i class="fab fa-youtube"></i>' : '<i class="fas fa-mobile-alt"></i>';
+              const channelColor = c.channel_type === 'instagram' ? 'bg-pink-500 text-white' : c.channel_type === 'blog' ? 'bg-green-500 text-white' : c.channel_type === 'youtube' ? 'bg-red-500 text-white' : 'bg-gray-500 text-white';
               
               return `
               <div class="border rounded-lg p-3 sm:p-4">
@@ -4696,8 +4696,8 @@ class ReviewSphere {
         <h2 class="text-2xl font-bold mb-6">전체 캠페인 관리</h2>
         <div class="space-y-4">
           ${campaigns.map(c => {
-            const channelIcon = c.channel_type === 'instagram' ? '📸' : c.channel_type === 'blog' ? '📝' : c.channel_type === 'youtube' ? '🎥' : '📱';
-            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-100 text-pink-800' : c.channel_type === 'blog' ? 'bg-green-100 text-green-800' : c.channel_type === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+            const channelIcon = c.channel_type === 'instagram' ? '<i class="fab fa-instagram"></i>' : c.channel_type === 'blog' ? '<i class="fas fa-blog"></i>' : c.channel_type === 'youtube' ? '<i class="fab fa-youtube"></i>' : '<i class="fas fa-mobile-alt"></i>';
+            const channelColor = c.channel_type === 'instagram' ? 'bg-pink-500 text-white' : c.channel_type === 'blog' ? 'bg-green-500 text-white' : c.channel_type === 'youtube' ? 'bg-red-500 text-white' : 'bg-gray-500 text-white';
             
             return `
             <div class="border rounded-lg p-4">
