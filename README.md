@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://229bc736.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://1af87d22.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
@@ -351,6 +351,13 @@ webapp/
 - 모바일에서도 1-2줄로 표시
 
 ## 📝 개발 로그
+
+### 2025-11-14 (v66)
+- ✅ **모든 입력값 보존 기능 완성**
+  - 숨겨진 필드도 값 유지 (필드에 0 설정하지 않음)
+  - 계산 함수에서 과금 타입을 보고 조건부로 0 사용
+  - 과금방식 변경해도 모든 입력값 보존
+  - 사용자 재입력 불필요
 
 ### 2025-11-14 (v65)
 - ✅ **과금방식 변경 시 계산 버그 수정**
