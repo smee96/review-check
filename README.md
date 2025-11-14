@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://3f35f541.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://16a6a93b.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
@@ -351,6 +351,14 @@ webapp/
 - 모바일에서도 1-2줄로 표시
 
 ## 📝 개발 로그
+
+### 2025-11-14 (v62)
+- ✅ **모집인원 입력 UX 개선**
+  - 클릭 시 placeholder '10' 자동 삭제되어 즉시 입력 가능
+  - 포커스 아웃 시 10명 미만 자동 검증 및 리셋
+  - 10명 이상 입력 시 실시간 과금 자동 업데이트
+  - 빈 값일 경우 자동으로 기본값 '10' 설정
+  - 입력 중 유효성 검사로 잘못된 값 방지
 
 ### 2025-11-14 (v61)
 - ✅ **플랫폼 수수료 프로모션 표시**
