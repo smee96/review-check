@@ -4667,7 +4667,10 @@ class ReviewSphere {
         }, 100);
       } catch (error) {
         console.error('Review submission error:', error);
-        alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
+        console.error('Error response:', error.response?.data);
+        const errorMsg = error.response?.data?.error || '리뷰 등록에 실패했습니다';
+        const details = error.response?.data?.details;
+        alert(errorMsg + (details ? `\n\n상세: ${details}` : ''));
       }
     });
   }

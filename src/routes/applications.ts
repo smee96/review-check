@@ -258,7 +258,14 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     return c.json({ success: true, message: '리뷰가 등록되었습니다' }, 201);
   } catch (error) {
     console.error('Submit review error:', error);
-    return c.json({ error: '리뷰 등록 중 오류가 발생했습니다' }, 500);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return c.json({ 
+      error: '리뷰 등록 중 오류가 발생했습니다',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
   }
 });
 
