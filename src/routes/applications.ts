@@ -125,7 +125,7 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
   }
 });
 
-// 결과 등록 (포스트 URL) (인플루언서)
+// 리뷰 등록 (포스트 URL) (인플루언서)
 applications.post('/:id/review', requireRole('influencer'), async (c) => {
   try {
     const applicationId = c.req.param('id');
@@ -138,13 +138,26 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     
     const { env } = c;
     
-    // Check if user owns the application and it's approved
+    // First check if application exists
     const application = await env.DB.prepare(
-      'SELECT * FROM applications WHERE id = ? AND influencer_id = ? AND status = ?'
-    ).bind(applicationId, user.userId, 'approved').first();
+      'SELECT * FROM applications WHERE id = ?'
+    ).bind(applicationId).first();
     
     if (!application) {
-      return c.json({ error: '확정된 지원 내역을 찾을 수 없습니다' }, 404);
+      console.error(`Application not found: ${applicationId}`);
+      return c.json({ error: '지원 내역을 찾을 수 없습니다' }, 404);
+    }
+    
+    // Check if user owns the application
+    if (application.influencer_id !== user.userId) {
+      console.error(`User mismatch: ${user.userId} vs ${application.influencer_id}`);
+      return c.json({ error: '본인의 지원 내역만 등록할 수 있습니다' }, 403);
+    }
+    
+    // Check if it's approved
+    if (application.status !== 'approved') {
+      console.error(`Application status: ${application.status}`);
+      return c.json({ error: `리뷰는 확정된 지원만 등록할 수 있습니다. (현재 상태: ${application.status === 'pending' ? '대기중' : application.status === 'rejected' ? '거절됨' : application.status})` }, 400);
     }
     
     // Check if review already exists
@@ -153,7 +166,7 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     ).bind(applicationId).first();
     
     if (existing) {
-      return c.json({ error: '이미 결과가 등록되었습니다' }, 400);
+      return c.json({ error: '이미 리뷰가 등록되었습니다' }, 400);
     }
     
     // Create review
@@ -161,10 +174,10 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
       'INSERT INTO reviews (application_id, post_url, submitted_at) VALUES (?, ?, ?)'
     ).bind(applicationId, post_url, getCurrentDateTime()).run();
     
-    return c.json({ success: true, message: '결과가 등록되었습니다' }, 201);
+    return c.json({ success: true, message: '리뷰가 등록되었습니다' }, 201);
   } catch (error) {
     console.error('Submit review error:', error);
-    return c.json({ error: '결과 등록 중 오류가 발생했습니다' }, 500);
+    return c.json({ error: '리뷰 등록 중 오류가 발생했습니다' }, 500);
   }
 });
 
