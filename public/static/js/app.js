@@ -6484,7 +6484,7 @@ class ReviewSphere {
       // 상품/이용권 가치 입력 숨김
       if (productValueSection) productValueSection.classList.add('hidden');
       productValueInput.required = false;
-      productValueInput.value = '0'; // 숨길 때는 0으로 초기화하여 계산에서 제외
+      // 값은 유지 (계산 시 과금 타입을 보고 조건부로 0 사용)
       
       // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
@@ -6530,7 +6530,7 @@ class ReviewSphere {
       // 스피어포인트 입력 숨김
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
-      spherePointsInput.value = '0'; // 숨길 때는 0으로 초기화하여 계산에서 제외
+      // 값은 유지 (계산 시 과금 타입을 보고 조건부로 0 사용)
       
       // 라벨 변경
       if (pricingType === 'product_only') {
@@ -6553,8 +6553,19 @@ class ReviewSphere {
     // 콤마 제거 후 숫자로 변환
     const productValueInput = document.getElementById('campaignProductValue');
     const spherePointsInput = document.getElementById('campaignSpherePoints');
-    const productValue = this.getNumericValue(productValueInput);
-    const spherePoints = this.getNumericValue(spherePointsInput);
+    
+    // 과금 타입에 따라 조건부로 값 사용
+    // 포인트만 지급: productValue는 0으로 처리
+    // 상품만/이용권만: spherePoints는 0으로 처리
+    let productValue = this.getNumericValue(productValueInput);
+    let spherePoints = this.getNumericValue(spherePointsInput);
+    
+    if (pricingType === 'points_only') {
+      productValue = 0; // 포인트만 지급일 때는 상품 가치 제외
+    } else if (pricingType === 'product_only' || pricingType === 'voucher_only') {
+      spherePoints = 0; // 상품만/이용권만일 때는 포인트 제외
+    }
+    
     const slots = Number(document.getElementById('campaignSlots')?.value || 10);
     const summaryDiv = document.getElementById('pricingSummary');
     
