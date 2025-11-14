@@ -2116,7 +2116,9 @@ class ReviewSphere {
       dateFormat: 'Y-m-d',
       disableMobile: false,
       allowInput: false,
-      clickOpens: true
+      clickOpens: true,
+      showMonths: 1,
+      monthSelectorType: 'static'
     };
 
     // 1. 캠페인 신청 시작일 (가장 이른 날짜, 오늘 이후만 가능)
@@ -2725,8 +2727,27 @@ class ReviewSphere {
           }
         }, 100);
         
-        // 날짜 필드는 비워둠 (광고주가 새로 설정)
-        // this.campaignDatePickers는 이미 초기화되어 있음
+        // 날짜 필드도 복사 (광고주가 필요시 수정)
+        if (this.campaignDatePickers) {
+          if (campaign.application_start_date) {
+            this.campaignDatePickers.applicationStart.setDate(campaign.application_start_date);
+          }
+          if (campaign.application_end_date) {
+            this.campaignDatePickers.applicationEnd.setDate(campaign.application_end_date);
+          }
+          if (campaign.announcement_date) {
+            this.campaignDatePickers.announcement.setDate(campaign.announcement_date);
+          }
+          if (campaign.content_start_date) {
+            this.campaignDatePickers.contentStart.setDate(campaign.content_start_date);
+          }
+          if (campaign.content_end_date) {
+            this.campaignDatePickers.contentEnd.setDate(campaign.content_end_date);
+          }
+          if (campaign.result_announcement_date) {
+            this.campaignDatePickers.resultAnnouncement.setDate(campaign.result_announcement_date);
+          }
+        }
         
         // 제공 내역
         document.getElementById('campaignProvidedItems').value = campaign.provided_items || '';
