@@ -2279,23 +2279,37 @@ class ReviewSphere {
     // 콤마 제거하고 순수 숫자만 추출
     const pointPerPerson = pointRewardInput ? this.getNumericValue(pointRewardInput) : 0;
     
+    // 과금 방식 확인
+    const pricingTypeInput = document.querySelector('input[name="pricingType"]:checked');
+    const pricingType = pricingTypeInput ? pricingTypeInput.value : 'product_only';
+    
+    // 제품 가액 (구매+포인트 방식에만 포함)
+    const productValueInput = document.getElementById('campaignProductValue');
+    const productValue = productValueInput ? this.getNumericValue(productValueInput) : 0;
+    
     const totalPoints = slots * pointPerPerson;
     let totalPointCost = totalPoints;
+    let totalProductCost = 0;
     let platformFee = 0;
     let subtotal = 0;
     let vat = 0;
     let totalCost = 0;
     
+    // 구매+포인트 방식: 제품 가액 포함 (리뷰어가 구매하는 금액을 광고주가 미리 제공)
+    if (pricingType === 'purchase_with_points') {
+      totalProductCost = slots * productValue;
+    }
+    
     if (pointPerPerson > 0) {
       // 포인트가 있는 경우: 기존 계산 방식
       platformFee = Math.floor(totalPointCost * 0.20);
-      subtotal = totalPointCost + platformFee;
+      subtotal = totalPointCost + totalProductCost + platformFee;
       vat = Math.floor(subtotal * 0.10);
       totalCost = subtotal + vat;
     } else {
       // 포인트가 0인 경우: 고정 수수료 10,000원
       platformFee = 10000;
-      subtotal = platformFee;
+      subtotal = totalProductCost + platformFee;
       vat = Math.floor(subtotal * 0.10);
       totalCost = subtotal + vat;
       totalPointCost = 0;
@@ -2314,6 +2328,22 @@ class ReviewSphere {
     const totalPointCostField = document.getElementById('totalPointCost');
     if (totalPointCostField) {
       totalPointCostField.textContent = totalPointCost.toLocaleString() + '원';
+    }
+    
+    // 제품 가액 표시 (구매+포인트 방식일 때만)
+    const totalProductCostField = document.getElementById('totalProductCost');
+    if (totalProductCostField) {
+      if (pricingType === 'purchase_with_points' && totalProductCost > 0) {
+        totalProductCostField.textContent = totalProductCost.toLocaleString() + '원';
+        // 부모 요소도 표시
+        const productCostRow = totalProductCostField.closest('.grid');
+        if (productCostRow) productCostRow.style.display = '';
+      } else {
+        totalProductCostField.textContent = '0원';
+        // 부모 요소 숨김
+        const productCostRow = totalProductCostField.closest('.grid');
+        if (productCostRow) productCostRow.style.display = 'none';
+      }
     }
     
     const platformFeeField = document.getElementById('platformFee');

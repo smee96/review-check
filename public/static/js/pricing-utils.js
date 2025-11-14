@@ -95,8 +95,18 @@ class PricingUtils {
   async calculateFullPricing(pricingType, productValue, spherePoints = 0) {
     const { fixedFee, pointsFee, totalFee } = await this.calculatePlatformFee(pricingType, productValue, spherePoints);
     
-    // 광고주 총 지출 = 상품/이용권 가격 + 포인트 + 플랫폼 수수료
-    const totalCost = productValue + spherePoints + totalFee;
+    // 광고주 총 지출 계산
+    // - 구매+포인트: 제품 가액 포함 (리뷰어 구매 대행 비용)
+    // - 상품만/상품+포인트/이용권만/이용권+포인트: 제품 가액 제외 (광고주가 직접 제공)
+    // - 포인트만: 포인트만 계산
+    let totalCost;
+    if (pricingType === 'purchase_with_points') {
+      // 구매+포인트: 제품 가액 + 포인트 + 플랫폼 수수료
+      totalCost = productValue + spherePoints + totalFee;
+    } else {
+      // 그 외: 포인트 + 플랫폼 수수료만
+      totalCost = spherePoints + totalFee;
+    }
     
     return {
       pricingType,
