@@ -2,7 +2,10 @@
 
 const UIUtils = {
   // Status badge helpers
-  getStatusBadge(status) {
+  getStatusBadge(status, campaign = null) {
+    // campaign 객체가 있으면 날짜 기반으로 실제 상태 계산
+    const actualStatus = campaign ? this.calculateCampaignStatus(campaign) : status;
+    
     const badges = {
       pending: 'bg-yellow-100 text-yellow-800',
       recruiting: 'bg-blue-100 text-blue-800',
@@ -11,10 +14,43 @@ const UIUtils = {
       completed: 'bg-purple-100 text-purple-800',
       cancelled: 'bg-gray-100 text-gray-800'
     };
-    return badges[status] || 'bg-gray-100 text-gray-800';
+    return badges[actualStatus] || 'bg-gray-100 text-gray-800';
   },
 
-  getStatusText(status) {
+  // 캠페인의 실제 상태를 날짜 기반으로 계산
+  calculateCampaignStatus(campaign) {
+    // 관리자가 수동으로 설정한 상태는 그대로 사용
+    if (campaign.status === 'pending' || campaign.status === 'suspended' || campaign.status === 'cancelled') {
+      return campaign.status;
+    }
+    
+    const now = new Date();
+    const applicationEndDate = campaign.application_end_date ? new Date(campaign.application_end_date) : null;
+    const resultAnnouncementDate = campaign.result_announcement_date ? new Date(campaign.result_announcement_date) : null;
+    
+    // 날짜 정보가 없으면 기존 상태 사용
+    if (!applicationEndDate) {
+      return campaign.status;
+    }
+    
+    // 모집기간 중 (모집종료일 이전)
+    if (now <= applicationEndDate) {
+      return 'recruiting';
+    }
+    
+    // 결과발표일이 설정되어 있고 결과발표일이 지났으면
+    if (resultAnnouncementDate && now > resultAnnouncementDate) {
+      return 'completed';
+    }
+    
+    // 모집기간은 지났지만 결과발표일 전이면 진행중
+    return 'in_progress';
+  },
+
+  getStatusText(status, campaign = null) {
+    // campaign 객체가 있으면 날짜 기반으로 실제 상태 계산
+    const actualStatus = campaign ? this.calculateCampaignStatus(campaign) : status;
+    
     const texts = {
       pending: '승인대기',
       recruiting: '모집중',
@@ -23,7 +59,7 @@ const UIUtils = {
       completed: '성공종료',
       cancelled: '취소'
     };
-    return texts[status] || status;
+    return texts[actualStatus] || actualStatus;
   },
 
   getApplicationStatusBadge(status) {

@@ -269,8 +269,8 @@ class ReviewSphere {
                     <div class="p-4 flex flex-col" style="height: 200px;">
                       <div class="flex items-start justify-between mb-2">
                         <h4 class="font-bold text-base line-clamp-1 flex-1">${c.title}</h4>
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status)} ml-2 whitespace-nowrap">
-                          ${this.getStatusText(c.status)}
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status, c)} ml-2 whitespace-nowrap">
+                          ${this.getStatusText(c.status, c)}
                         </span>
                       </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2" style="height: 40px;">${c.description || '캠페인 설명이 없습니다'}</p>
@@ -335,8 +335,8 @@ class ReviewSphere {
                     <div class="p-4 flex flex-col" style="height: 200px;">
                       <div class="flex items-start justify-between mb-2">
                         <h4 class="font-bold text-base line-clamp-1 flex-1">${c.title}</h4>
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status)} ml-2 whitespace-nowrap">
-                          ${this.getStatusText(c.status)}
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status, c)} ml-2 whitespace-nowrap">
+                          ${this.getStatusText(c.status, c)}
                         </span>
                       </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2" style="height: 40px;">${c.description || '캠페인 설명이 없습니다'}</p>
@@ -866,8 +866,8 @@ class ReviewSphere {
                 <div class="p-6 sm:p-8">
                   <!-- 상태와 모집인원 -->
                   <div class="flex items-center justify-between mb-4">
-                    <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getStatusBadge(campaign.status)}">
-                      ${this.getStatusText(campaign.status)}
+                    <span class="px-4 py-2 rounded-full text-sm font-semibold ${this.getStatusBadge(campaign.status, campaign)}">
+                      ${this.getStatusText(campaign.status, campaign)}
                     </span>
                     <span class="text-gray-500">
                       <i class="fas fa-users mr-1"></i>${campaign.slots || 1}명 모집
@@ -1467,8 +1467,8 @@ class ReviewSphere {
                           </span>
                         ` : ''}
                       </div>
-                      <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status)} whitespace-nowrap self-start">
-                        ${this.getStatusText(c.status)}
+                      <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status, c)} whitespace-nowrap self-start">
+                        ${this.getStatusText(c.status, c)}
                       </span>
                     </div>
                     <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
@@ -4946,8 +4946,8 @@ class ReviewSphere {
                   </div>
                   <p class="text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status)}">
-                  ${this.getStatusText(c.status)}
+                <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status, c)}">
+                  ${this.getStatusText(c.status, c)}
                 </span>
               </div>
 
@@ -5159,12 +5159,12 @@ class ReviewSphere {
     return UIUtils.renderFooter();
   }
 
-  getStatusBadge(status) {
-    return UIUtils.getStatusBadge(status);
+  getStatusBadge(status, campaign = null) {
+    return UIUtils.getStatusBadge(status, campaign);
   }
 
-  getStatusText(status) {
-    return UIUtils.getStatusText(status);
+  getStatusText(status, campaign = null) {
+    return UIUtils.getStatusText(status, campaign);
   }
 
   getApplicationStatusBadge(status) {
