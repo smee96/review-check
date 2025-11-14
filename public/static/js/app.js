@@ -6679,15 +6679,27 @@ class ReviewSphere {
               </div>
             </div>
           ` : `
-            <!-- 일반 과금: 기존 표시 -->
-            <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
+            <!-- 일반 과금: 총 결제 금액 -->
+            <div class="bg-green-50 border border-green-300 rounded p-4 mt-3">
               <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
-                  <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-800 font-bold text-lg">
+                    <i class="fas fa-credit-card mr-1 text-green-600"></i>총 결제 금액 (${slots}명)
+                  </span>
                 </div>
-                <div class="text-xs text-gray-600">
-                  소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
+                <div class="bg-white rounded p-3 space-y-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">소계:</span>
+                    <span class="font-semibold">${totalForAllInfluencers.toLocaleString()}원</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">부가세 (10%):</span>
+                    <span class="font-semibold text-orange-600">+${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원</span>
+                  </div>
+                  <div class="flex justify-between items-center pt-2 border-t border-green-200">
+                    <span class="text-gray-800 font-bold">실제 입금 금액:</span>
+                    <span class="font-bold text-2xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+                  </div>
                 </div>
               </div>
             </div>
