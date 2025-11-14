@@ -12,5 +12,11 @@
       "database_name": "review-spheres-v1-production",
       "database_id": "907a208c-c1cb-4ca4-a5d7-73d7731f11b9"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "reviewsphere-images"
+    }
   ]
 }

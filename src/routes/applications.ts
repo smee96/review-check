@@ -6,6 +6,7 @@ import { authMiddleware, requireRole } from '../middleware/auth';
 
 type Bindings = {
   DB: D1Database;
+  R2: R2Bucket;
 };
 
 const applications = new Hono<{ Bindings: Bindings }>();
@@ -141,9 +142,12 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     
     const { env } = c;
     
-    // First check if application exists
+    // Get application with campaign info
     const application = await env.DB.prepare(
-      'SELECT * FROM applications WHERE id = ?'
+      `SELECT a.*, c.content_submission_end_date 
+       FROM applications a
+       JOIN campaigns c ON a.campaign_id = c.id
+       WHERE a.id = ?`
     ).bind(applicationId).first();
     
     if (!application) {
@@ -169,18 +173,173 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     ).bind(applicationId).first();
     
     if (existing) {
-      return c.json({ error: '이미 리뷰가 등록되었습니다' }, 400);
+      return c.json({ error: '이미 리뷰가 등록되었습니다. 수정하려면 수정 기능을 사용하세요.' }, 400);
     }
     
-    // Create review with optional image
+    // Check if within content submission period
+    const now = new Date();
+    const endDate = new Date(application.content_submission_end_date);
+    if (now > endDate) {
+      return c.json({ error: '컨텐츠 등록 기간이 종료되었습니다' }, 400);
+    }
+    
+    // Upload image to R2 if provided
+    let imageUrl = null;
+    if (image_data) {
+      try {
+        // Extract base64 data
+        const base64Data = image_data.split(',')[1];
+        const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(7);
+        const key = `reviews/${applicationId}-${timestamp}-${randomId}.jpg`;
+        
+        // Upload to R2
+        await env.R2.put(key, imageBuffer, {
+          httpMetadata: {
+            contentType: 'image/jpeg'
+          }
+        });
+        
+        imageUrl = key;
+      } catch (error) {
+        console.error('R2 upload error:', error);
+        return c.json({ error: '이미지 업로드에 실패했습니다' }, 500);
+      }
+    }
+    
+    // Create review
     await env.DB.prepare(
       'INSERT INTO reviews (application_id, post_url, image_url, submitted_at) VALUES (?, ?, ?, ?)'
-    ).bind(applicationId, post_url || null, image_data || null, getCurrentDateTime()).run();
+    ).bind(applicationId, post_url || null, imageUrl, getCurrentDateTime()).run();
     
     return c.json({ success: true, message: '리뷰가 등록되었습니다' }, 201);
   } catch (error) {
     console.error('Submit review error:', error);
     return c.json({ error: '리뷰 등록 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 리뷰 수정 (포스트 URL + 이미지) (인플루언서)
+applications.put('/:id/review', requireRole('influencer'), async (c) => {
+  try {
+    const applicationId = c.req.param('id');
+    const user = c.get('user');
+    const { post_url, image_data } = await c.req.json();
+    
+    // post_url or image_data is required
+    if (!post_url && !image_data) {
+      return c.json({ error: '게시물 링크 또는 리뷰 캡쳐 이미지를 입력해주세요' }, 400);
+    }
+    
+    const { env } = c;
+    
+    // Get application with campaign info
+    const application = await env.DB.prepare(
+      `SELECT a.*, c.content_submission_end_date 
+       FROM applications a
+       JOIN campaigns c ON a.campaign_id = c.id
+       WHERE a.id = ?`
+    ).bind(applicationId).first();
+    
+    if (!application) {
+      return c.json({ error: '지원 내역을 찾을 수 없습니다' }, 404);
+    }
+    
+    // Check ownership
+    if (application.influencer_id !== user.userId) {
+      return c.json({ error: '본인의 지원 내역만 수정할 수 있습니다' }, 403);
+    }
+    
+    // Check if approved
+    if (application.status !== 'approved') {
+      return c.json({ error: '확정된 지원만 리뷰를 수정할 수 있습니다' }, 400);
+    }
+    
+    // Check if review exists
+    const existing = await env.DB.prepare(
+      'SELECT * FROM reviews WHERE application_id = ?'
+    ).bind(applicationId).first();
+    
+    if (!existing) {
+      return c.json({ error: '등록된 리뷰가 없습니다' }, 404);
+    }
+    
+    // Check if within content submission period
+    const now = new Date();
+    const endDate = new Date(application.content_submission_end_date);
+    if (now > endDate) {
+      return c.json({ error: '컨텐츠 등록 기간이 종료되어 수정할 수 없습니다' }, 400);
+    }
+    
+    // Handle image update
+    let imageUrl = existing.image_url;
+    if (image_data) {
+      try {
+        // Delete old image if exists
+        if (existing.image_url) {
+          await env.R2.delete(existing.image_url);
+        }
+        
+        // Upload new image
+        const base64Data = image_data.split(',')[1];
+        const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(7);
+        const key = `reviews/${applicationId}-${timestamp}-${randomId}.jpg`;
+        
+        await env.R2.put(key, imageBuffer, {
+          httpMetadata: {
+            contentType: 'image/jpeg'
+          }
+        });
+        
+        imageUrl = key;
+      } catch (error) {
+        console.error('R2 upload error:', error);
+        return c.json({ error: '이미지 업로드에 실패했습니다' }, 500);
+      }
+    }
+    
+    // Update review
+    await env.DB.prepare(
+      'UPDATE reviews SET post_url = ?, image_url = ?, updated_at = ? WHERE application_id = ?'
+    ).bind(post_url || null, imageUrl, getCurrentDateTime(), applicationId).run();
+    
+    return c.json({ success: true, message: '리뷰가 수정되었습니다' });
+  } catch (error) {
+    console.error('Update review error:', error);
+    return c.json({ error: '리뷰 수정 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// R2 이미지 가져오기 (공개)
+applications.get('/review-image/:key', async (c) => {
+  try {
+    const key = c.req.param('key');
+    const { env } = c;
+    
+    // Decode the key (it's URL encoded)
+    const decodedKey = decodeURIComponent(key);
+    
+    const object = await env.R2.get(decodedKey);
+    
+    if (!object) {
+      return c.json({ error: '이미지를 찾을 수 없습니다' }, 404);
+    }
+    
+    return new Response(object.body, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
+        'Cache-Control': 'public, max-age=31536000'
+      }
+    });
+  } catch (error) {
+    console.error('Get review image error:', error);
+    return c.json({ error: '이미지 로딩 중 오류가 발생했습니다' }, 500);
   }
 });
 

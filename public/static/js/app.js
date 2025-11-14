@@ -3579,8 +3579,13 @@ class ReviewSphere {
                     </button>
                   </div>
                   ${app.status === 'approved' && app.review_url ? `
-                    <div class="mt-2 text-sm text-green-600">
-                      <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
+                    <div class="mt-2 flex items-center gap-2">
+                      <span class="text-sm text-green-600">
+                        <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
+                      </span>
+                      <button onclick="app.editReview(${app.id}, '${app.review_url || ''}', '${app.review_image_url || ''}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                        <i class="fas fa-edit mr-1"></i>수정하기
+                      </button>
                     </div>
                   ` : ''}
                 </div>
@@ -3674,7 +3679,7 @@ class ReviewSphere {
                       </a>
                     ` : ''}
                     ${app.review_image_url ? `
-                      <button onclick="app.viewReviewImage('${app.review_image_url}')" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm ml-2">
+                      <button onclick="app.viewReviewImageByKey('${app.review_image_url}')" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm ml-2">
                         <i class="fas fa-image mr-1"></i>리뷰 캡쳐 보기
                       </button>
                     ` : ''}
@@ -4669,8 +4674,143 @@ class ReviewSphere {
     });
   }
   
+  async editReview(applicationId, existingUrl, existingImageKey) {
+    // 모달 생성
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg max-w-lg w-full p-6">
+        <h3 class="text-xl font-bold mb-4">리뷰 수정하기</h3>
+        
+        <form id="reviewEditForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              게시물 링크
+              <span class="text-xs text-gray-500 font-normal">(선택사항)</span>
+            </label>
+            <input type="url" id="reviewPostUrl" value="${existingUrl}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="https://blog.naver.com/...">
+            <p class="text-xs text-gray-500 mt-1">블로그, 인스타그램, 유튜브 등 게시물 링크를 입력하세요</p>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              리뷰 캡쳐 이미지
+              <span class="text-xs text-gray-500 font-normal">(선택사항 - 스마트스토어 리뷰 등)</span>
+            </label>
+            ${existingImageKey ? `
+              <div class="mb-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                <p class="text-xs text-blue-800">
+                  <i class="fas fa-check-circle mr-1"></i>기존 이미지가 등록되어 있습니다
+                </p>
+                <button type="button" onclick="app.viewReviewImageByKey('${existingImageKey}')" class="text-blue-600 hover:text-blue-800 text-xs mt-1">
+                  <i class="fas fa-eye mr-1"></i>기존 이미지 보기
+                </button>
+              </div>
+            ` : ''}
+            <input type="file" id="reviewImage" accept="image/*"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <p class="text-xs text-gray-500 mt-1">새 이미지를 선택하면 기존 이미지가 교체됩니다 (최대 2MB)</p>
+          </div>
+          
+          <div id="imagePreview" class="hidden mt-2">
+            <img id="previewImg" class="max-w-full h-auto rounded-lg border">
+          </div>
+          
+          <p class="text-xs text-orange-600">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            게시물 링크 또는 리뷰 캡쳐 이미지 중 최소 1개는 필수입니다
+          </p>
+          
+          <p class="text-xs text-blue-600">
+            <i class="fas fa-info-circle mr-1"></i>
+            컨텐츠 등록 기간 내에만 수정 가능합니다
+          </p>
+          
+          <div class="flex gap-2 pt-4">
+            <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
+              수정하기
+            </button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="px-6 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition font-semibold">
+              취소
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // 이미지 미리보기
+    const imageInput = document.getElementById('reviewImage');
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          alert('이미지 크기는 2MB 이하여야 합니다');
+          imageInput.value = '';
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+    
+    // 폼 제출
+    document.getElementById('reviewEditForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const postUrl = document.getElementById('reviewPostUrl').value.trim();
+      const imageFile = imageInput.files[0];
+      
+      if (!postUrl && !imageFile && !existingImageKey) {
+        alert('게시물 링크 또는 리뷰 캡쳐 이미지 중 최소 1개를 입력해주세요');
+        return;
+      }
+      
+      try {
+        const payload = { post_url: postUrl || null };
+        
+        // 이미지가 있으면 base64로 인코딩
+        if (imageFile) {
+          const reader = new FileReader();
+          const imageData = await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(imageFile);
+          });
+          payload.image_data = imageData;
+        }
+        
+        await axios.put(`/api/applications/${applicationId}/review`, payload, this.getAuthHeaders());
+        alert('리뷰가 수정되었습니다!');
+        modal.remove();
+        
+        // 마이페이지 나의 캠페인 섹션 다시 로드
+        await this.showMyPage();
+        setTimeout(() => {
+          this.toggleAccordion('myCampaigns');
+        }, 100);
+      } catch (error) {
+        console.error('Review update error:', error);
+        alert(error.response?.data?.error || '리뷰 수정에 실패했습니다');
+      }
+    });
+  }
+  
   viewReviewImage(imageUrl) {
-    // 이미지 모달 표시
+    // 이미지 모달 표시 (URL 직접)
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
     modal.onclick = () => modal.remove();
@@ -4680,6 +4820,12 @@ class ReviewSphere {
       </div>
     `;
     document.body.appendChild(modal);
+  }
+  
+  viewReviewImageByKey(imageKey) {
+    // R2 이미지 키로 표시
+    const imageUrl = `/api/applications/review-image/${encodeURIComponent(imageKey)}`;
+    this.viewReviewImage(imageUrl);
   }
 
   async cancelApplication(applicationId) {
