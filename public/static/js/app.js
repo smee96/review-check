@@ -6484,7 +6484,7 @@ class ReviewSphere {
       // 상품/이용권 가치 입력 숨김
       if (productValueSection) productValueSection.classList.add('hidden');
       productValueInput.required = false;
-      // 값 초기화하지 않고 유지 (사용자가 이미 입력한 값 보존)
+      productValueInput.value = '0'; // 숨길 때는 0으로 초기화하여 계산에서 제외
       
       // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
@@ -6530,7 +6530,7 @@ class ReviewSphere {
       // 스피어포인트 입력 숨김
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
-      // 값 초기화하지 않고 유지 (사용자가 이미 입력한 값 보존)
+      spherePointsInput.value = '0'; // 숨길 때는 0으로 초기화하여 계산에서 제외
       
       // 라벨 변경
       if (pricingType === 'product_only') {
