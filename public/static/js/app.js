@@ -5963,9 +5963,6 @@ class ReviewSphere {
       // pricingUtils를 사용하여 계산
       const pricing = await window.pricingUtils.calculateFullPricing(pricingType, productValue, spherePoints);
       
-      // 총 비용 (모집인원 고려)
-      const totalForAllInfluencers = pricing.total_cost * slots;
-      
       // 라벨 결정
       let productLabel = '상품/이용권 가치';
       if (pricingType === 'purchase_with_points') {
