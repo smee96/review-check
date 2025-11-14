@@ -171,7 +171,7 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     
     // Get application with campaign info
     const application = await env.DB.prepare(
-      `SELECT a.*, c.content_start_date, c.content_end_date 
+      `SELECT a.*, c.content_start_date, c.result_announcement_date 
        FROM applications a
        JOIN campaigns c ON a.campaign_id = c.id
        WHERE a.id = ?`
@@ -203,18 +203,22 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '이미 리뷰가 등록되었습니다. 수정하려면 수정 기능을 사용하세요.' }, 400);
     }
     
-    // Check if within content submission period
-    if (application.content_start_date && application.content_end_date) {
+    // Check if within review submission period (content_start_date ~ result_announcement_date + 3일)
+    if (application.content_start_date && application.result_announcement_date) {
       const now = new Date();
       const startDate = new Date(application.content_start_date);
-      const endDate = new Date(application.content_end_date);
+      const announcementDate = new Date(application.result_announcement_date);
       
-      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+      if (!isNaN(startDate.getTime()) && !isNaN(announcementDate.getTime())) {
+        // result_announcement_date + 3일
+        const endDate = new Date(announcementDate);
+        endDate.setDate(endDate.getDate() + 3);
+        
         if (now < startDate) {
-          return c.json({ error: '컨텐츠 등록 기간이 아직 시작되지 않았습니다' }, 400);
+          return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다' }, 400);
         }
         if (now > endDate) {
-          return c.json({ error: '컨텐츠 등록 기간이 종료되었습니다' }, 400);
+          return c.json({ error: '리뷰 등록 기간이 종료되었습니다 (결과발표일 +3일까지)' }, 400);
         }
       }
     }
@@ -269,7 +273,7 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
     
     // Get application with campaign info
     const application = await env.DB.prepare(
-      `SELECT a.*, c.content_start_date, c.content_end_date 
+      `SELECT a.*, c.content_start_date, c.result_announcement_date 
        FROM applications a
        JOIN campaigns c ON a.campaign_id = c.id
        WHERE a.id = ?`
@@ -298,18 +302,22 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '등록된 리뷰가 없습니다' }, 404);
     }
     
-    // Check if within content submission period
-    if (application.content_start_date && application.content_end_date) {
+    // Check if within review submission period (content_start_date ~ result_announcement_date + 3일)
+    if (application.content_start_date && application.result_announcement_date) {
       const now = new Date();
       const startDate = new Date(application.content_start_date);
-      const endDate = new Date(application.content_end_date);
+      const announcementDate = new Date(application.result_announcement_date);
       
-      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+      if (!isNaN(startDate.getTime()) && !isNaN(announcementDate.getTime())) {
+        // result_announcement_date + 3일
+        const endDate = new Date(announcementDate);
+        endDate.setDate(endDate.getDate() + 3);
+        
         if (now < startDate) {
-          return c.json({ error: '컨텐츠 등록 기간이 아직 시작되지 않았습니다' }, 400);
+          return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다' }, 400);
         }
         if (now > endDate) {
-          return c.json({ error: '컨텐츠 등록 기간이 종료되어 수정할 수 없습니다' }, 400);
+          return c.json({ error: '리뷰 등록 기간이 종료되어 수정할 수 없습니다 (결과발표일 +3일까지)' }, 400);
         }
       }
     }
