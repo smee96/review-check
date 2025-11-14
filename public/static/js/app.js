@@ -2951,6 +2951,10 @@ class ReviewSphere {
         ${applications.length === 0 ? '<p class="text-gray-600">아직 지원자가 없습니다</p>' : `
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           ${applications.map(a => {
+            // 선정 취소 가능 여부 체크 (선정일 당일까지만 가능)
+            const today = new Date().toISOString().split('T')[0];
+            const canCancelSelection = !campaign.announcement_date || campaign.announcement_date >= today;
+            
             // 채널 URL 생성
             const makeChannelUrl = (type, handle) => {
               if (!handle) return null;
@@ -3038,10 +3042,16 @@ class ReviewSphere {
                     </button>
                   </div>
                 ` : a.status === 'approved' ? `
-                  <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'pending', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
-                    class="w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 text-sm font-semibold transition">
-                    <i class="fas fa-undo mr-1"></i>선정 취소
-                  </button>
+                  ${canCancelSelection ? `
+                    <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'pending', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
+                      class="w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700 text-sm font-semibold transition">
+                      <i class="fas fa-undo mr-1"></i>선정 취소
+                    </button>
+                  ` : `
+                    <div class="text-center text-sm text-gray-500 py-2">
+                      <i class="fas fa-lock mr-1"></i>선정발표일 이후 취소 불가
+                    </div>
+                  `}
                 ` : a.status === 'rejected' ? `
                   <button onclick="event.stopPropagation(); app.updateApplicationStatus(${a.id}, 'pending', ${this.currentCampaignId}); app.viewApplications(${this.currentCampaignId});" 
                     class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold transition">
@@ -3068,6 +3078,10 @@ class ReviewSphere {
 
   async viewApplicationDetail(applicationId) {
     try {
+      // 캠페인 정보 가져오기 (선정 취소 가능 여부 확인용)
+      const campaignResponse = await axios.get(`/api/campaigns/${this.currentCampaignId}`, this.getAuthHeaders());
+      const campaign = campaignResponse.data;
+      
       const response = await axios.get(`/api/campaigns/${this.currentCampaignId}/applications`, this.getAuthHeaders());
       const applications = response.data;
       const application = applications.find(a => a.id === applicationId);
@@ -3076,6 +3090,10 @@ class ReviewSphere {
         alert('지원자 정보를 찾을 수 없습니다');
         return;
       }
+      
+      // 선정 취소 가능 여부 체크 (선정일 당일까지만 가능)
+      const today = new Date().toISOString().split('T')[0];
+      const canCancelSelection = !campaign.announcement_date || campaign.announcement_date >= today;
 
       // SNS URL 생성 함수
       const makeChannelUrl = (type, handle) => {
@@ -3198,13 +3216,21 @@ class ReviewSphere {
                   </div>
                 ` : application.status === 'approved' ? `
                   <div class="space-y-3">
-                    <button onclick="app.updateApplicationStatus(${application.id}, 'pending', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
-                      class="w-full bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 font-semibold transition">
-                      <i class="fas fa-undo mr-2"></i>선정 취소
-                    </button>
-                    <p class="text-xs text-gray-500 text-center">
-                      <i class="fas fa-info-circle mr-1"></i>선정을 취소하면 대기 상태로 되돌아갑니다
-                    </p>
+                    ${canCancelSelection ? `
+                      <button onclick="app.updateApplicationStatus(${application.id}, 'pending', ${this.currentCampaignId}); app.viewApplicationDetail(${application.id});" 
+                        class="w-full bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 font-semibold transition">
+                        <i class="fas fa-undo mr-2"></i>선정 취소
+                      </button>
+                      <p class="text-xs text-gray-500 text-center">
+                        <i class="fas fa-info-circle mr-1"></i>선정을 취소하면 대기 상태로 되돌아갑니다
+                      </p>
+                    ` : `
+                      <div class="text-center py-4 bg-gray-50 rounded-lg">
+                        <i class="fas fa-lock text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-sm text-gray-600 font-medium">선정발표일 이후 취소 불가</p>
+                        <p class="text-xs text-gray-500 mt-1">수정이 필요한 경우 관리자에게 문의해주세요</p>
+                      </div>
+                    `}
                   </div>
                 ` : application.status === 'rejected' ? `
                   <div class="space-y-3">

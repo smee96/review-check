@@ -112,7 +112,7 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
     
     // Check if user owns the campaign
     const application = await env.DB.prepare(
-      `SELECT a.*, c.advertiser_id
+      `SELECT a.*, c.advertiser_id, c.announcement_date
        FROM applications a
        JOIN campaigns c ON a.campaign_id = c.id
        WHERE a.id = ?`
@@ -124,6 +124,17 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
     
     if (user.role !== 'admin' && application.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
+    }
+    
+    // 선정 취소 제한: 선정일 이후는 취소 불가 (관리자는 예외)
+    if (user.role !== 'admin' && status === 'pending' && application.status === 'approved') {
+      if (application.announcement_date) {
+        const now = new Date();
+        const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];
+        if (application.announcement_date < koreaDate) {
+          return c.json({ error: '선정 발표일 이후에는 선정을 취소할 수 없습니다' }, 403);
+        }
+      }
     }
     
     // Update application status
