@@ -1491,6 +1491,9 @@ class ReviewSphere {
                           <i class="fas fa-edit mr-1"></i>수정
                         </button>
                       `}
+                      <button onclick="app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
+                        <i class="fas fa-copy mr-1"></i>복사하기
+                      </button>
                       ${c.status === 'recruiting' || c.status === 'in_progress' ? `
                         <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
                           <i class="fas fa-users mr-1"></i>지원자 보기
@@ -2669,6 +2672,158 @@ class ReviewSphere {
       
     } catch (error) {
       console.error('Edit campaign error:', error);
+      alert(error.response?.data?.error || '캠페인 정보를 불러오는데 실패했습니다');
+    }
+  }
+
+  async copyCampaign(campaignId) {
+    try {
+      // 캠페인 데이터 가져오기
+      const response = await axios.get(`/api/campaigns/${campaignId}`, this.getAuthHeaders());
+      const campaign = response.data;
+      
+      if (!confirm('이 캠페인을 복사하시겠습니까?\n모든 내용이 복사되며, 날짜만 새로 지정하면 됩니다.')) {
+        return;
+      }
+      
+      // showCreateCampaign과 동일한 폼 표시
+      await this.showCreateCampaign();
+      
+      // 폼 제목 변경 및 데이터 채우기 (datepicker 초기화 대기: 300ms)
+      setTimeout(() => {
+        const formTitle = document.querySelector('h2');
+        if (formTitle && formTitle.textContent.includes('캠페인 등록')) {
+          formTitle.innerHTML = '<i class="fas fa-copy text-green-600 mr-2"></i>캠페인 복사';
+        }
+        
+        // 기존 데이터 채우기 (제목에 "(복사본)" 추가)
+        document.getElementById('campaignTitle').value = campaign.title + ' (복사본)';
+        document.getElementById('campaignDescription').value = campaign.description || '';
+        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        
+        // 채널 타입 선택
+        const channelTypeSelect = document.getElementById('campaignChannelType');
+        if (channelTypeSelect && campaign.channel_type) {
+          channelTypeSelect.value = campaign.channel_type;
+          this.handleChannelChange(); // 채널별 필드 표시
+        }
+        
+        // 채널별 필드 채우기
+        setTimeout(() => {
+          if (campaign.channel_type === 'instagram' && campaign.instagram_mention_account) {
+            const instagramField = document.getElementById('instagramMentionAccount');
+            if (instagramField) instagramField.value = campaign.instagram_mention_account;
+          } else if (campaign.channel_type === 'blog' && campaign.blog_product_url) {
+            const blogField = document.getElementById('blogProductUrl');
+            if (blogField) blogField.value = campaign.blog_product_url;
+          } else if (campaign.channel_type === 'youtube' && campaign.youtube_purchase_link) {
+            const youtubeField = document.getElementById('youtubePurchaseLink');
+            if (youtubeField) youtubeField.value = campaign.youtube_purchase_link;
+          } else if (campaign.channel_type === 'smartstore' && campaign.smartstore_product_url) {
+            const smartstoreField = document.getElementById('smartstoreProductUrl');
+            if (smartstoreField) smartstoreField.value = campaign.smartstore_product_url;
+          }
+        }, 100);
+        
+        // 날짜 필드는 비워둠 (광고주가 새로 설정)
+        // this.campaignDatePickers는 이미 초기화되어 있음
+        
+        // 제공 내역
+        document.getElementById('campaignProvidedItems').value = campaign.provided_items || '';
+        document.getElementById('campaignProductName').value = campaign.product_name || '';
+        document.getElementById('campaignProductUrl').value = campaign.product_url || '';
+        
+        // 예상 가액 (숫자 포맷)
+        const budgetField = document.getElementById('campaignBudget');
+        if (budgetField && campaign.budget) {
+          budgetField.value = campaign.budget.toLocaleString();
+        }
+        
+        // 미션 필드 초기화 및 채우기
+        const missionContainer = document.getElementById('missionContainer');
+        if (missionContainer && campaign.mission) {
+          missionContainer.innerHTML = ''; // 기존 필드 제거
+          const missions = campaign.mission.split('\n').filter(m => m.trim());
+          missions.forEach((mission, index) => {
+            this.addMissionField();
+            const missionInput = document.getElementById(`mission${index + 1}`);
+            if (missionInput) missionInput.value = mission.trim();
+          });
+          // 최소 5개 필드 유지
+          while (missionContainer.children.length < 5) {
+            this.addMissionField();
+          }
+        }
+        
+        // 요구사항
+        document.getElementById('campaignRequirements').value = campaign.requirements || '';
+        
+        // 키워드 (해시태그)
+        if (campaign.keywords) {
+          this.keywords = []; // 초기화
+          const keywords = campaign.keywords.split(',').map(k => k.trim()).filter(k => k);
+          keywords.forEach(keyword => {
+            this.addKeyword(keyword);
+          });
+        }
+        
+        // 유의사항
+        document.getElementById('campaignNotes').value = campaign.notes || `1. 제공받은 제품은 타인에게 양도 및 판매, 교환이 불가능 하며 적발 시 제품 가격 환불 및 캠페인 참여가 제한됩니다.
+
+2. 리뷰 콘텐츠 등록 기간 내 리뷰 콘텐츠 미등록 시 제품 가격에 대하여 비용이 청구됩니다.
+
+3. 선정 후 단순 변심에 의한 제공내역 옵션 및 배송지 변경은 어렵습니다.
+
+4. 안내된 제공 내역과 다르거나, 별도 공지 없이 3일 이상 배송이 진행되지 않을 경우에는 1:1문의로 연락해주세요.
+
+5. 업체측 요청에 따라 리뷰어 선정 인원수가 변경될 수 있습니다.
+
+6. 리뷰 콘텐츠 작성 시 선정 된 리뷰 캠페인의 제품으로만 촬영이 이루어져야 합니다.
+
+7. 작성한 리뷰 콘텐츠는 캠페인 마감일을 기준으로 6개월간 유지되어야 하며, 유지되지 않을 경우 페널티가 부과됩니다.
+
+8. 체험하신 블로거분들의 리뷰 콘텐츠는 업체 홍보로 이용될 수 있습니다.`;
+        
+        // 과금 방식 선택
+        if (campaign.pricing_type) {
+          const pricingRadio = document.querySelector(`input[name="pricingType"][value="${campaign.pricing_type}"]`);
+          if (pricingRadio) {
+            pricingRadio.checked = true;
+            this.handlePricingTypeChange(); // 과금 방식에 따른 필드 표시
+          }
+        }
+        
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        setTimeout(() => {
+          // 제품 가액
+          const productValueField = document.getElementById('campaignProductValue');
+          if (productValueField && campaign.product_value) {
+            productValueField.value = campaign.product_value.toLocaleString();
+          }
+          
+          // 스피어포인트
+          const spherePointsField = document.getElementById('campaignSpherePoints');
+          if (spherePointsField && campaign.sphere_points) {
+            spherePointsField.value = campaign.sphere_points.toLocaleString();
+          }
+          
+          // 포인트 리워드
+          const pointRewardField = document.getElementById('campaignPointReward');
+          if (pointRewardField && campaign.point_reward) {
+            pointRewardField.value = campaign.point_reward.toLocaleString();
+          }
+          
+          // 비용 재계산
+          this.calculateCampaignCost();
+        }, 50);
+        
+        // 제출 버튼은 기본 "캠페인 등록" 그대로 사용
+        // 새로운 캠페인으로 등록됨
+        
+      }, 300);
+      
+    } catch (error) {
+      console.error('Copy campaign error:', error);
       alert(error.response?.data?.error || '캠페인 정보를 불러오는데 실패했습니다');
     }
   }
