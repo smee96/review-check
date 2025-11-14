@@ -176,11 +176,13 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '이미 리뷰가 등록되었습니다. 수정하려면 수정 기능을 사용하세요.' }, 400);
     }
     
-    // Check if within content submission period
-    const now = new Date();
-    const endDate = new Date(application.content_submission_end_date);
-    if (now > endDate) {
-      return c.json({ error: '컨텐츠 등록 기간이 종료되었습니다' }, 400);
+    // Check if within content submission period (only if date exists)
+    if (application.content_submission_end_date) {
+      const now = new Date();
+      const endDate = new Date(application.content_submission_end_date);
+      if (!isNaN(endDate.getTime()) && now > endDate) {
+        return c.json({ error: '컨텐츠 등록 기간이 종료되었습니다' }, 400);
+      }
     }
     
     // Upload image to R2 if provided
@@ -262,11 +264,13 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '등록된 리뷰가 없습니다' }, 404);
     }
     
-    // Check if within content submission period
-    const now = new Date();
-    const endDate = new Date(application.content_submission_end_date);
-    if (now > endDate) {
-      return c.json({ error: '컨텐츠 등록 기간이 종료되어 수정할 수 없습니다' }, 400);
+    // Check if within content submission period (only if date exists)
+    if (application.content_submission_end_date) {
+      const now = new Date();
+      const endDate = new Date(application.content_submission_end_date);
+      if (!isNaN(endDate.getTime()) && now > endDate) {
+        return c.json({ error: '컨텐츠 등록 기간이 종료되어 수정할 수 없습니다' }, 400);
+      }
     }
     
     // Check if at least one field is provided (post_url, image_data, or existing data)
@@ -304,15 +308,33 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       }
     }
     
-    // Update review
+    // Update review (ensure empty strings become null)
+    const finalPostUrl = post_url && post_url.trim() ? post_url.trim() : null;
+    const finalImageUrl = imageUrl || null;
+    
+    console.log('Updating review:', {
+      applicationId,
+      finalPostUrl,
+      finalImageUrl,
+      existingPostUrl: existing.post_url,
+      existingImageUrl: existing.image_url
+    });
+    
     await env.DB.prepare(
       'UPDATE reviews SET post_url = ?, image_url = ?, updated_at = ? WHERE application_id = ?'
-    ).bind(post_url || null, imageUrl, getCurrentDateTime(), applicationId).run();
+    ).bind(finalPostUrl, finalImageUrl, getCurrentDateTime(), applicationId).run();
     
     return c.json({ success: true, message: '리뷰가 수정되었습니다' });
   } catch (error) {
     console.error('Update review error:', error);
-    return c.json({ error: '리뷰 수정 중 오류가 발생했습니다' }, 500);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    return c.json({ 
+      error: '리뷰 수정 중 오류가 발생했습니다',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
   }
 });
 
