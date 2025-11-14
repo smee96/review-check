@@ -1676,8 +1676,8 @@ class ReviewSphere {
               <label class="block text-sm font-medium text-gray-700 mb-2">모집인원 *</label>
               <input type="number" id="campaignSlots" placeholder="10" min="10" required
                 onfocus="if(this.value=='10') this.value=''"
-                onblur="if(this.value=='') {this.value='10'}; if(parseInt(this.value) < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateCampaignCost()"
-                oninput="if(parseInt(this.value) >= 10) app.calculateCampaignCost()"
+                onblur="if(this.value=='') {this.value='10'}; if(parseInt(this.value) < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateNewPricingCost()"
+                oninput="if(parseInt(this.value) >= 10) app.calculateNewPricingCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               <p class="text-xs text-gray-500 mt-1">최소 10명부터 모집 가능합니다</p>
             </div>
@@ -2032,8 +2032,7 @@ class ReviewSphere {
         slotsInput.value = '10';
       }
       
-      this.handlePricingTypeChange(); // 초기 과금 타입에 따른 UI 설정
-      this.calculateCampaignCost();
+      this.handlePricingTypeChange(); // 초기 과금 타입에 따른 UI 설정 (내부에서 calculateNewPricingCost 호출)
       this.initializeDatePickers();
       this.initializeMissionFields();
       this.initializeKeywords();
@@ -6486,7 +6485,7 @@ class ReviewSphere {
       // 상품/이용권 가치 입력 숨김
       if (productValueSection) productValueSection.classList.add('hidden');
       productValueInput.required = false;
-      productValueInput.value = '0';
+      // 값 초기화하지 않고 유지 (사용자가 이미 입력한 값 보존)
       
       // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
@@ -6532,7 +6531,7 @@ class ReviewSphere {
       // 스피어포인트 입력 숨김
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
-      spherePointsInput.value = '0';
+      // 값 초기화하지 않고 유지 (사용자가 이미 입력한 값 보존)
       
       // 라벨 변경
       if (pricingType === 'product_only') {
