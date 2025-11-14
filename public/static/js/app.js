@@ -3583,7 +3583,12 @@ class ReviewSphere {
                       <span class="text-sm text-green-600">
                         <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
                       </span>
-                      <button onclick="app.editReview(${app.id}, '${app.review_url || ''}', '${app.review_image_url || ''}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                      <button 
+                        data-app-id="${app.id}"
+                        data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
+                        data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
+                        onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
+                        class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
                         <i class="fas fa-edit mr-1"></i>수정하기
                       </button>
                     </div>
