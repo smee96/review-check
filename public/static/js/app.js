@@ -2500,7 +2500,7 @@ class ReviewSphere {
           return;
         }
         
-        if (campaign.application_start_date && campaign.application_start_date <= today) {
+        if (campaign.application_start_date && campaign.application_start_date < today) {
           alert('신청 시작일 이후에는 캠페인을 수정할 수 없습니다.\n수정이 필요한 경우 관리자에게 문의해주세요.');
           return;
         }
