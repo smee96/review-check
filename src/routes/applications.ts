@@ -11,7 +11,34 @@ type Bindings = {
 
 const applications = new Hono<{ Bindings: Bindings }>();
 
-// All routes require authentication
+// R2 이미지 가져오기 (공개 - 인증 불필요)
+applications.get('/review-image/:key', async (c) => {
+  try {
+    const key = c.req.param('key');
+    const { env } = c;
+    
+    // Decode the key (it's URL encoded)
+    const decodedKey = decodeURIComponent(key);
+    
+    const object = await env.R2.get(decodedKey);
+    
+    if (!object) {
+      return c.json({ error: '이미지를 찾을 수 없습니다' }, 404);
+    }
+    
+    return new Response(object.body, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
+        'Cache-Control': 'public, max-age=31536000'
+      }
+    });
+  } catch (error) {
+    console.error('Get review image error:', error);
+    return c.json({ error: '이미지 로딩 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// All routes below require authentication
 applications.use('*', authMiddleware);
 
 // 내 지원 내역 조회 (인플루언서)
@@ -349,33 +376,6 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       error: '리뷰 수정 중 오류가 발생했습니다',
       details: error instanceof Error ? error.message : String(error)
     }, 500);
-  }
-});
-
-// R2 이미지 가져오기 (공개)
-applications.get('/review-image/:key', async (c) => {
-  try {
-    const key = c.req.param('key');
-    const { env } = c;
-    
-    // Decode the key (it's URL encoded)
-    const decodedKey = decodeURIComponent(key);
-    
-    const object = await env.R2.get(decodedKey);
-    
-    if (!object) {
-      return c.json({ error: '이미지를 찾을 수 없습니다' }, 404);
-    }
-    
-    return new Response(object.body, {
-      headers: {
-        'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
-        'Cache-Control': 'public, max-age=31536000'
-      }
-    });
-  } catch (error) {
-    console.error('Get review image error:', error);
-    return c.json({ error: '이미지 로딩 중 오류가 발생했습니다' }, 500);
   }
 });
 
