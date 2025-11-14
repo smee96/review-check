@@ -6,7 +6,8 @@ export interface PricingCalculation {
   sphere_points: number;
   total_value: number;
   platform_fee: number;
-  platform_fee_rate: number;
+  points_fee: number; // 포인트 수수료
+  total_platform_fee: number; // 고정 수수료 + 포인트 수수료
   total_cost: number; // 광고주 총 지출
   influencer_gets: {
     product_or_voucher: number;
@@ -26,92 +27,66 @@ export async function getSystemSetting(env: any, key: string): Promise<string | 
 }
 
 /**
- * DB에서 수수료율 조회
+ * DB에서 건당 고정 수수료 조회
  */
-export async function getFeeRate(env: any, pricingType: string): Promise<number> {
+export async function getFixedFee(env: any, pricingType: string): Promise<number> {
   let settingKey: string;
   
   switch(pricingType) {
-    case 'product_only':
-      settingKey = 'fee_rate_product_only';
-      break;
-    case 'voucher_only':
-      settingKey = 'fee_rate_voucher_only';
-      break;
     case 'points_only':
-      settingKey = 'fee_rate_points_only';
+      settingKey = 'fixed_fee_points_only';
+      break;
+    case 'purchase_with_points':
+      settingKey = 'fixed_fee_purchase_with_points';
+      break;
+    case 'product_only':
+      settingKey = 'fixed_fee_product_only';
       break;
     case 'product_with_points':
+      settingKey = 'fixed_fee_product_with_points';
+      break;
+    case 'voucher_only':
+      settingKey = 'fixed_fee_voucher_only';
+      break;
     case 'voucher_with_points':
-      settingKey = 'fee_rate_with_points';
+      settingKey = 'fixed_fee_voucher_with_points';
       break;
     default:
-      settingKey = 'fee_rate_product_only';
+      settingKey = 'fixed_fee_product_only';
   }
   
-  const rateStr = await getSystemSetting(env, settingKey);
-  return rateStr ? Number(rateStr) / 100 : 0.20; // 기본값 20%
+  const feeStr = await getSystemSetting(env, settingKey);
+  return feeStr ? Number(feeStr) : 10000; // 기본값 10,000원
 }
 
 /**
- * DB에서 최소 수수료 조회
+ * DB에서 포인트 수수료율 조회
  */
-export async function getMinFee(env: any, pricingType: string): Promise<number> {
-  let settingKey: string;
-  
-  switch(pricingType) {
-    case 'product_only':
-      settingKey = 'min_fee_product';
-      break;
-    case 'voucher_only':
-      settingKey = 'min_fee_voucher';
-      break;
-    case 'points_only':
-      settingKey = 'min_fee_points';
-      break;
-    case 'product_with_points':
-    case 'voucher_with_points':
-      settingKey = 'min_fee_with_points';
-      break;
-    default:
-      settingKey = 'min_fee_product';
-  }
-  
-  const minFeeStr = await getSystemSetting(env, settingKey);
-  return minFeeStr ? Number(minFeeStr) : 3000; // 기본값 3,000원
+export async function getPointsFeeRate(env: any): Promise<number> {
+  const rateStr = await getSystemSetting(env, 'points_fee_rate');
+  return rateStr ? Number(rateStr) / 100 : 0.30; // 기본값 30%
 }
 
 /**
- * 플랫폼 수수료 계산 (실시간 DB 조회)
+ * 플랫폼 수수료 계산 (고정 수수료 + 포인트 수수료)
  */
 export async function calculatePlatformFee(
   env: any,
   pricingType: string,
   productValue: number,
   spherePoints: number = 0
-): Promise<number> {
-  const feeRate = await getFeeRate(env, pricingType);
-  const minFee = await getMinFee(env, pricingType);
+): Promise<{ fixedFee: number; pointsFee: number; totalFee: number }> {
+  const fixedFee = await getFixedFee(env, pricingType);
+  const pointsFeeRate = await getPointsFeeRate(env);
   
-  let totalValue: number;
+  // 포인트가 있는 경우에만 포인트 수수료 계산
+  const pointsFee = spherePoints > 0 ? Math.floor(spherePoints * pointsFeeRate) : 0;
   
-  // 포인트만 지급하는 경우
-  if (pricingType === 'points_only') {
-    totalValue = spherePoints;
-  }
-  // 포인트 포함 여부에 따라 계산 방식 다름
-  else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
-    totalValue = productValue + spherePoints;
-  } 
-  // 상품만 또는 이용권만
-  else {
-    totalValue = productValue;
-  }
-  
-  const calculatedFee = Math.floor(totalValue * feeRate);
-  
-  // 최소 수수료와 비교하여 큰 값 반환
-  return Math.max(calculatedFee, minFee);
+  return {
+    fixedFee,
+    pointsFee,
+    totalFee: fixedFee + pointsFee
+  };
 }
 
 /**
@@ -123,27 +98,28 @@ export async function calculateFullPricing(
   productValue: number,
   spherePoints: number = 0
 ): Promise<PricingCalculation> {
-  const platformFee = await calculatePlatformFee(env, pricingType, productValue, spherePoints);
-  const feeRate = await getFeeRate(env, pricingType);
+  const { fixedFee, pointsFee, totalFee } = await calculatePlatformFee(env, pricingType, productValue, spherePoints);
   
   let totalValue: number;
   if (pricingType === 'points_only') {
     totalValue = spherePoints;
-  } else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
+  } else if (pricingType === 'purchase_with_points' || pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
     totalValue = productValue + spherePoints;
   } else {
     totalValue = productValue;
   }
   
-  const totalCost = productValue + spherePoints + platformFee;
+  // 광고주 총 지출 = 상품/이용권 가격 + 포인트 + 플랫폼 수수료
+  const totalCost = productValue + spherePoints + totalFee;
   
   return {
     pricing_type: pricingType,
     product_value: productValue,
     sphere_points: spherePoints,
     total_value: totalValue,
-    platform_fee: platformFee,
-    platform_fee_rate: feeRate,
+    platform_fee: fixedFee,
+    points_fee: pointsFee,
+    total_platform_fee: totalFee,
     total_cost: totalCost,
     influencer_gets: {
       product_or_voucher: productValue,
@@ -157,11 +133,12 @@ export async function calculateFullPricing(
  */
 export function getPricingTypeName(pricingType: string): string {
   const names: Record<string, string> = {
-    'product_only': '상품만 제공',
-    'voucher_only': '이용권만 제공',
     'points_only': '포인트만 지급',
-    'product_with_points': '상품 + 스피어포인트',
-    'voucher_with_points': '이용권 + 스피어포인트'
+    'purchase_with_points': '구매 + 포인트',
+    'product_only': '상품만 제공',
+    'product_with_points': '상품 + 포인트',
+    'voucher_only': '이용권만 제공',
+    'voucher_with_points': '이용권 + 포인트'
   };
   return names[pricingType] || pricingType;
 }

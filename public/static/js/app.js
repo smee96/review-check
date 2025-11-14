@@ -1896,45 +1896,49 @@ class ReviewSphere {
           </h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <label class="cursor-pointer">
-              <input type="radio" name="pricingType" value="product_only" onchange="app.handlePricingTypeChange()" 
-                class="peer sr-only" checked>
-              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-400 transition">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-semibold text-gray-800">상품만 제공</span>
-                  <i class="fas fa-box text-purple-600"></i>
-                </div>
-                <p class="text-xs text-gray-600">리뷰어에게 상품만 제공</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 상품가의 20% (최소 3,000원)</p>
-              </div>
-            </label>
-            
-            <label class="cursor-pointer">
-              <input type="radio" name="pricingType" value="voucher_only" onchange="app.handlePricingTypeChange()" 
-                class="peer sr-only">
-              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-400 transition">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-semibold text-gray-800">이용권만 제공</span>
-                  <i class="fas fa-ticket-alt text-green-600"></i>
-                </div>
-                <p class="text-xs text-gray-600">리뷰어에게 이용권만 제공</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 이용권 가치의 20% (최소 3,000원)</p>
-              </div>
-            </label>
-            
+            <!-- 1. 포인트만 지급 -->
             <label class="cursor-pointer">
               <input type="radio" name="pricingType" value="points_only" onchange="app.handlePricingTypeChange()" 
-                class="peer sr-only">
+                class="peer sr-only" checked>
               <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition">
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-semibold text-gray-800">포인트만 지급</span>
                   <i class="fas fa-coins text-orange-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">스피어포인트만 지급</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 포인트의 20% (최소 3,000원)</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
               </div>
             </label>
             
+            <!-- 2. 구매 + 포인트 -->
+            <label class="cursor-pointer">
+              <input type="radio" name="pricingType" value="purchase_with_points" onchange="app.handlePricingTypeChange()" 
+                class="peer sr-only">
+              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:border-indigo-400 transition">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold text-gray-800">구매 + 포인트</span>
+                  <i class="fas fa-shopping-cart text-indigo-600"></i>
+                </div>
+                <p class="text-xs text-gray-600">리뷰어가 직접 구매 + 포인트</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+              </div>
+            </label>
+            
+            <!-- 3. 상품만 제공 -->
+            <label class="cursor-pointer">
+              <input type="radio" name="pricingType" value="product_only" onchange="app.handlePricingTypeChange()" 
+                class="peer sr-only">
+              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-purple-600 peer-checked:bg-purple-50 hover:border-purple-400 transition">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold text-gray-800">상품만 제공</span>
+                  <i class="fas fa-box text-purple-600"></i>
+                </div>
+                <p class="text-xs text-gray-600">리뷰어에게 상품만 제공</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원</p>
+              </div>
+            </label>
+            
+            <!-- 4. 상품 + 포인트 -->
             <label class="cursor-pointer">
               <input type="radio" name="pricingType" value="product_with_points" onchange="app.handlePricingTypeChange()" 
                 class="peer sr-only">
@@ -1944,10 +1948,25 @@ class ReviewSphere {
                   <i class="fas fa-gift text-blue-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">상품 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28% (최소 5,000원)</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
               </div>
             </label>
             
+            <!-- 5. 이용권만 제공 -->
+            <label class="cursor-pointer">
+              <input type="radio" name="pricingType" value="voucher_only" onchange="app.handlePricingTypeChange()" 
+                class="peer sr-only">
+              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-400 transition">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold text-gray-800">이용권만 제공</span>
+                  <i class="fas fa-ticket-alt text-green-600"></i>
+                </div>
+                <p class="text-xs text-gray-600">리뷰어에게 이용권만 제공</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원</p>
+              </div>
+            </label>
+            
+            <!-- 6. 이용권 + 포인트 -->
             <label class="cursor-pointer">
               <input type="radio" name="pricingType" value="voucher_with_points" onchange="app.handlePricingTypeChange()" 
                 class="peer sr-only">
@@ -1957,7 +1976,7 @@ class ReviewSphere {
                   <i class="fas fa-spa text-teal-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">이용권 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28% (최소 5,000원)</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
               </div>
             </label>
           </div>
@@ -2359,8 +2378,8 @@ class ReviewSphere {
           return;
         }
       }
-      // 포인트 포함 타입인 경우
-      else if (pricingType.includes('with_points')) {
+      // 포인트 포함 타입인 경우 (구매+포인트, 상품+포인트, 이용권+포인트)
+      else if (pricingType === 'purchase_with_points' || pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
         if (productValue <= 0) {
           alert('상품/이용권 가치를 입력해주세요');
           return;
@@ -5637,99 +5656,147 @@ class ReviewSphere {
 
       container.innerHTML = `
         <div class="p-4 sm:p-6">
-          <h2 class="text-xl sm:text-2xl font-bold mb-2">시스템 설정 관리</h2>
-          <p class="text-sm text-gray-600 mb-6">수수료율 변경 시 모든 캠페인에 즉시 적용됩니다</p>
+          <h2 class="text-xl sm:text-2xl font-bold mb-2">시스템 수수료 설정</h2>
+          <p class="text-sm text-gray-600 mb-6">건당 고정 수수료 + 포인트 비율 수수료 체계입니다. 변경 시 모든 캠페인에 즉시 적용됩니다.</p>
           
           <div class="space-y-6">
-            <!-- 상품만 제공 -->
+            <!-- 포인트 수수료율 -->
+            <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-300">
+              <h3 class="font-bold text-lg mb-3 text-blue-700">
+                <i class="fas fa-percentage mr-2"></i>포인트 수수료율
+              </h3>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">포인트 수수료율 (%)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="points_fee_rate" 
+                    value="${settingsObj.points_fee_rate?.setting_value || 30}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                  <button onclick="app.updateSystemSetting('points_fee_rate')" 
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    저장
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">포인트 지급 시 추가로 부과되는 수수료율입니다</p>
+              </div>
+            </div>
+          
+            <!-- 1. 포인트만 지급 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-orange-600">
+                <i class="fas fa-coins mr-2"></i>포인트만 지급
+              </h3>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_points_only" 
+                    value="${settingsObj.fixed_fee_points_only?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_points_only')" 
+                    class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition">
+                    저장
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">브랜드 홍보, 해시태그 챌린지 등</p>
+              </div>
+            </div>
+
+            <!-- 2. 구매 + 포인트 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-indigo-600">
+                <i class="fas fa-shopping-cart mr-2"></i>구매 + 포인트
+              </h3>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_purchase_with_points" 
+                    value="${settingsObj.fixed_fee_purchase_with_points?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_purchase_with_points')" 
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    저장
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">리뷰어가 외부에서 직접 구매 후 리뷰 작성</p>
+              </div>
+            </div>
+
+            <!-- 3. 상품만 제공 -->
             <div class="bg-gray-50 p-4 rounded-lg">
               <h3 class="font-bold text-lg mb-3 text-purple-600">
                 <i class="fas fa-box mr-2"></i>상품만 제공
               </h3>
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" id="fee_rate_product_only" 
-                      value="${settingsObj.fee_rate_product_only?.setting_value || 20}"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                    <button onclick="app.updateSystemSetting('fee_rate_product_only')" 
-                      class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
-                      저장
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_product_only?.description || ''}</p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_product_only" 
+                    value="${settingsObj.fixed_fee_product_only?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_product_only')" 
+                    class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                    저장
+                  </button>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">최소 수수료 (원)</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" id="min_fee_product" 
-                      value="${settingsObj.min_fee_product?.setting_value || 2000}"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                    <button onclick="app.updateSystemSetting('min_fee_product')" 
-                      class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
-                      저장
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">${settingsObj.min_fee_product?.description || ''}</p>
-                </div>
+                <p class="text-xs text-gray-500 mt-1">리뷰어에게 실물 상품만 배송</p>
               </div>
             </div>
 
-            <!-- 이용권만 제공 -->
+            <!-- 4. 상품 + 포인트 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-blue-600">
+                <i class="fas fa-gift mr-2"></i>상품 + 포인트
+              </h3>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_product_with_points" 
+                    value="${settingsObj.fixed_fee_product_with_points?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_product_with_points')" 
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    저장
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">실물 상품 배송 + 포인트 지급</p>
+              </div>
+            </div>
+
+            <!-- 5. 이용권만 제공 -->
             <div class="bg-gray-50 p-4 rounded-lg">
               <h3 class="font-bold text-lg mb-3 text-green-600">
                 <i class="fas fa-ticket-alt mr-2"></i>이용권만 제공
               </h3>
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" id="fee_rate_voucher_only" 
-                      value="${settingsObj.fee_rate_voucher_only?.setting_value || 20}"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
-                    <button onclick="app.updateSystemSetting('fee_rate_voucher_only')" 
-                      class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                      저장
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_voucher_only?.description || ''}</p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_voucher_only" 
+                    value="${settingsObj.fixed_fee_voucher_only?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_voucher_only')" 
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                    저장
+                  </button>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">최소 수수료 (원)</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" id="min_fee_voucher" 
-                      value="${settingsObj.min_fee_voucher?.setting_value || 3000}"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
-                    <button onclick="app.updateSystemSetting('min_fee_voucher')" 
-                      class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                      저장
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">${settingsObj.min_fee_voucher?.description || ''}</p>
-                </div>
+                <p class="text-xs text-gray-500 mt-1">숙박권, 식사권, 체험권 등 이용권만 제공</p>
               </div>
             </div>
 
-            <!-- 포인트 포함 -->
+            <!-- 6. 이용권 + 포인트 -->
             <div class="bg-gray-50 p-4 rounded-lg">
-              <h3 class="font-bold text-lg mb-3 text-blue-600">
-                <i class="fas fa-coins mr-2"></i>상품/이용권 + 스피어포인트
+              <h3 class="font-bold text-lg mb-3 text-teal-600">
+                <i class="fas fa-spa mr-2"></i>이용권 + 포인트
               </h3>
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
-                  <div class="flex items-center gap-2">
-                    <input type="number" id="fee_rate_with_points" 
-                      value="${settingsObj.fee_rate_with_points?.setting_value || 28}"
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
-                    <button onclick="app.updateSystemSetting('fee_rate_with_points')" 
-                      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                      저장
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_with_points?.description || ''}</p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="fixed_fee_voucher_with_points" 
+                    value="${settingsObj.fixed_fee_voucher_with_points?.setting_value || 10000}"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
+                  <button onclick="app.updateSystemSetting('fixed_fee_voucher_with_points')" 
+                    class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition">
+                    저장
+                  </button>
                 </div>
+                <p class="text-xs text-gray-500 mt-1">이용권 제공 + 포인트 지급</p>
               </div>
             </div>
 
@@ -5739,9 +5806,10 @@ class ReviewSphere {
                 <i class="fas fa-calculator mr-2 text-yellow-600"></i>수수료 계산 예시
               </h3>
               <div class="text-sm space-y-2 text-gray-700">
-                <p><strong>상품만 30,000원:</strong> 수수료 ${Math.max(30000 * (Number(settingsObj.fee_rate_product_only?.setting_value || 20) / 100), Number(settingsObj.min_fee_product?.setting_value || 2000)).toLocaleString()}원</p>
-                <p><strong>이용권만 50,000원:</strong> 수수료 ${Math.max(50000 * (Number(settingsObj.fee_rate_voucher_only?.setting_value || 20) / 100), Number(settingsObj.min_fee_voucher?.setting_value || 3000)).toLocaleString()}원</p>
-                <p><strong>상품 50,000원 + 포인트 20,000P:</strong> 수수료 ${Math.floor(70000 * (Number(settingsObj.fee_rate_with_points?.setting_value || 28) / 100)).toLocaleString()}원</p>
+                <p><strong>포인트만 10,000P:</strong> 고정 ${Number(settingsObj.fixed_fee_points_only?.setting_value || 10000).toLocaleString()}원 + 포인트 수수료 ${Math.floor(10000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100)).toLocaleString()}원 = ${(Number(settingsObj.fixed_fee_points_only?.setting_value || 10000) + Math.floor(10000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100))).toLocaleString()}원</p>
+                <p><strong>구매 30,000원 + 포인트 5,000P:</strong> 고정 ${Number(settingsObj.fixed_fee_purchase_with_points?.setting_value || 10000).toLocaleString()}원 + 포인트 수수료 ${Math.floor(5000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100)).toLocaleString()}원 = ${(Number(settingsObj.fixed_fee_purchase_with_points?.setting_value || 10000) + Math.floor(5000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100))).toLocaleString()}원</p>
+                <p><strong>상품만 50,000원:</strong> 고정 ${Number(settingsObj.fixed_fee_product_only?.setting_value || 10000).toLocaleString()}원</p>
+                <p><strong>상품 50,000원 + 포인트 20,000P:</strong> 고정 ${Number(settingsObj.fixed_fee_product_with_points?.setting_value || 10000).toLocaleString()}원 + 포인트 수수료 ${Math.floor(20000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100)).toLocaleString()}원 = ${(Number(settingsObj.fixed_fee_product_with_points?.setting_value || 10000) + Math.floor(20000 * (Number(settingsObj.points_fee_rate?.setting_value || 30) / 100))).toLocaleString()}원</p>
               </div>
             </div>
           </div>
@@ -5805,8 +5873,20 @@ class ReviewSphere {
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
     }
-    // 포인트 포함 타입
-    else if (pricingType.includes('with_points')) {
+    // 구매+포인트인 경우
+    else if (pricingType === 'purchase_with_points') {
+      // 상품/이용권 가치 입력 표시 (구매 대행 비용)
+      if (productValueSection) productValueSection.classList.remove('hidden');
+      productValueInput.required = true;
+      productValueLabel.textContent = '리뷰어 구매 금액';
+      productValueHint.textContent = '리뷰어가 구매할 상품/서비스의 금액을 입력하세요 (구매 대행)';
+      
+      // 스피어포인트 입력 표시
+      spherePointsSection.classList.remove('hidden');
+      spherePointsInput.required = true;
+    }
+    // 포인트 포함 타입 (상품+포인트, 이용권+포인트)
+    else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
       // 상품/이용권 가치 입력 표시
       if (productValueSection) productValueSection.classList.remove('hidden');
       productValueInput.required = true;
@@ -5814,6 +5894,15 @@ class ReviewSphere {
       // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
+      
+      // 라벨 변경
+      if (pricingType === 'product_with_points') {
+        productValueLabel.textContent = '상품 가치';
+        productValueHint.textContent = '리뷰어에게 제공되는 상품의 가치를 입력하세요';
+      } else {
+        productValueLabel.textContent = '이용권 가치';
+        productValueHint.textContent = '리뷰어에게 제공되는 이용권의 가치를 입력하세요';
+      }
     }
     // 상품만 또는 이용권만
     else {
@@ -5825,15 +5914,15 @@ class ReviewSphere {
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
       spherePointsInput.value = '0';
-    }
-    
-    // 라벨 변경
-    if (pricingType.startsWith('product')) {
-      productValueLabel.textContent = '상품 가치';
-      productValueHint.textContent = '리뷰어에게 제공되는 상품의 가치를 입력하세요';
-    } else if (pricingType.startsWith('voucher')) {
-      productValueLabel.textContent = '이용권 가치';
-      productValueHint.textContent = '리뷰어에게 제공되는 이용권의 가치를 입력하세요';
+      
+      // 라벨 변경
+      if (pricingType === 'product_only') {
+        productValueLabel.textContent = '상품 가치';
+        productValueHint.textContent = '리뷰어에게 제공되는 상품의 가치를 입력하세요';
+      } else {
+        productValueLabel.textContent = '이용권 가치';
+        productValueHint.textContent = '리뷰어에게 제공되는 이용권의 가치를 입력하세요';
+      }
     }
     
     // 비용 재계산
@@ -5852,17 +5941,43 @@ class ReviewSphere {
     const slots = Number(document.getElementById('campaignSlots')?.value || 10);
     const summaryDiv = document.getElementById('pricingSummary');
     
-    if (!pricingType || productValue <= 0) {
+    // 유효성 검증 - 과금 타입에 따라 다르게 처리
+    if (!pricingType) {
+      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">과금 정보를 입력하면 자동으로 계산됩니다</p>';
+      return;
+    }
+    
+    // 포인트만 지급인 경우
+    if (pricingType === 'points_only' && spherePoints <= 0) {
+      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">스피어포인트를 입력해주세요</p>';
+      return;
+    }
+    
+    // 상품/이용권만 또는 포함인 경우
+    if (pricingType !== 'points_only' && productValue <= 0) {
       summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">과금 정보를 입력하면 자동으로 계산됩니다</p>';
       return;
     }
     
     try {
-      // PricingUtils를 사용하여 계산
-      const pricing = await PricingUtils.calculateFullPricing(pricingType, productValue, spherePoints);
+      // pricingUtils를 사용하여 계산
+      const pricing = await window.pricingUtils.calculateFullPricing(pricingType, productValue, spherePoints);
       
       // 총 비용 (모집인원 고려)
       const totalForAllInfluencers = pricing.total_cost * slots;
+      
+      // 라벨 결정
+      let productLabel = '상품/이용권 가치';
+      if (pricingType === 'purchase_with_points') {
+        productLabel = '리뷰어 구매 금액';
+      } else if (pricingType.startsWith('product')) {
+        productLabel = '상품 가치';
+      } else if (pricingType.startsWith('voucher')) {
+        productLabel = '이용권 가치';
+      }
+      
+      // 총 비용 (모집인원 고려)
+      const totalForAllInfluencers = pricing.totalCost * slots;
       
       summaryDiv.innerHTML = `
         <div class="space-y-3">
@@ -5871,42 +5986,49 @@ class ReviewSphere {
           </h4>
           
           <div class="space-y-2 text-sm">
-            ${pricing.product_value > 0 ? `
+            ${pricing.productValue > 0 ? `
               <div class="flex justify-between">
-                <span class="text-gray-700">${pricingType.startsWith('product') ? '상품 가치' : '이용권 가치'}:</span>
-                <span class="font-semibold">${PricingUtils.formatNumber(pricing.product_value)}원</span>
+                <span class="text-gray-700">${productLabel}:</span>
+                <span class="font-semibold">${pricing.productValue.toLocaleString()}원</span>
               </div>
             ` : ''}
             
-            ${pricing.sphere_points > 0 ? `
+            ${pricing.spherePoints > 0 ? `
               <div class="flex justify-between">
                 <span class="text-gray-700">스피어포인트:</span>
-                <span class="font-semibold text-purple-600">${PricingUtils.formatNumber(pricing.sphere_points)}P</span>
+                <span class="font-semibold text-purple-600">${pricing.spherePoints.toLocaleString()}P</span>
               </div>
             ` : ''}
             
-            <div class="flex justify-between pt-2 border-t">
-              <span class="text-gray-700">플랫폼 수수료 (${pricing.platform_fee_rate}%):</span>
-              <span class="font-semibold text-red-600">${PricingUtils.formatNumber(pricing.platform_fee)}원</span>
+            <div class="flex justify-between pt-2 border-t border-gray-200">
+              <span class="text-gray-700">플랫폼 고정 수수료:</span>
+              <span class="font-semibold text-red-600">${pricing.fixedFee.toLocaleString()}원</span>
             </div>
             
-            <div class="flex justify-between pt-2 border-t">
+            ${pricing.pointsFee > 0 ? `
+              <div class="flex justify-between">
+                <span class="text-gray-700">포인트 수수료 (30%):</span>
+                <span class="font-semibold text-red-600">${pricing.pointsFee.toLocaleString()}원</span>
+              </div>
+            ` : ''}
+            
+            <div class="flex justify-between pt-2 border-t border-gray-300">
               <span class="text-gray-800 font-bold">1명당 총 비용:</span>
-              <span class="font-bold text-lg text-blue-600">${PricingUtils.formatNumber(pricing.total_cost)}원</span>
+              <span class="font-bold text-lg text-blue-600">${pricing.totalCost.toLocaleString()}원</span>
             </div>
           </div>
           
           <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
             <div class="flex justify-between items-center">
               <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
-              <span class="font-bold text-xl text-green-600">${PricingUtils.formatNumber(totalForAllInfluencers)}원</span>
+              <span class="font-bold text-xl text-green-600">${totalForAllInfluencers.toLocaleString()}원</span>
             </div>
           </div>
           
           <div class="text-xs text-gray-600 mt-2 pt-2 border-t">
             <div><strong>리뷰어 1명당 혜택:</strong></div>
-            <div>• ${pricingType.startsWith('product') ? '상품' : '이용권'}: ${PricingUtils.formatNumber(pricing.influencer_gets.product_or_voucher)}원</div>
-            ${pricing.influencer_gets.points > 0 ? `<div>• 포인트: ${PricingUtils.formatNumber(pricing.influencer_gets.points)}P (현금 출금 가능)</div>` : ''}
+            ${pricing.productValue > 0 ? `<div>• ${productLabel}: ${pricing.productValue.toLocaleString()}원</div>` : ''}
+            ${pricing.spherePoints > 0 ? `<div>• 포인트: ${pricing.spherePoints.toLocaleString()}P (현금 출금 가능)</div>` : ''}
           </div>
         </div>
       `;
