@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://1af87d22.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://c4b477eb.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
@@ -351,6 +351,13 @@ webapp/
 - 모바일에서도 1-2줄로 표시
 
 ## 📝 개발 로그
+
+### 2025-11-14 (v67)
+- ✅ **모집인원 변경 시 자동 재계산 추가**
+  - 모집인원 입력 중 실시간 비용 재계산 (10명 이상일 때)
+  - 포커스 아웃 시 최종 비용 재계산
+  - 제출 전 항상 정확한 비용 계산 보장
+  - 인원수와 비용 불일치 오류 방지
 
 ### 2025-11-14 (v66)
 - ✅ **모든 입력값 보존 기능 완성**
