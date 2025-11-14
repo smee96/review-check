@@ -4088,8 +4088,8 @@ class ReviewSphere {
                     </a>
                   ` : `
                     <p class="text-sm text-gray-500">아직 컨텐츠를 등록하지 않았습니다</p>
-                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="mt-2 text-purple-600 hover:text-purple-800 text-sm font-semibold">
-                      <i class="fas fa-plus mr-1"></i>컨텐츠 등록하기
+                    <button onclick="app.submitReview(${app.id})" class="mt-2 text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      <i class="fas fa-plus mr-1"></i>리뷰 등록하기
                     </button>
                   `}
                 </div>
@@ -4539,7 +4539,7 @@ class ReviewSphere {
   }
 
   async submitReview(applicationId) {
-    const postUrl = prompt('포스트 URL을 입력하세요:');
+    const postUrl = prompt('리뷰 포스트 URL을 입력하세요:');
     
     if (!postUrl) {
       return;
@@ -4550,6 +4550,7 @@ class ReviewSphere {
       alert('리뷰가 등록되었습니다!');
       this.showMyApplications();
     } catch (error) {
+      console.error('Review submission error:', error);
       alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
     }
   }
