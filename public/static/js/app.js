@@ -6610,7 +6610,11 @@ class ReviewSphere {
             
             <div class="flex justify-between pt-2 border-t border-gray-200">
               <span class="text-gray-700">플랫폼 고정 수수료:</span>
-              <span class="font-semibold text-red-600">${pricing.fixedFee.toLocaleString()}원</span>
+              <span class="font-semibold">
+                <span class="text-gray-400 line-through mr-1">30,000원</span>
+                <span class="text-red-600">${pricing.fixedFee.toLocaleString()}원</span>
+                <span class="text-xs text-green-600 ml-1">🎉 런칭 프로모션</span>
+              </span>
             </div>
             
             ${pricing.pointsFee > 0 ? `

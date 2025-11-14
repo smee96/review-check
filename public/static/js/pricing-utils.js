@@ -35,7 +35,7 @@ class PricingUtils {
       return settingsObj;
     } catch (error) {
       console.error('Failed to load system settings:', error);
-      // 에러 시 기본값 반환
+      // 에러 시 기본값 반환 (런칭 프로모션: 30,000원 → 10,000원)
       return {
         fixed_fee_points_only: 10000,
         fixed_fee_purchase_with_points: 10000,
@@ -43,7 +43,8 @@ class PricingUtils {
         fixed_fee_product_with_points: 10000,
         fixed_fee_voucher_only: 10000,
         fixed_fee_voucher_with_points: 10000,
-        points_fee_rate: 30
+        points_fee_rate: 30,
+        fixed_fee_original: 30000  // 원래 가격 (프로모션 전)
       };
     }
   }
