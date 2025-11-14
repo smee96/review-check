@@ -15,7 +15,7 @@ const PricingUtils = {
     }
 
     try {
-      const response = await axios.get('/api/admin/settings', app.getAuthHeaders());
+      const response = await axios.get('/api/settings');
       const settings = response.data;
       
       // 객체로 변환

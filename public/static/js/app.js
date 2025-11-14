@@ -1954,8 +1954,9 @@ class ReviewSphere {
             <label class="block text-sm font-medium text-gray-700 mb-2">
               <span id="productValueLabel">상품/이용권 가치</span> (원) *
             </label>
-            <input type="number" id="campaignProductValue" value="0" min="0" required
-              oninput="app.calculateNewPricingCost()"
+            <input type="text" id="campaignProductValue" value="0" required
+              oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
+              onfocus="app.clearDefaultZero(this)"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
             <p class="text-xs text-gray-500 mt-1" id="productValueHint">리뷰어에게 제공되는 상품 또는 이용권의 가치를 입력하세요</p>
           </div>
@@ -1965,8 +1966,9 @@ class ReviewSphere {
             <label class="block text-sm font-medium text-gray-700 mb-2">
               스피어포인트 (P) *
             </label>
-            <input type="number" id="campaignSpherePoints" value="0" min="0"
-              oninput="app.calculateNewPricingCost()"
+            <input type="text" id="campaignSpherePoints" value="0"
+              oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
+              onfocus="app.clearDefaultZero(this)"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
             <p class="text-xs text-gray-500 mt-1">1포인트 = 1원 (1만P 이상 현금 출금 가능)</p>
           </div>
@@ -2325,8 +2327,10 @@ class ReviewSphere {
       
       // 과금 방식 데이터 수집
       const pricingType = document.querySelector('input[name="pricingType"]:checked')?.value || 'product_only';
-      const productValue = Number(document.getElementById('campaignProductValue')?.value || 0);
-      const spherePoints = Number(document.getElementById('campaignSpherePoints')?.value || 0);
+      const productValueInput = document.getElementById('campaignProductValue');
+      const spherePointsInput = document.getElementById('campaignSpherePoints');
+      const productValue = this.getNumericValue(productValueInput);
+      const spherePoints = this.getNumericValue(spherePointsInput);
       
       if (productValue <= 0) {
         alert('상품/이용권 가치를 입력해주세요');
@@ -5789,8 +5793,12 @@ class ReviewSphere {
   // 새로운 과금 방식 비용 계산
   async calculateNewPricingCost() {
     const pricingType = document.querySelector('input[name="pricingType"]:checked')?.value;
-    const productValue = Number(document.getElementById('campaignProductValue')?.value || 0);
-    const spherePoints = Number(document.getElementById('campaignSpherePoints')?.value || 0);
+    
+    // 콤마 제거 후 숫자로 변환
+    const productValueInput = document.getElementById('campaignProductValue');
+    const spherePointsInput = document.getElementById('campaignSpherePoints');
+    const productValue = this.getNumericValue(productValueInput);
+    const spherePoints = this.getNumericValue(spherePointsInput);
     const slots = Number(document.getElementById('campaignSlots')?.value || 10);
     const summaryDiv = document.getElementById('pricingSummary');
     

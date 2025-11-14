@@ -9,6 +9,7 @@ import applications from './routes/applications';
 import profiles from './routes/profiles';
 import admin from './routes/admin';
 import notifications from './routes/notifications';
+import settings from './routes/settings';
 
 type Bindings = {
   DB: D1Database;
@@ -29,6 +30,7 @@ app.route('/api/applications', applications);
 app.route('/api/profile', profiles);
 app.route('/api/admin', admin);
 app.route('/api/notifications', notifications);
+app.route('/api/settings', settings);
 
 // Frontend route
 app.get('/', (c) => {
