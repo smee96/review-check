@@ -6594,10 +6594,10 @@ class ReviewSphere {
           </h4>
           
           <div class="space-y-2 text-sm">
-            ${pricing.productValue > 0 ? `
+            ${pricingType === 'purchase_with_points' && pricing.productValue > 0 ? `
               <div class="flex justify-between">
-                <span class="text-gray-700">${productLabel}:</span>
-                <span class="font-semibold">${pricing.productValue.toLocaleString()}원</span>
+                <span class="text-gray-700">${productLabel} (리뷰어 구매 대행):</span>
+                <span class="font-semibold text-red-600">${pricing.productValue.toLocaleString()}원</span>
               </div>
             ` : ''}
             
@@ -6621,18 +6621,8 @@ class ReviewSphere {
             ` : ''}
             
             <div class="flex justify-between pt-2 border-t border-gray-300">
-              <span class="text-gray-800 font-bold">1명당 소계 (부가세 별도):</span>
+              <span class="text-gray-800 font-bold">1명당 비용:</span>
               <span class="font-bold text-lg text-blue-600">${pricing.totalCost.toLocaleString()}원</span>
-            </div>
-            
-            <div class="flex justify-between">
-              <span class="text-gray-700">부가세 (10%):</span>
-              <span class="font-semibold text-orange-600">${Math.floor(pricing.totalCost * 0.1).toLocaleString()}원</span>
-            </div>
-            
-            <div class="flex justify-between pt-2 border-t border-gray-300">
-              <span class="text-gray-800 font-bold">1명당 총 비용 (부가세 포함):</span>
-              <span class="font-bold text-lg text-purple-600">${Math.floor(pricing.totalCost * 1.1).toLocaleString()}원</span>
             </div>
           </div>
           
