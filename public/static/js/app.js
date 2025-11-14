@@ -6623,7 +6623,23 @@ class ReviewSphere {
           </div>
           
           ${pricingType === 'purchase_with_points' && pricing.productValue > 0 ? `
-            <!-- 구매+포인트: 리뷰 비용과 결제 비용 분리 표시 -->
+            <!-- 구매+포인트: 3단계 비용 분리 표시 -->
+            <!-- 1. 구매 금액 -->
+            <div class="bg-orange-50 border border-orange-200 rounded p-3 mt-3">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-800 font-bold">
+                    <i class="fas fa-shopping-cart mr-1 text-orange-600"></i>구매 금액 (${slots}명)
+                  </span>
+                  <span class="font-bold text-xl text-orange-600">${(pricing.productValue * slots).toLocaleString()}원</span>
+                </div>
+                <div class="text-xs text-gray-500 bg-white rounded p-2">
+                  💡 리뷰어 구매 대행 비용 (판매 수익으로 회수 예정)
+                </div>
+              </div>
+            </div>
+            
+            <!-- 2. 리뷰 비용 -->
             <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
@@ -6632,25 +6648,33 @@ class ReviewSphere {
                   </span>
                   <span class="font-bold text-xl text-blue-600">${((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots).toLocaleString()}원</span>
                 </div>
-                <div class="text-xs text-gray-500 bg-white rounded p-2 mt-2">
-                  💡 포인트 + 플랫폼 수수료 (순수 리뷰 마케팅 비용, 부가세 별도)
+                <div class="text-xs text-gray-500 bg-white rounded p-2">
+                  💡 포인트 + 플랫폼 수수료 (순수 리뷰 마케팅 비용)
                 </div>
               </div>
             </div>
             
-            <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
+            <!-- 3. 총 결제 금액 -->
+            <div class="bg-green-50 border border-green-300 rounded p-4 mt-3">
               <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-800 font-bold">
-                    <i class="fas fa-credit-card mr-1 text-green-600"></i>결제 비용 (${slots}명)
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-800 font-bold text-lg">
+                    <i class="fas fa-credit-card mr-1 text-green-600"></i>총 결제 금액 (${slots}명)
                   </span>
-                  <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
                 </div>
-                <div class="text-xs text-gray-600">
-                  소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
-                </div>
-                <div class="text-xs text-gray-500 bg-white rounded p-2 mt-2">
-                  💡 리뷰어 구매 금액 ${(pricing.productValue * slots).toLocaleString()}원 포함 (판매 수익으로 회수 예정)
+                <div class="bg-white rounded p-3 space-y-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">구매 금액 + 리뷰 비용:</span>
+                    <span class="font-semibold">${totalForAllInfluencers.toLocaleString()}원</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">부가세 (10%):</span>
+                    <span class="font-semibold text-orange-600">+${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원</span>
+                  </div>
+                  <div class="flex justify-between items-center pt-2 border-t border-green-200">
+                    <span class="text-gray-800 font-bold">실제 입금 금액:</span>
+                    <span class="font-bold text-2xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+                  </div>
                 </div>
               </div>
             </div>
