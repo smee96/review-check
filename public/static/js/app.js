@@ -3569,7 +3569,7 @@ class ReviewSphere {
                         <i class="fas fa-times mr-1"></i>지원취소
                       </button>
                     ` : ''}
-                    ${app.status === 'approved' && !app.review_url ? `
+                    ${app.status === 'approved' && !app.review_url && !app.review_image_url ? `
                       <button onclick="app.submitReview(${app.id})" class="bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-purple-700 transition">
                         <i class="fas fa-pen mr-1"></i>리뷰 등록하기
                       </button>
@@ -3578,7 +3578,7 @@ class ReviewSphere {
                       캠페인 보기 →
                     </button>
                   </div>
-                  ${app.status === 'approved' && app.review_url ? `
+                  ${app.status === 'approved' && (app.review_url || app.review_image_url) ? `
                     <div class="mt-2 flex items-center gap-2">
                       <span class="text-sm text-green-600">
                         <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
@@ -3661,7 +3661,7 @@ class ReviewSphere {
   async loadMyContentsContent(contentDiv) {
     try {
       const response = await axios.get('/api/applications/my', this.getAuthHeaders());
-      const applications = response.data.filter(app => app.status === 'approved' && app.review_url);
+      const applications = response.data.filter(app => app.status === 'approved' && (app.review_url || app.review_image_url));
       
       contentDiv.innerHTML = `
         <div class="p-4 sm:p-6">
