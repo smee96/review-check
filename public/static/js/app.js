@@ -6626,17 +6626,63 @@ class ReviewSphere {
             </div>
           </div>
           
-          <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
-            <div class="space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
-                <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+          ${pricingType === 'purchase_with_points' && pricing.productValue > 0 ? `
+            <!-- 구매+포인트: 토글 기능 추가 -->
+            <div class="bg-yellow-50 border border-yellow-300 rounded p-3 mt-3">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-semibold text-yellow-800">
+                  <i class="fas fa-info-circle mr-1"></i>비용 계산 방식
+                </span>
+                <button 
+                  onclick="app.togglePurchaseCostView()"
+                  class="text-xs bg-white px-3 py-1 rounded border border-yellow-400 hover:bg-yellow-100 transition"
+                >
+                  <i class="fas fa-exchange-alt mr-1"></i>전환
+                </button>
               </div>
-              <div class="text-xs text-gray-600">
-                소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
+              
+              <div id="costViewToggle" class="space-y-2">
+                <div id="totalCostView" class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
+                    <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+                  </div>
+                  <div class="text-xs text-gray-600">
+                    소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
+                  </div>
+                  <div class="text-xs text-gray-500 mt-2 pt-2 border-t border-yellow-200">
+                    💡 리뷰어 구매 금액 포함 (총 ${(pricing.productValue * slots).toLocaleString()}원)
+                  </div>
+                </div>
+                
+                <div id="netCostView" class="space-y-2" style="display: none;">
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-800 font-bold">실질 비용 (${slots}명):</span>
+                    <span class="font-bold text-xl text-blue-600">${Math.floor(((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots) * 1.1).toLocaleString()}원</span>
+                  </div>
+                  <div class="text-xs text-gray-600">
+                    소계: ${((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots).toLocaleString()}원 + 부가세: ${Math.floor(((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots) * 0.1).toLocaleString()}원
+                  </div>
+                  <div class="text-xs text-gray-500 mt-2 pt-2 border-t border-yellow-200">
+                    💡 리뷰어 구매 금액 제외 (판매 수익으로 회수 가능)
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ` : `
+            <!-- 일반 과금: 기존 표시 -->
+            <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
+                  <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+                </div>
+                <div class="text-xs text-gray-600">
+                  소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
+                </div>
+              </div>
+            </div>
+          `}
           
           <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
             <div class="space-y-1 text-sm">
@@ -6659,6 +6705,24 @@ class ReviewSphere {
     } catch (error) {
       console.error('Calculate pricing error:', error);
       summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">비용 계산 중 오류가 발생했습니다</p>';
+    }
+  }
+
+  // 구매+포인트 비용 계산 방식 토글
+  togglePurchaseCostView() {
+    const totalView = document.getElementById('totalCostView');
+    const netView = document.getElementById('netCostView');
+    
+    if (totalView && netView) {
+      if (totalView.style.display === 'none') {
+        // 총 지출 보기로 전환
+        totalView.style.display = '';
+        netView.style.display = 'none';
+      } else {
+        // 실질 비용 보기로 전환
+        totalView.style.display = 'none';
+        netView.style.display = '';
+      }
     }
   }
 }
