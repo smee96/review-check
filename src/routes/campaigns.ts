@@ -22,7 +22,8 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       smartstore_product_url,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
-      provided_items, mission, keywords, notes
+      provided_items, mission, keywords, notes,
+      pricing_type, product_value, sphere_points
     } = data;
     
     if (!title) {
@@ -33,6 +34,11 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       return c.json({ error: '캠페인 채널을 선택해주세요' }, 400);
     }
     
+    // 과금 방식 검증
+    if (pricing_type && !['product_only', 'voucher_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
+      return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
+    }
+    
     const { env } = c;
     
     const result = await env.DB.prepare(
@@ -41,8 +47,8 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
         budget, slots, point_reward, thumbnail_image, channel_type, instagram_mention_account, 
         blog_product_url, youtube_purchase_link, smartstore_product_url, application_start_date, application_end_date, 
         announcement_date, content_start_date, content_end_date, result_announcement_date,
-        provided_items, mission, keywords, notes, status, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+        provided_items, mission, keywords, notes, pricing_type, product_value, sphere_points, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
     ).bind(
       user.userId,
       title,
@@ -69,6 +75,9 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       mission || null,
       keywords || null,
       notes || null,
+      pricing_type || 'product_only',
+      product_value || 0,
+      sphere_points || 0,
       getCurrentDateTime(),
       getCurrentDateTime()
     ).run();
@@ -240,7 +249,8 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       smartstore_product_url,
       application_start_date, application_end_date, announcement_date,
       content_start_date, content_end_date, result_announcement_date,
-      provided_items, mission, keywords, notes, payment_status
+      provided_items, mission, keywords, notes, payment_status,
+      pricing_type, product_value, sphere_points
     } = data;
     
     if (!title) {
@@ -251,13 +261,18 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       return c.json({ error: '캠페인 채널을 선택해주세요' }, 400);
     }
     
+    // 과금 방식 검증
+    if (pricing_type && !['product_only', 'voucher_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
+      return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
+    }
+    
     // 썸네일 이미지가 새로 제공된 경우만 업데이트
     let updateQuery = `UPDATE campaigns 
        SET title = ?, description = ?, product_name = ?, product_url = ?, requirements = ?, 
            budget = ?, slots = ?, point_reward = ?, channel_type = ?, instagram_mention_account = ?, 
            blog_product_url = ?, youtube_purchase_link = ?, smartstore_product_url = ?, application_start_date = ?, application_end_date = ?, 
            announcement_date = ?, content_start_date = ?, content_end_date = ?, result_announcement_date = ?,
-           provided_items = ?, mission = ?, keywords = ?, notes = ?, updated_at = ?`;
+           provided_items = ?, mission = ?, keywords = ?, notes = ?, pricing_type = ?, product_value = ?, sphere_points = ?, updated_at = ?`;
     
     const params = [
       title,
@@ -283,6 +298,9 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       mission || null,
       keywords || null,
       notes || null,
+      pricing_type || 'product_only',
+      product_value || 0,
+      sphere_points || 0,
       getCurrentDateTime()
     ];
     
