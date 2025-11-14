@@ -2021,6 +2021,7 @@ class ReviewSphere {
     
     // Initialize cost calculation, date pickers, and mission fields
     setTimeout(() => {
+      this.handlePricingTypeChange(); // 초기 과금 타입에 따른 UI 설정
       this.calculateCampaignCost();
       this.initializeDatePickers();
       this.initializeMissionFields();
