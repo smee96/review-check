@@ -4595,6 +4595,27 @@ class ReviewSphere {
                 </div>
               </div>
 
+              <!-- 시스템 설정 -->
+              <div class="bg-white rounded-lg shadow border-2 border-blue-200">
+                <button onclick="app.toggleAdminAccordion('systemSettings')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-cog text-blue-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-blue-600">시스템 설정</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">수수료율 및 시스템 설정 관리</p>
+                      </div>
+                    </div>
+                    <i id="systemSettings-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="systemSettings-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
               <!-- 로그아웃 -->
               <div class="bg-white rounded-lg shadow border-2 border-red-200">
                 <button onclick="app.logout()" class="w-full p-5 sm:p-6 text-left hover:bg-red-50 transition">
@@ -4636,7 +4657,7 @@ class ReviewSphere {
   async toggleAdminAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['campaignManagement', 'settlements'];
+    const allSections = ['campaignManagement', 'settlements', 'systemSettings'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -4667,6 +4688,9 @@ class ReviewSphere {
           break;
         case 'settlements':
           await this.loadSettlementsContent(content);
+          break;
+        case 'systemSettings':
+          await this.loadSystemSettingsContent(content);
           break;
       }
     } catch (error) {
@@ -5503,6 +5527,165 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+  }
+
+  // 시스템 설정 관리
+  async loadSystemSettingsContent(container) {
+    try {
+      const response = await axios.get('/api/admin/settings', this.getAuthHeaders());
+      const settings = response.data;
+
+      // 설정값을 객체로 변환
+      const settingsObj = {};
+      settings.forEach(s => {
+        settingsObj[s.setting_key] = s;
+      });
+
+      container.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <h2 class="text-xl sm:text-2xl font-bold mb-2">시스템 설정 관리</h2>
+          <p class="text-sm text-gray-600 mb-6">수수료율 변경 시 모든 캠페인에 즉시 적용됩니다</p>
+          
+          <div class="space-y-6">
+            <!-- 상품만 제공 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-purple-600">
+                <i class="fas fa-box mr-2"></i>상품만 제공
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="fee_rate_product_only" 
+                      value="${settingsObj.fee_rate_product_only?.setting_value || 20}"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    <button onclick="app.updateSystemSetting('fee_rate_product_only')" 
+                      class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                      저장
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_product_only?.description || ''}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">최소 수수료 (원)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="min_fee_product" 
+                      value="${settingsObj.min_fee_product?.setting_value || 2000}"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    <button onclick="app.updateSystemSetting('min_fee_product')" 
+                      class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                      저장
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${settingsObj.min_fee_product?.description || ''}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 이용권만 제공 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-green-600">
+                <i class="fas fa-ticket-alt mr-2"></i>이용권만 제공
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="fee_rate_voucher_only" 
+                      value="${settingsObj.fee_rate_voucher_only?.setting_value || 20}"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
+                    <button onclick="app.updateSystemSetting('fee_rate_voucher_only')" 
+                      class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                      저장
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_voucher_only?.description || ''}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">최소 수수료 (원)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="min_fee_voucher" 
+                      value="${settingsObj.min_fee_voucher?.setting_value || 3000}"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
+                    <button onclick="app.updateSystemSetting('min_fee_voucher')" 
+                      class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                      저장
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${settingsObj.min_fee_voucher?.description || ''}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 포인트 포함 -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-3 text-blue-600">
+                <i class="fas fa-coins mr-2"></i>상품/이용권 + 스피어포인트
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">수수료율 (%)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="fee_rate_with_points" 
+                      value="${settingsObj.fee_rate_with_points?.setting_value || 28}"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                    <button onclick="app.updateSystemSetting('fee_rate_with_points')" 
+                      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                      저장
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${settingsObj.fee_rate_with_points?.description || ''}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 예시 계산 -->
+            <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+              <h3 class="font-bold text-lg mb-2">
+                <i class="fas fa-calculator mr-2 text-yellow-600"></i>수수료 계산 예시
+              </h3>
+              <div class="text-sm space-y-2 text-gray-700">
+                <p><strong>상품만 30,000원:</strong> 수수료 ${Math.max(30000 * (Number(settingsObj.fee_rate_product_only?.setting_value || 20) / 100), Number(settingsObj.min_fee_product?.setting_value || 2000)).toLocaleString()}원</p>
+                <p><strong>이용권만 50,000원:</strong> 수수료 ${Math.max(50000 * (Number(settingsObj.fee_rate_voucher_only?.setting_value || 20) / 100), Number(settingsObj.min_fee_voucher?.setting_value || 3000)).toLocaleString()}원</p>
+                <p><strong>상품 50,000원 + 포인트 20,000P:</strong> 수수료 ${Math.floor(70000 * (Number(settingsObj.fee_rate_with_points?.setting_value || 28) / 100)).toLocaleString()}원</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Load system settings error:', error);
+      container.innerHTML = '<p class="text-red-600 p-4">시스템 설정을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async updateSystemSetting(settingKey) {
+    try {
+      const inputElement = document.getElementById(settingKey);
+      if (!inputElement) {
+        alert('설정값을 찾을 수 없습니다');
+        return;
+      }
+
+      const value = inputElement.value;
+      if (!value || isNaN(value) || Number(value) < 0) {
+        alert('유효한 값을 입력해주세요');
+        return;
+      }
+
+      await axios.put(`/api/admin/settings/${settingKey}`, { value }, this.getAuthHeaders());
+      
+      alert('설정이 저장되었습니다');
+      
+      // 설정 새로고침
+      const content = document.getElementById('systemSettings-content');
+      if (content) {
+        await this.loadSystemSettingsContent(content);
+      }
+    } catch (error) {
+      console.error('Update system setting error:', error);
+      alert('설정 저장에 실패했습니다: ' + (error.response?.data?.error || error.message));
+    }
   }
 }
 

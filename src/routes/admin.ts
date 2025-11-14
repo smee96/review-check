@@ -117,4 +117,49 @@ admin.get('/settlements', async (c) => {
   }
 });
 
+// 시스템 설정 조회
+admin.get('/settings', async (c) => {
+  try {
+    const { env } = c;
+    
+    const settings = await env.DB.prepare(
+      'SELECT * FROM system_settings ORDER BY setting_key'
+    ).all();
+    
+    return c.json(settings.results);
+  } catch (error) {
+    console.error('Get system settings error:', error);
+    return c.json({ error: '시스템 설정 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 시스템 설정 수정
+admin.put('/settings/:key', async (c) => {
+  try {
+    const settingKey = c.req.param('key');
+    const { value } = await c.req.json();
+    
+    if (!value) {
+      return c.json({ error: '설정값을 입력해주세요' }, 400);
+    }
+    
+    const { env } = c;
+    
+    // 설정값 업데이트
+    await env.DB.prepare(
+      'UPDATE system_settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?'
+    ).bind(value, settingKey).run();
+    
+    // 업데이트된 설정값 반환
+    const updated = await env.DB.prepare(
+      'SELECT * FROM system_settings WHERE setting_key = ?'
+    ).bind(settingKey).first();
+    
+    return c.json(updated);
+  } catch (error) {
+    console.error('Update system setting error:', error);
+    return c.json({ error: '시스템 설정 수정 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default admin;
