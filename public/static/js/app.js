@@ -5834,6 +5834,8 @@ class ReviewSphere {
   }
 
   getNumericValue(input) {
+    // 입력 요소가 없으면 0 반환
+    if (!input) return 0;
     // 콤마 제거하고 숫자만 반환
     return parseInt(input.value.replace(/[^\d]/g, '') || '0');
   }

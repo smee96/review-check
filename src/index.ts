@@ -122,7 +122,7 @@ app.get('/', (c) => {
         <script src="/static/js/api.js?v=46"></script>
         <script src="/static/js/ui-utils.js?v=46"></script>
         <script src="/static/js/pricing-utils.js?v=46"></script>
-        <script src="/static/js/app.js?v=48"></script>
+        <script src="/static/js/app.js?v=49"></script>
     </body>
     </html>
   `);
