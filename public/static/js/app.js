@@ -4586,7 +4586,7 @@ class ReviewSphere {
             </label>
             <input type="file" id="reviewImage" accept="image/*"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <p class="text-xs text-gray-500 mt-1">스마트스토어 리뷰 캡쳐 이미지를 업로드하세요 (최대 2MB)</p>
+            <p class="text-xs text-gray-500 mt-1">스마트스토어 리뷰 캡쳐 이미지를 업로드하세요 (자동 압축)</p>
           </div>
           
           <div id="imagePreview" class="hidden mt-2">
@@ -4617,21 +4617,19 @@ class ReviewSphere {
     const preview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
     
-    imageInput.addEventListener('change', (e) => {
+    imageInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        if (file.size > 2 * 1024 * 1024) {
-          alert('이미지 크기는 2MB 이하여야 합니다');
-          imageInput.value = '';
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
+        // 자동 압축 및 미리보기
+        try {
+          const compressedData = await this.compressImage(file);
+          previewImg.src = compressedData;
           preview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error('Image compression error:', error);
+          alert('이미지 처리 중 오류가 발생했습니다');
+          imageInput.value = '';
+        }
       } else {
         preview.classList.add('hidden');
       }
@@ -4652,14 +4650,9 @@ class ReviewSphere {
       try {
         const payload = { post_url: postUrl || null };
         
-        // 이미지가 있으면 base64로 인코딩
+        // 이미지가 있으면 압축 후 base64로 인코딩
         if (imageFile) {
-          const reader = new FileReader();
-          const imageData = await new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(imageFile);
-          });
+          const imageData = await this.compressImage(imageFile);
           payload.image_data = imageData;
         }
         
@@ -4676,6 +4669,63 @@ class ReviewSphere {
         console.error('Review submission error:', error);
         alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
       }
+    });
+  }
+  
+  // 이미지 압축 함수 (2MB 미만으로)
+  async compressImage(file, maxSizeMB = 2) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // 최대 크기 제한 (긴 변 기준 2048px)
+          const maxDimension = 2048;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = (height * maxDimension) / width;
+              width = maxDimension;
+            } else {
+              width = (width * maxDimension) / height;
+              height = maxDimension;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // 압축 품질 조절
+          let quality = 0.9;
+          const maxSize = maxSizeMB * 1024 * 1024;
+          
+          const tryCompress = () => {
+            canvas.toBlob((blob) => {
+              if (blob.size > maxSize && quality > 0.1) {
+                quality -= 0.1;
+                tryCompress();
+              } else {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              }
+            }, 'image/jpeg', quality);
+          };
+          
+          tryCompress();
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
   
@@ -4716,7 +4766,7 @@ class ReviewSphere {
             ` : ''}
             <input type="file" id="reviewImage" accept="image/*"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <p class="text-xs text-gray-500 mt-1">새 이미지를 선택하면 기존 이미지가 교체됩니다 (최대 2MB)</p>
+            <p class="text-xs text-gray-500 mt-1">새 이미지를 선택하면 기존 이미지가 교체됩니다 (자동 압축)</p>
           </div>
           
           <div id="imagePreview" class="hidden mt-2">
@@ -4752,21 +4802,19 @@ class ReviewSphere {
     const preview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
     
-    imageInput.addEventListener('change', (e) => {
+    imageInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
-        if (file.size > 2 * 1024 * 1024) {
-          alert('이미지 크기는 2MB 이하여야 합니다');
-          imageInput.value = '';
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
+        // 자동 압축 및 미리보기
+        try {
+          const compressedData = await this.compressImage(file);
+          previewImg.src = compressedData;
           preview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error('Image compression error:', error);
+          alert('이미지 처리 중 오류가 발생했습니다');
+          imageInput.value = '';
+        }
       } else {
         preview.classList.add('hidden');
       }
@@ -4787,14 +4835,9 @@ class ReviewSphere {
       try {
         const payload = { post_url: postUrl || null };
         
-        // 이미지가 있으면 base64로 인코딩
+        // 이미지가 있으면 압축 후 base64로 인코딩
         if (imageFile) {
-          const reader = new FileReader();
-          const imageData = await new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(imageFile);
-          });
+          const imageData = await this.compressImage(imageFile);
           payload.image_data = imageData;
         }
         

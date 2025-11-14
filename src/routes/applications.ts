@@ -229,11 +229,6 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
     const user = c.get('user');
     const { post_url, image_data } = await c.req.json();
     
-    // post_url or image_data is required
-    if (!post_url && !image_data) {
-      return c.json({ error: '게시물 링크 또는 리뷰 캡쳐 이미지를 입력해주세요' }, 400);
-    }
-    
     const { env } = c;
     
     // Get application with campaign info
@@ -272,6 +267,11 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
     const endDate = new Date(application.content_submission_end_date);
     if (now > endDate) {
       return c.json({ error: '컨텐츠 등록 기간이 종료되어 수정할 수 없습니다' }, 400);
+    }
+    
+    // Check if at least one field is provided (post_url, image_data, or existing data)
+    if (!post_url && !image_data && !existing.post_url && !existing.image_url) {
+      return c.json({ error: '게시물 링크 또는 리뷰 캡쳐 이미지를 입력해주세요' }, 400);
     }
     
     // Handle image update
