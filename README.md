@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://4e0fc0d7.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://8b55254c.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
@@ -143,10 +143,13 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 - 상태: 대기중/확정/거절
 
 #### Reviews (결과)
-- 확정된 캠페인의 포스트 URL
+- 확정된 캠페인의 포스트 URL 및 이미지 (R2 저장)
+- 컨텐츠 등록 기간 내 수정 가능
+- 스마트스토어 리뷰 캡쳐 지원
 
 ### 스토리지 서비스
 - **Cloudflare D1**: SQLite 기반 관계형 데이터베이스
+- **Cloudflare R2**: 리뷰 이미지 저장 (10GB 무료)
 - **로컬 개발**: `--local` 플래그로 로컬 SQLite 자동 사용
 
 ## 🎨 사용자 가이드
@@ -302,6 +305,7 @@ webapp/
 - **Backend**: Hono (TypeScript) - 경량 웹 프레임워크
 - **Frontend**: Vanilla JavaScript + TailwindCSS
 - **Database**: Cloudflare D1 (SQLite) - 프로덕션 배포 완료
+- **Storage**: Cloudflare R2 - 리뷰 이미지 저장 (10GB 무료)
 - **Authentication**: JWT (Web Crypto API)
 - **Deployment**: Cloudflare Pages/Workers
 - **Architecture**: 모듈화된 라우트 기반 구조
@@ -347,6 +351,30 @@ webapp/
 - 모바일에서도 1-2줄로 표시
 
 ## 📝 개발 로그
+
+### 2025-11-14
+- ✅ **R2 스토리지 전환 및 리뷰 수정 기능**
+  - Cloudflare R2 버킷 생성 (reviewsphere-images)
+  - Base64 인코딩 → R2 스토리지로 전환 (90% DB 용량 절약)
+  - 리뷰 수정 기능 추가 (컨텐츠 등록 기간 내)
+  - 리뷰 이미지 업로드 및 R2 저장
+  - 이미지 미리보기 및 기존 이미지 확인
+  - R2 이미지 URL 엔드포인트 추가 (CDN 캐싱)
+  - 기존 이미지 자동 삭제 (수정 시)
+- ✅ **리뷰 등록/수정 UI 개선**
+  - 리뷰 등록 위치 변경: "나의 캠페인"에서 직접 등록
+  - "나의 컨텐츠": 등록된 컨텐츠 보기 전용
+  - 모달 폼으로 URL + 이미지 업로드
+  - 수정 버튼 추가 (등록 완료된 리뷰)
+  - 컨텐츠 등록 기간 검증
+- ✅ **고정 수수료 구조 적용**
+  - 모든 캠페인: 10,000원 고정 수수료
+  - 포인트: 추가 30% 수수료 (관리자 조정 가능)
+  - VAT 10% 별도 표시
+  - 입금 계좌 정보 표시 (모빈 국민은행)
+- ✅ **캠페인 상태 자동 계산**
+  - 날짜 기반 상태: 모집중 → 진행중 → 성공종료
+  - application_end_date, result_announcement_date 기준
 
 ### 2025-11-12
 - ✅ **개인정보 보호 및 보안 강화**
