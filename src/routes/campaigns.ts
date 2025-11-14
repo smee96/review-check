@@ -35,7 +35,7 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
     }
     
     // 과금 방식 검증
-    if (pricing_type && !['product_only', 'voucher_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
+    if (pricing_type && !['product_only', 'voucher_only', 'points_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
       return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
     }
     
@@ -262,7 +262,7 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     }
     
     // 과금 방식 검증
-    if (pricing_type && !['product_only', 'voucher_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
+    if (pricing_type && !['product_only', 'voucher_only', 'points_only', 'product_with_points', 'voucher_with_points'].includes(pricing_type)) {
       return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
     }
     

@@ -38,6 +38,9 @@ export async function getFeeRate(env: any, pricingType: string): Promise<number>
     case 'voucher_only':
       settingKey = 'fee_rate_voucher_only';
       break;
+    case 'points_only':
+      settingKey = 'fee_rate_points_only';
+      break;
     case 'product_with_points':
     case 'voucher_with_points':
       settingKey = 'fee_rate_with_points';
@@ -58,19 +61,24 @@ export async function getMinFee(env: any, pricingType: string): Promise<number> 
   
   switch(pricingType) {
     case 'product_only':
-    case 'product_with_points':
       settingKey = 'min_fee_product';
       break;
     case 'voucher_only':
-    case 'voucher_with_points':
       settingKey = 'min_fee_voucher';
+      break;
+    case 'points_only':
+      settingKey = 'min_fee_points';
+      break;
+    case 'product_with_points':
+    case 'voucher_with_points':
+      settingKey = 'min_fee_with_points';
       break;
     default:
       settingKey = 'min_fee_product';
   }
   
   const minFeeStr = await getSystemSetting(env, settingKey);
-  return minFeeStr ? Number(minFeeStr) : 0;
+  return minFeeStr ? Number(minFeeStr) : 3000; // 기본값 3,000원
 }
 
 /**
@@ -87,10 +95,16 @@ export async function calculatePlatformFee(
   
   let totalValue: number;
   
+  // 포인트만 지급하는 경우
+  if (pricingType === 'points_only') {
+    totalValue = spherePoints;
+  }
   // 포인트 포함 여부에 따라 계산 방식 다름
-  if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
+  else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
     totalValue = productValue + spherePoints;
-  } else {
+  } 
+  // 상품만 또는 이용권만
+  else {
     totalValue = productValue;
   }
   
@@ -113,7 +127,9 @@ export async function calculateFullPricing(
   const feeRate = await getFeeRate(env, pricingType);
   
   let totalValue: number;
-  if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
+  if (pricingType === 'points_only') {
+    totalValue = spherePoints;
+  } else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
     totalValue = productValue + spherePoints;
   } else {
     totalValue = productValue;
@@ -143,6 +159,7 @@ export function getPricingTypeName(pricingType: string): string {
   const names: Record<string, string> = {
     'product_only': '상품만 제공',
     'voucher_only': '이용권만 제공',
+    'points_only': '포인트만 지급',
     'product_with_points': '상품 + 스피어포인트',
     'voucher_with_points': '이용권 + 스피어포인트'
   };

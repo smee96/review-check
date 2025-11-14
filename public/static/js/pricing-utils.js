@@ -50,6 +50,8 @@ const PricingUtils = {
         return settings.fee_rate_product_only || 20;
       case 'voucher_only':
         return settings.fee_rate_voucher_only || 20;
+      case 'points_only':
+        return settings.fee_rate_points_only || 20;
       case 'product_with_points':
       case 'voucher_with_points':
         return settings.fee_rate_with_points || 28;
@@ -64,13 +66,16 @@ const PricingUtils = {
     
     switch(pricingType) {
       case 'product_only':
-      case 'product_with_points':
-        return settings.min_fee_product || 2000;
+        return settings.min_fee_product || 3000;
       case 'voucher_only':
-      case 'voucher_with_points':
         return settings.min_fee_voucher || 3000;
+      case 'points_only':
+        return settings.min_fee_points || 3000;
+      case 'product_with_points':
+      case 'voucher_with_points':
+        return settings.min_fee_with_points || 5000;
       default:
-        return 2000;
+        return 3000;
     }
   },
 
@@ -80,7 +85,9 @@ const PricingUtils = {
     const minFee = await this.getMinFee(pricingType);
     
     let totalValue;
-    if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
+    if (pricingType === 'points_only') {
+      totalValue = spherePoints;
+    } else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
       totalValue = productValue + spherePoints;
     } else {
       totalValue = productValue;
@@ -96,7 +103,9 @@ const PricingUtils = {
     const feeRate = await this.getFeeRate(pricingType);
     
     let totalValue;
-    if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
+    if (pricingType === 'points_only') {
+      totalValue = spherePoints;
+    } else if (pricingType === 'product_with_points' || pricingType === 'voucher_with_points') {
       totalValue = productValue + spherePoints;
     } else {
       totalValue = productValue;
@@ -124,6 +133,7 @@ const PricingUtils = {
     const names = {
       'product_only': '상품만 제공',
       'voucher_only': '이용권만 제공',
+      'points_only': '포인트만 지급',
       'product_with_points': '상품 + 스피어포인트',
       'voucher_with_points': '이용권 + 스피어포인트'
     };
@@ -135,6 +145,7 @@ const PricingUtils = {
     const descriptions = {
       'product_only': '리뷰어에게 상품만 제공합니다. 고가 상품(2만원 이상) 추천',
       'voucher_only': '리뷰어에게 이용권만 제공합니다. 서비스업(3만원 이상) 추천',
+      'points_only': '리뷰어에게 현금화 가능한 스피어포인트만 지급합니다. 인증샷, 브랜드 홍보에 적합',
       'product_with_points': '리뷰어에게 상품과 현금화 가능한 스피어포인트를 제공합니다. 확실한 모집에 유리',
       'voucher_with_points': '리뷰어에게 이용권과 현금화 가능한 스피어포인트를 제공합니다. 확실한 모집에 유리'
     };

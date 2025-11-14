@@ -1905,7 +1905,7 @@ class ReviewSphere {
                   <i class="fas fa-box text-purple-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">리뷰어에게 상품만 제공</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 상품가의 20% (최소 2,000원)</p>
+                <p class="text-xs text-gray-500 mt-1">수수료: 상품가의 20% (최소 3,000원)</p>
               </div>
             </label>
             
@@ -1923,15 +1923,28 @@ class ReviewSphere {
             </label>
             
             <label class="cursor-pointer">
+              <input type="radio" name="pricingType" value="points_only" onchange="app.handlePricingTypeChange()" 
+                class="peer sr-only">
+              <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-semibold text-gray-800">포인트만 지급</span>
+                  <i class="fas fa-coins text-orange-600"></i>
+                </div>
+                <p class="text-xs text-gray-600">스피어포인트만 지급</p>
+                <p class="text-xs text-gray-500 mt-1">수수료: 포인트의 20% (최소 3,000원)</p>
+              </div>
+            </label>
+            
+            <label class="cursor-pointer">
               <input type="radio" name="pricingType" value="product_with_points" onchange="app.handlePricingTypeChange()" 
                 class="peer sr-only">
               <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-blue-600 peer-checked:bg-blue-50 hover:border-blue-400 transition">
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-semibold text-gray-800">상품 + 포인트</span>
-                  <i class="fas fa-coins text-blue-600"></i>
+                  <i class="fas fa-gift text-blue-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">상품 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28%</p>
+                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28% (최소 5,000원)</p>
               </div>
             </label>
             
@@ -1941,10 +1954,10 @@ class ReviewSphere {
               <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-teal-600 peer-checked:bg-teal-50 hover:border-teal-400 transition">
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-semibold text-gray-800">이용권 + 포인트</span>
-                  <i class="fas fa-gift text-teal-600"></i>
+                  <i class="fas fa-spa text-teal-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">이용권 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28%</p>
+                <p class="text-xs text-gray-500 mt-1">수수료: 총 가치의 28% (최소 5,000원)</p>
               </div>
             </label>
           </div>
@@ -2332,15 +2345,30 @@ class ReviewSphere {
       const productValue = this.getNumericValue(productValueInput);
       const spherePoints = this.getNumericValue(spherePointsInput);
       
-      if (productValue <= 0) {
-        alert('상품/이용권 가치를 입력해주세요');
-        return;
+      // 포인트만 지급인 경우
+      if (pricingType === 'points_only') {
+        if (spherePoints <= 0) {
+          alert('스피어포인트를 입력해주세요 (최소 1P 이상)');
+          return;
+        }
       }
-      
-      // 포인트 포함 타입인데 포인트가 0이면 경고
-      if (pricingType.includes('with_points') && spherePoints <= 0) {
-        alert('스피어포인트를 입력해주세요 (최소 1P 이상)');
-        return;
+      // 상품/이용권만인 경우
+      else if (pricingType === 'product_only' || pricingType === 'voucher_only') {
+        if (productValue <= 0) {
+          alert('상품/이용권 가치를 입력해주세요');
+          return;
+        }
+      }
+      // 포인트 포함 타입인 경우
+      else if (pricingType.includes('with_points')) {
+        if (productValue <= 0) {
+          alert('상품/이용권 가치를 입력해주세요');
+          return;
+        }
+        if (spherePoints <= 0) {
+          alert('스피어포인트를 입력해주세요 (최소 1P 이상)');
+          return;
+        }
       }
       
       // 숫자 필드에서 콤마 제거하고 순수 숫자만 추출
@@ -5758,20 +5786,42 @@ class ReviewSphere {
   handlePricingTypeChange() {
     const pricingType = document.querySelector('input[name="pricingType"]:checked')?.value;
     const spherePointsSection = document.getElementById('spherePointsSection');
+    const productValueSection = document.getElementById('campaignProductValue')?.parentElement;
     const productValueLabel = document.getElementById('productValueLabel');
     const productValueHint = document.getElementById('productValueHint');
+    const productValueInput = document.getElementById('campaignProductValue');
     const spherePointsInput = document.getElementById('campaignSpherePoints');
     
     if (!pricingType) return;
     
-    // 포인트 포함 타입인지 확인
-    const withPoints = pricingType.includes('with_points');
-    
-    // 스피어포인트 섹션 표시/숨김
-    if (withPoints) {
+    // 포인트만 지급인 경우
+    if (pricingType === 'points_only') {
+      // 상품/이용권 가치 입력 숨김
+      if (productValueSection) productValueSection.classList.add('hidden');
+      productValueInput.required = false;
+      productValueInput.value = '0';
+      
+      // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
-    } else {
+    }
+    // 포인트 포함 타입
+    else if (pricingType.includes('with_points')) {
+      // 상품/이용권 가치 입력 표시
+      if (productValueSection) productValueSection.classList.remove('hidden');
+      productValueInput.required = true;
+      
+      // 스피어포인트 입력 표시
+      spherePointsSection.classList.remove('hidden');
+      spherePointsInput.required = true;
+    }
+    // 상품만 또는 이용권만
+    else {
+      // 상품/이용권 가치 입력 표시
+      if (productValueSection) productValueSection.classList.remove('hidden');
+      productValueInput.required = true;
+      
+      // 스피어포인트 입력 숨김
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
       spherePointsInput.value = '0';
