@@ -6011,15 +6011,41 @@ class ReviewSphere {
             ` : ''}
             
             <div class="flex justify-between pt-2 border-t border-gray-300">
-              <span class="text-gray-800 font-bold">1명당 총 비용:</span>
+              <span class="text-gray-800 font-bold">1명당 소계 (부가세 별도):</span>
               <span class="font-bold text-lg text-blue-600">${pricing.totalCost.toLocaleString()}원</span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-gray-700">부가세 (10%):</span>
+              <span class="font-semibold text-orange-600">${Math.floor(pricing.totalCost * 0.1).toLocaleString()}원</span>
+            </div>
+            
+            <div class="flex justify-between pt-2 border-t border-gray-300">
+              <span class="text-gray-800 font-bold">1명당 총 비용 (부가세 포함):</span>
+              <span class="font-bold text-lg text-purple-600">${Math.floor(pricing.totalCost * 1.1).toLocaleString()}원</span>
             </div>
           </div>
           
           <div class="bg-green-50 border border-green-200 rounded p-3 mt-3">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
-              <span class="font-bold text-xl text-green-600">${totalForAllInfluencers.toLocaleString()}원</span>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-800 font-bold">전체 광고주 지출 (${slots}명):</span>
+                <span class="font-bold text-xl text-green-600">${Math.floor(totalForAllInfluencers * 1.1).toLocaleString()}원</span>
+              </div>
+              <div class="text-xs text-gray-600">
+                소계: ${totalForAllInfluencers.toLocaleString()}원 + 부가세: ${Math.floor(totalForAllInfluencers * 0.1).toLocaleString()}원
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
+            <div class="space-y-1 text-sm">
+              <div class="font-bold text-blue-800 mb-2">
+                <i class="fas fa-building-columns mr-2"></i>입금 계좌
+              </div>
+              <div class="text-gray-700">예금주: <span class="font-semibold">(주)모빈</span></div>
+              <div class="text-gray-700">은행: <span class="font-semibold">국민은행</span></div>
+              <div class="text-gray-700">계좌번호: <span class="font-semibold">005790-17-614313</span></div>
             </div>
           </div>
           
