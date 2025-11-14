@@ -20,9 +20,11 @@ applications.get('/my', requireRole('influencer'), async (c) => {
     const { env } = c;
     
     const applications = await env.DB.prepare(
-      `SELECT a.*, c.title as campaign_title, c.product_name, c.budget
+      `SELECT a.*, c.title as campaign_title, c.product_name, c.budget,
+              r.post_url as review_url, r.image_url as review_image_url, r.submitted_at
        FROM applications a
        JOIN campaigns c ON a.campaign_id = c.id
+       LEFT JOIN reviews r ON a.id = r.application_id
        WHERE a.influencer_id = ?
        ORDER BY a.applied_at DESC`
     ).bind(user.userId).all();
@@ -125,15 +127,16 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
   }
 });
 
-// 리뷰 등록 (포스트 URL) (인플루언서)
+// 리뷰 등록 (포스트 URL + 이미지) (인플루언서)
 applications.post('/:id/review', requireRole('influencer'), async (c) => {
   try {
     const applicationId = c.req.param('id');
     const user = c.get('user');
-    const { post_url } = await c.req.json();
+    const { post_url, image_data } = await c.req.json();
     
-    if (!post_url) {
-      return c.json({ error: '포스트 URL을 입력해주세요' }, 400);
+    // post_url or image_data is required
+    if (!post_url && !image_data) {
+      return c.json({ error: '게시물 링크 또는 리뷰 캡쳐 이미지를 입력해주세요' }, 400);
     }
     
     const { env } = c;
@@ -169,10 +172,10 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '이미 리뷰가 등록되었습니다' }, 400);
     }
     
-    // Create review
+    // Create review with optional image
     await env.DB.prepare(
-      'INSERT INTO reviews (application_id, post_url, submitted_at) VALUES (?, ?, ?)'
-    ).bind(applicationId, post_url, getCurrentDateTime()).run();
+      'INSERT INTO reviews (application_id, post_url, image_url, submitted_at) VALUES (?, ?, ?, ?)'
+    ).bind(applicationId, post_url || null, image_data || null, getCurrentDateTime()).run();
     
     return c.json({ success: true, message: '리뷰가 등록되었습니다' }, 201);
   } catch (error) {

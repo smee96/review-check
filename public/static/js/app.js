@@ -3382,7 +3382,7 @@ class ReviewSphere {
 
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
-              <!-- 나의 캠페인 -->
+              <!-- 1. 나의 캠페인 -->
               <div class="bg-white rounded-lg shadow">
                 <button onclick="app.toggleAccordion('myCampaigns')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
                   <div class="flex items-center justify-between">
@@ -3403,7 +3403,28 @@ class ReviewSphere {
                 </div>
               </div>
 
-              <!-- 관심 캠페인 -->
+              <!-- 2. 나의 컨텐츠 (리뷰 등록 및 관리) -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('myContents')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-pen-to-square text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">나의 컨텐츠</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">리뷰 등록 및 관리</p>
+                      </div>
+                    </div>
+                    <i id="myContents-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="myContents-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. 관심 캠페인 -->
               <div class="bg-white rounded-lg shadow">
                 <button onclick="app.toggleAccordion('favoriteCampaigns')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
                   <div class="flex items-center justify-between">
@@ -3424,28 +3445,7 @@ class ReviewSphere {
                 </div>
               </div>
 
-              <!-- 나의 컨텐츠 -->
-              <div class="bg-white rounded-lg shadow">
-                <button onclick="app.toggleAccordion('myContents')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <i class="fas fa-pen-to-square text-purple-600 text-xl sm:text-2xl"></i>
-                      <div>
-                        <h3 class="font-semibold text-base sm:text-lg">나의 컨텐츠</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">등록한 리뷰 관리</p>
-                      </div>
-                    </div>
-                    <i id="myContents-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                  </div>
-                </button>
-                <div id="myContents-content" class="hidden border-t">
-                  <div class="p-4 sm:p-6">
-                    <p class="text-gray-600">로딩 중...</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 프로필 관리 -->
+              <!-- 4. 프로필 관리 -->
               <div class="bg-white rounded-lg shadow ${profileIncomplete ? 'border-2 border-orange-400' : ''}">
                 <button onclick="app.toggleAccordion('profile')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
                   <div class="flex items-center justify-between">
@@ -3569,14 +3569,19 @@ class ReviewSphere {
                         <i class="fas fa-times mr-1"></i>지원취소
                       </button>
                     ` : ''}
+                    ${app.status === 'approved' && !app.review_url ? `
+                      <button onclick="app.submitReview(${app.id})" class="bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-purple-700 transition">
+                        <i class="fas fa-pen mr-1"></i>리뷰 등록하기
+                      </button>
+                    ` : ''}
                     <button onclick="app.viewCampaignDetail(${app.campaign_id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
                       캠페인 보기 →
                     </button>
                   </div>
-                  ${app.status === 'approved' && !app.review_url ? `
-                    <button onclick="app.submitReview(${app.id})" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
-                      리뷰 등록하기
-                    </button>
+                  ${app.status === 'approved' && app.review_url ? `
+                    <div class="mt-2 text-sm text-green-600">
+                      <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
+                    </div>
                   ` : ''}
                 </div>
               `).join('')}
@@ -3646,7 +3651,7 @@ class ReviewSphere {
   async loadMyContentsContent(contentDiv) {
     try {
       const response = await axios.get('/api/applications/my', this.getAuthHeaders());
-      const applications = response.data.filter(app => app.status === 'approved');
+      const applications = response.data.filter(app => app.status === 'approved' && app.review_url);
       
       contentDiv.innerHTML = `
         <div class="p-4 sm:p-6">
@@ -3655,22 +3660,28 @@ class ReviewSphere {
             <div class="text-center py-8">
               <i class="fas fa-pen-to-square text-6xl text-gray-300 mb-4"></i>
               <p class="text-gray-600">등록된 컨텐츠가 없습니다</p>
+              <p class="text-sm text-gray-500 mt-2">캠페인 확정 후 '나의 캠페인' 메뉴에서 리뷰를 등록하세요</p>
             </div>
           ` : `
             <div class="space-y-4">
               ${applications.map(app => `
                 <div class="border rounded-lg p-4">
                   <h4 class="font-bold text-lg mb-2">${app.campaign_title}</h4>
-                  ${app.review_url ? `
-                    <a href="${app.review_url}" target="_blank" class="text-purple-600 hover:text-purple-800 text-sm">
-                      <i class="fas fa-external-link-alt mr-1"></i>컨텐츠 보기
-                    </a>
-                  ` : `
-                    <p class="text-sm text-gray-500 mb-2">아직 컨텐츠를 등록하지 않았습니다</p>
-                    <button onclick="app.submitReview(${app.id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
-                      <i class="fas fa-plus mr-1"></i>리뷰 등록하기
-                    </button>
-                  `}
+                  <div class="mt-2">
+                    ${app.review_url ? `
+                      <a href="${app.review_url}" target="_blank" class="inline-block bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>컨텐츠 보기
+                      </a>
+                    ` : ''}
+                    ${app.review_image_url ? `
+                      <button onclick="app.viewReviewImage('${app.review_image_url}')" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm ml-2">
+                        <i class="fas fa-image mr-1"></i>리뷰 캡쳐 보기
+                      </button>
+                    ` : ''}
+                  </div>
+                  <div class="text-xs text-gray-500 mt-2">
+                    <i class="fas fa-clock mr-1"></i>등록일: ${new Date(app.submitted_at || app.created_at).toLocaleDateString('ko-KR')}
+                  </div>
                 </div>
               `).join('')}
             </div>
@@ -4518,15 +4529,15 @@ class ReviewSphere {
               ${a.budget ? `<p class="text-sm mb-2"><strong>예산:</strong> ${a.budget.toLocaleString()}원</p>` : ''}
 
               <div class="flex gap-2 mt-2">
-                ${a.status === 'approved' ? `
-                  <button onclick="app.submitReview(${a.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                    <i class="fas fa-upload mr-1"></i>리뷰 등록
-                  </button>
-                ` : ''}
                 ${a.status === 'pending' ? `
                   <button onclick="app.cancelApplication(${a.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
                     <i class="fas fa-times mr-1"></i>지원 취소
                   </button>
+                ` : ''}
+                ${a.status === 'approved' ? `
+                  <p class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-1"></i>리뷰 등록은 마이페이지 > 나의 컨텐츠에서 진행해주세요
+                  </p>
                 ` : ''}
               </div>
             </div>
@@ -4539,20 +4550,136 @@ class ReviewSphere {
   }
 
   async submitReview(applicationId) {
-    const postUrl = prompt('리뷰 포스트 URL을 입력하세요:');
+    // 모달 생성
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg max-w-lg w-full p-6">
+        <h3 class="text-xl font-bold mb-4">리뷰 등록하기</h3>
+        
+        <form id="reviewForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              게시물 링크
+              <span class="text-xs text-gray-500 font-normal">(선택사항)</span>
+            </label>
+            <input type="url" id="reviewPostUrl" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="https://blog.naver.com/...">
+            <p class="text-xs text-gray-500 mt-1">블로그, 인스타그램, 유튜브 등 게시물 링크를 입력하세요</p>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              리뷰 캡쳐 이미지
+              <span class="text-xs text-gray-500 font-normal">(선택사항 - 스마트스토어 리뷰 등)</span>
+            </label>
+            <input type="file" id="reviewImage" accept="image/*"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <p class="text-xs text-gray-500 mt-1">스마트스토어 리뷰 캡쳐 이미지를 업로드하세요 (최대 2MB)</p>
+          </div>
+          
+          <div id="imagePreview" class="hidden mt-2">
+            <img id="previewImg" class="max-w-full h-auto rounded-lg border">
+          </div>
+          
+          <p class="text-xs text-orange-600">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            게시물 링크 또는 리뷰 캡쳐 이미지 중 최소 1개는 필수입니다
+          </p>
+          
+          <div class="flex gap-2 pt-4">
+            <button type="submit" class="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition font-semibold">
+              등록하기
+            </button>
+            <button type="button" onclick="this.closest('.fixed').remove()" class="px-6 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition font-semibold">
+              취소
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
     
-    if (!postUrl) {
-      return;
-    }
-
-    try {
-      await axios.post(`/api/applications/${applicationId}/review`, { post_url: postUrl }, this.getAuthHeaders());
-      alert('리뷰가 등록되었습니다!');
-      this.showMyApplications();
-    } catch (error) {
-      console.error('Review submission error:', error);
-      alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
-    }
+    document.body.appendChild(modal);
+    
+    // 이미지 미리보기
+    const imageInput = document.getElementById('reviewImage');
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          alert('이미지 크기는 2MB 이하여야 합니다');
+          imageInput.value = '';
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.classList.add('hidden');
+      }
+    });
+    
+    // 폼 제출
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const postUrl = document.getElementById('reviewPostUrl').value.trim();
+      const imageFile = imageInput.files[0];
+      
+      if (!postUrl && !imageFile) {
+        alert('게시물 링크 또는 리뷰 캡쳐 이미지 중 최소 1개를 입력해주세요');
+        return;
+      }
+      
+      try {
+        const payload = { post_url: postUrl || null };
+        
+        // 이미지가 있으면 base64로 인코딩
+        if (imageFile) {
+          const reader = new FileReader();
+          const imageData = await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(imageFile);
+          });
+          payload.image_data = imageData;
+        }
+        
+        await axios.post(`/api/applications/${applicationId}/review`, payload, this.getAuthHeaders());
+        alert('리뷰가 등록되었습니다!');
+        modal.remove();
+        
+        // 마이페이지 나의 캠페인 섹션 다시 로드
+        await this.showMyPage();
+        setTimeout(() => {
+          this.toggleAccordion('myCampaigns');
+        }, 100);
+      } catch (error) {
+        console.error('Review submission error:', error);
+        alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
+      }
+    });
+  }
+  
+  viewReviewImage(imageUrl) {
+    // 이미지 모달 표시
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.onclick = () => modal.remove();
+    modal.innerHTML = `
+      <div class="max-w-4xl max-h-full">
+        <img src="${imageUrl}" class="max-w-full max-h-screen object-contain rounded-lg">
+      </div>
+    `;
+    document.body.appendChild(modal);
   }
 
   async cancelApplication(applicationId) {
