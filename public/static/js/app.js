@@ -3574,8 +3574,8 @@ class ReviewSphere {
                     </button>
                   </div>
                   ${app.status === 'approved' && !app.review_url ? `
-                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
-                      결과 등록하기
+                    <button onclick="app.submitReview(${app.id})" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
+                      리뷰 등록하기
                     </button>
                   ` : ''}
                 </div>
@@ -3667,8 +3667,8 @@ class ReviewSphere {
                     </a>
                   ` : `
                     <p class="text-sm text-gray-500 mb-2">아직 컨텐츠를 등록하지 않았습니다</p>
-                    <button onclick="app.submitReview(${app.campaign_id}, ${app.id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
-                      <i class="fas fa-plus mr-1"></i>컨텐츠 등록하기
+                    <button onclick="app.submitReview(${app.id})" class="text-purple-600 hover:text-purple-800 text-sm font-semibold">
+                      <i class="fas fa-plus mr-1"></i>리뷰 등록하기
                     </button>
                   `}
                 </div>
@@ -4520,7 +4520,7 @@ class ReviewSphere {
               <div class="flex gap-2 mt-2">
                 ${a.status === 'approved' ? `
                   <button onclick="app.submitReview(${a.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                    <i class="fas fa-upload mr-1"></i>결과 등록
+                    <i class="fas fa-upload mr-1"></i>리뷰 등록
                   </button>
                 ` : ''}
                 ${a.status === 'pending' ? `
@@ -4547,10 +4547,10 @@ class ReviewSphere {
 
     try {
       await axios.post(`/api/applications/${applicationId}/review`, { post_url: postUrl }, this.getAuthHeaders());
-      alert('결과가 등록되었습니다!');
+      alert('리뷰가 등록되었습니다!');
       this.showMyApplications();
     } catch (error) {
-      alert(error.response?.data?.error || '결과 등록에 실패했습니다');
+      alert(error.response?.data?.error || '리뷰 등록에 실패했습니다');
     }
   }
 
