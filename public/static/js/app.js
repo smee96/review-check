@@ -2620,14 +2620,38 @@ class ReviewSphere {
 
 8. 체험하신 블로거분들의 리뷰 콘텐츠는 업체 홍보로 이용될 수 있습니다.`;
         
-        // 포인트 리워드 (숫자 포맷)
-        const pointRewardField = document.getElementById('campaignPointReward');
-        if (pointRewardField && campaign.point_reward) {
-          pointRewardField.value = campaign.point_reward.toLocaleString();
+        // 과금 방식 선택
+        if (campaign.pricing_type) {
+          const pricingRadio = document.querySelector(`input[name="pricingType"][value="${campaign.pricing_type}"]`);
+          if (pricingRadio) {
+            pricingRadio.checked = true;
+            this.handlePricingTypeChange(); // 과금 방식에 따른 필드 표시
+          }
         }
         
-        // 비용 재계산
-        this.calculateCampaignCost();
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        setTimeout(() => {
+          // 제품 가액
+          const productValueField = document.getElementById('campaignProductValue');
+          if (productValueField && campaign.product_value) {
+            productValueField.value = campaign.product_value.toLocaleString();
+          }
+          
+          // 스피어포인트
+          const spherePointsField = document.getElementById('campaignSpherePoints');
+          if (spherePointsField && campaign.sphere_points) {
+            spherePointsField.value = campaign.sphere_points.toLocaleString();
+          }
+          
+          // 포인트 리워드
+          const pointRewardField = document.getElementById('campaignPointReward');
+          if (pointRewardField && campaign.point_reward) {
+            pointRewardField.value = campaign.point_reward.toLocaleString();
+          }
+          
+          // 비용 재계산
+          this.calculateCampaignCost();
+        }, 50);
         
         // 제출 버튼 변경
         const form = document.getElementById('createCampaignForm');
@@ -2862,14 +2886,38 @@ class ReviewSphere {
 
 8. 체험하신 블로거분들의 리뷰 콘텐츠는 업체 홍보로 이용될 수 있습니다.`;
         
-        // 포인트 리워드 (숫자 포맷)
-        const pointRewardField = document.getElementById('campaignPointReward');
-        if (pointRewardField && campaign.point_reward) {
-          pointRewardField.value = campaign.point_reward.toLocaleString();
+        // 과금 방식 선택
+        if (campaign.pricing_type) {
+          const pricingRadio = document.querySelector(`input[name="pricingType"][value="${campaign.pricing_type}"]`);
+          if (pricingRadio) {
+            pricingRadio.checked = true;
+            this.handlePricingTypeChange(); // 과금 방식에 따른 필드 표시
+          }
         }
         
-        // 비용 재계산
-        this.calculateCampaignCost();
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        setTimeout(() => {
+          // 제품 가액
+          const productValueField = document.getElementById('campaignProductValue');
+          if (productValueField && campaign.product_value) {
+            productValueField.value = campaign.product_value.toLocaleString();
+          }
+          
+          // 스피어포인트
+          const spherePointsField = document.getElementById('campaignSpherePoints');
+          if (spherePointsField && campaign.sphere_points) {
+            spherePointsField.value = campaign.sphere_points.toLocaleString();
+          }
+          
+          // 포인트 리워드
+          const pointRewardField = document.getElementById('campaignPointReward');
+          if (pointRewardField && campaign.point_reward) {
+            pointRewardField.value = campaign.point_reward.toLocaleString();
+          }
+          
+          // 비용 재계산
+          this.calculateCampaignCost();
+        }, 50);
         
         // 관리자 전용: 결제 상태 선택 필드 추가
         const pointSection = document.querySelector('.bg-purple-50');
