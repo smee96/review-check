@@ -2509,7 +2509,7 @@ class ReviewSphere {
       // showCreateCampaign과 동일한 폼 표시
       await this.showCreateCampaign();
       
-      // 폼 제목 변경
+      // 폼 제목 변경 및 데이터 채우기 (datepicker 초기화 대기: 300ms)
       setTimeout(() => {
         const formTitle = document.querySelector('h2');
         if (formTitle && formTitle.textContent.includes('캠페인 등록')) {
@@ -2641,7 +2641,7 @@ class ReviewSphere {
             };
           }
         }
-      }, 200);
+      }, 300);
       
     } catch (error) {
       console.error('Edit campaign error:', error);
@@ -2751,7 +2751,7 @@ class ReviewSphere {
       // showCreateCampaign과 동일한 폼 표시
       await this.showCreateCampaign();
       
-      // 폼 제목 변경
+      // 폼 제목 변경 및 데이터 채우기 (datepicker 초기화 대기: 300ms)
       setTimeout(() => {
         const formTitle = document.querySelector('h2');
         if (formTitle && formTitle.textContent.includes('캠페인 등록')) {
@@ -2904,7 +2904,7 @@ class ReviewSphere {
             };
           }
         }
-      }, 200);
+      }, 300);
       
     } catch (error) {
       console.error('Edit campaign as admin error:', error);
