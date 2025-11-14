@@ -6630,13 +6630,10 @@ class ReviewSphere {
                   <span class="text-gray-800 font-bold">
                     <i class="fas fa-star mr-1 text-blue-600"></i>리뷰 비용 (${slots}명)
                   </span>
-                  <span class="font-bold text-xl text-blue-600">${Math.floor(((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots) * 1.1).toLocaleString()}원</span>
-                </div>
-                <div class="text-xs text-gray-600">
-                  소계: ${((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots).toLocaleString()}원 + 부가세: ${Math.floor(((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots) * 0.1).toLocaleString()}원
+                  <span class="font-bold text-xl text-blue-600">${((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots).toLocaleString()}원</span>
                 </div>
                 <div class="text-xs text-gray-500 bg-white rounded p-2 mt-2">
-                  💡 포인트 + 플랫폼 수수료 (순수 리뷰 마케팅 비용)
+                  💡 포인트 + 플랫폼 수수료 (순수 리뷰 마케팅 비용, 부가세 별도)
                 </div>
               </div>
             </div>
