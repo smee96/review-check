@@ -224,22 +224,22 @@ class ReviewSphere {
 
         <!-- Hero Section Slider -->
         <div class="relative overflow-hidden">
-          <div id="heroSlider" class="flex transition-transform duration-500 ease-in-out">
+          <div id="heroSlider" class="flex transition-transform duration-500 ease-in-out touch-pan-y">
             
             <!-- 슬라이드 1: 메인 화면 -->
-            <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-12 sm:py-16">
+            <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-8 sm:py-12">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3">
                   진짜 리뷰, 리뷰스피어
                 </h2>
-                <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
+                <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
                   리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                     <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                   </button>
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
+                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                     <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                   </button>
                 </div>
@@ -247,58 +247,46 @@ class ReviewSphere {
             </div>
             
             <!-- 슬라이드 2: 광고주 프로모션 -->
-            <div class="min-w-full bg-gradient-to-br from-pink-500 to-purple-600 text-white py-12 sm:py-16">
+            <div class="min-w-full bg-gradient-to-br from-pink-500 to-purple-600 text-white py-8 sm:py-12">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-                <div class="flex items-center justify-center mb-6">
-                  <i class="fas fa-percentage text-5xl sm:text-6xl text-white mr-4"></i>
-                  <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold">
+                <div class="flex items-center justify-center mb-3">
+                  <i class="fas fa-percentage text-3xl sm:text-4xl text-white mr-3"></i>
+                  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
                     광고주 특별 프로모션
                   </h2>
                 </div>
-                <p class="text-xl sm:text-2xl text-pink-100 mb-4">
+                <p class="text-base sm:text-lg text-pink-100 mb-3">
                   캠페인 등록비 할인 🔥
                 </p>
-                <div class="mb-8">
-                  <p class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2">
-                    <span class="line-through opacity-70">30,000원</span>
-                  </p>
-                  <p class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-yellow-300">
-                    → 10,000원
+                <div class="mb-4">
+                  <p class="text-2xl sm:text-3xl font-extrabold">
+                    <span class="line-through opacity-70">30,000원</span> → <span class="text-yellow-300">10,000원</span>
                   </p>
                 </div>
-                <p class="text-lg sm:text-xl text-pink-100 mb-8">
-                  기간 한정! 지금이 기회입니다 🚀
-                </p>
-                <button onclick="app.showLogin()" class="bg-white text-pink-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-pink-50 transition shadow-lg w-64">
+                <button onclick="app.showLogin()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
                   <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                 </button>
               </div>
             </div>
             
             <!-- 슬라이드 3: 인플루언서 이벤트 -->
-            <div class="min-w-full bg-gradient-to-br from-yellow-400 to-orange-500 text-white py-12 sm:py-16">
+            <div class="min-w-full bg-gradient-to-br from-yellow-400 to-orange-500 text-white py-8 sm:py-12">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-                <div class="flex items-center justify-center mb-6">
-                  <i class="fas fa-gift text-5xl sm:text-6xl text-white mr-4"></i>
-                  <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold">
+                <div class="flex items-center justify-center mb-3">
+                  <i class="fas fa-gift text-3xl sm:text-4xl text-white mr-3"></i>
+                  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
                     신규 가입 이벤트
                   </h2>
                 </div>
-                <p class="text-xl sm:text-2xl text-yellow-100 mb-4">
+                <p class="text-base sm:text-lg text-yellow-100 mb-3">
                   인플루언서 신규 가입 시 🎉
                 </p>
-                <div class="mb-8">
-                  <p class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-2">
-                    스피어 포인트
-                  </p>
-                  <p class="text-5xl sm:text-6xl lg:text-7xl font-extrabold">
-                    1,000P 지급!
+                <div class="mb-4">
+                  <p class="text-2xl sm:text-3xl font-extrabold">
+                    스피어 포인트 <span class="text-3xl sm:text-4xl">1,000P 지급!</span>
                   </p>
                 </div>
-                <p class="text-lg sm:text-xl text-yellow-100 mb-8">
-                  지금 바로 가입하고 포인트를 받아보세요 💰
-                </p>
-                <button onclick="app.showLogin()" class="bg-white text-orange-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-orange-50 transition shadow-lg w-64">
+                <button onclick="app.showLogin()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
                   <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                 </button>
               </div>
@@ -307,7 +295,7 @@ class ReviewSphere {
           </div>
           
           <!-- 슬라이더 인디케이터 -->
-          <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">
             <button onclick="app.setHeroSlide(0)" class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="0"></button>
             <button onclick="app.setHeroSlide(1)" class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="1"></button>
             <button onclick="app.setHeroSlide(2)" class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="2"></button>
@@ -315,9 +303,11 @@ class ReviewSphere {
         </div>
         
         <script>
-          // 히어로 슬라이더 자동 슬라이드
+          // 히어로 슬라이더 자동 슬라이드 및 터치 스와이프
           let heroSlideIndex = 0;
           let heroSlideInterval;
+          let touchStartX = 0;
+          let touchEndX = 0;
           
           app.setHeroSlide = function(index) {
             heroSlideIndex = index;
@@ -349,10 +339,46 @@ class ReviewSphere {
             }, 5000); // 5초마다 자동 전환
           };
           
+          // 터치 스와이프 이벤트
+          app.handleHeroTouchStart = function(e) {
+            touchStartX = e.touches[0].clientX;
+          };
+          
+          app.handleHeroTouchMove = function(e) {
+            touchEndX = e.touches[0].clientX;
+          };
+          
+          app.handleHeroTouchEnd = function() {
+            const diff = touchStartX - touchEndX;
+            const threshold = 50; // 최소 스와이프 거리
+            
+            if (Math.abs(diff) > threshold) {
+              if (diff > 0) {
+                // 왼쪽으로 스와이프 (다음)
+                heroSlideIndex = (heroSlideIndex + 1) % 3;
+              } else {
+                // 오른쪽으로 스와이프 (이전)
+                heroSlideIndex = (heroSlideIndex - 1 + 3) % 3;
+              }
+              app.setHeroSlide(heroSlideIndex);
+              
+              // 자동 슬라이드 재시작
+              app.startHeroAutoSlide();
+            }
+          };
+          
           // 초기화
           setTimeout(() => {
             app.setHeroSlide(0);
             app.startHeroAutoSlide();
+            
+            // 터치 이벤트 리스너 추가
+            const slider = document.getElementById('heroSlider');
+            if (slider) {
+              slider.addEventListener('touchstart', app.handleHeroTouchStart, { passive: true });
+              slider.addEventListener('touchmove', app.handleHeroTouchMove, { passive: true });
+              slider.addEventListener('touchend', app.handleHeroTouchEnd);
+            }
           }, 100);
         </script>
 
