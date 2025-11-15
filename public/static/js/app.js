@@ -1894,8 +1894,8 @@ class ReviewSphere {
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">모집인원 *</label>
               <input type="number" id="campaignSlots" placeholder="10" min="10" required
-                onfocus="if(this.value=='10') this.value=''"
-                onblur="if(this.value=='') {this.value='10'}; if(parseInt(this.value) < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateNewPricingCost()"
+                onfocus="this.dataset.prevValue=this.value; this.value=''"
+                onblur="if(this.value=='') {this.value=this.dataset.prevValue||'10'}; if(parseInt(this.value) < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateNewPricingCost()"
                 oninput="if(parseInt(this.value) >= 10) app.calculateNewPricingCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               <p class="text-xs text-gray-500 mt-1">최소 10명부터 모집 가능합니다</p>
@@ -2213,6 +2213,7 @@ class ReviewSphere {
             <input type="text" id="campaignProductValue" value="0" required
               oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
               onfocus="app.clearDefaultZero(this)"
+              onblur="if(this.value==='') this.value='0'; app.calculateNewPricingCost()"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
             <p class="text-xs text-gray-500 mt-1" id="productValueHint">리뷰어에게 제공되는 상품 또는 이용권의 가치를 입력하세요</p>
           </div>
@@ -2225,6 +2226,7 @@ class ReviewSphere {
             <input type="text" id="campaignSpherePoints" value="0"
               oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
               onfocus="app.clearDefaultZero(this)"
+              onblur="if(this.value==='') this.value='0'; app.calculateNewPricingCost()"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
             <p class="text-xs text-gray-500 mt-1">1포인트 = 1원 (1만P 이상 현금 출금 가능)</p>
           </div>
@@ -6356,10 +6358,11 @@ class ReviewSphere {
   }
 
   clearDefaultZero(input) {
-    // 포커스 시 0이면 비우기
-    if (input.value === '0' || input.value === '0원') {
-      input.value = '';
+    // 포커스 시 현재 값을 저장하고 비우기
+    if (!input.dataset.originalValue) {
+      input.dataset.originalValue = input.value;
     }
+    input.value = '';
   }
 
   getNumericValue(input) {
