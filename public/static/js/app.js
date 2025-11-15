@@ -5543,6 +5543,11 @@ class ReviewSphere {
       const campaigns = response.data;
 
       const content = document.getElementById('adminContent');
+      if (!content) {
+        console.error('adminContent element not found');
+        return;
+      }
+      
       content.innerHTML = `
         <h2 class="text-2xl font-bold mb-6">전체 캠페인 관리</h2>
         <div class="space-y-4">
@@ -5653,7 +5658,15 @@ class ReviewSphere {
     try {
       await axios.put(`/api/admin/campaigns/${campaignId}/status`, { status }, this.getAuthHeaders());
       alert('상태가 변경되었습니다');
-      this.showAllCampaigns();
+      
+      // adminContent 요소가 있는지 확인
+      const adminContent = document.getElementById('adminContent');
+      if (adminContent) {
+        this.showAllCampaigns();
+      } else {
+        // adminContent가 없으면 관리자 페이지로 이동
+        this.showMyPage();
+      }
     } catch (error) {
       alert(error.response?.data?.error || '상태 변경에 실패했습니다');
     }
