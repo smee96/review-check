@@ -5680,7 +5680,15 @@ class ReviewSphere {
     try {
       await axios.put(`/api/admin/campaigns/${campaignId}/payment`, { payment_status: 'paid' }, this.getAuthHeaders());
       alert('결제 완료 처리되었습니다. 이제 인플루언서들이 참여 신청을 할 수 있습니다.');
-      this.showAllCampaigns();
+      
+      // adminContent 요소가 있는지 확인
+      const adminContent = document.getElementById('adminContent');
+      if (adminContent) {
+        this.showAllCampaigns();
+      } else {
+        // adminContent가 없으면 관리자 페이지로 이동
+        this.showMyPage();
+      }
     } catch (error) {
       alert(error.response?.data?.error || '결제 처리에 실패했습니다');
     }
