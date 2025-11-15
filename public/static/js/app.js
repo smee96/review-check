@@ -277,7 +277,7 @@ class ReviewSphere {
                       <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
                         <div class="flex items-center justify-between text-xs">
                           <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${c.point_reward > 0 ? c.point_reward.toLocaleString() + ' P' : '-'}</span>
+                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
                         </div>
                       </div>
                       <div class="flex items-center justify-between pt-2 border-t mt-auto">
@@ -343,7 +343,7 @@ class ReviewSphere {
                       <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
                         <div class="flex items-center justify-between text-xs">
                           <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${c.point_reward > 0 ? c.point_reward.toLocaleString() + ' P' : '-'}</span>
+                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
                         </div>
                       </div>
                       <div class="flex items-center justify-between pt-2 border-t mt-auto">
@@ -588,7 +588,7 @@ class ReviewSphere {
                       <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
                         <div class="flex items-center justify-between text-xs">
                           <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${c.point_reward > 0 ? c.point_reward.toLocaleString() + ' P' : '-'}</span>
+                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
                         </div>
                       </div>
                       <div class="pt-2 border-t mt-auto flex items-center justify-between">
