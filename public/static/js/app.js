@@ -5581,16 +5581,22 @@ class ReviewSphere {
                       <p class="font-semibold text-lg">${c.product_value.toLocaleString()}원</p>
                     </div>
                   ` : ''}
-                  ${c.sphere_points > 0 ? `
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
                     <div>
                       <p class="text-gray-600">인당 포인트</p>
-                      <p class="font-semibold text-lg">${c.sphere_points.toLocaleString()}P</p>
+                      <p class="font-semibold text-lg">${(c.sphere_points || c.point_reward).toLocaleString()}P</p>
                     </div>
                   ` : ''}
-                  ${c.sphere_points > 0 ? `
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
                     <div>
                       <p class="text-gray-600">총 포인트</p>
-                      <p class="font-semibold text-lg">${(c.sphere_points * c.slots).toLocaleString()}P</p>
+                      <p class="font-semibold text-lg">${((c.sphere_points || c.point_reward) * c.slots).toLocaleString()}P</p>
+                    </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
+                    <div>
+                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
+                      <p class="font-semibold text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.2).toLocaleString()}P</p>
                     </div>
                   ` : ''}
                   <div>
