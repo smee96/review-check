@@ -266,7 +266,7 @@ class ReviewSphere {
                         <i class="fas fa-image text-white text-5xl opacity-50"></i>
                       </div>
                     `}
-                    <div class="p-4 flex flex-col" style="height: 200px;">
+                    <div class="p-4 flex flex-col" style="min-height: 220px;">
                       <div class="flex items-start justify-between mb-2">
                         <h4 class="font-bold text-base line-clamp-1 flex-1">${c.title}</h4>
                         <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status, c)} ml-2 whitespace-nowrap">
@@ -274,12 +274,85 @@ class ReviewSphere {
                         </span>
                       </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2" style="height: 40px;">${c.description || '캠페인 설명이 없습니다'}</p>
-                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
-                        <div class="flex items-center justify-between text-xs">
-                          <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
-                        </div>
+                      
+                      <!-- 과금 방식 정보 -->
+                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2 space-y-1">
+                        ${c.pricing_type === 'points_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">포인트만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'purchase_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">구매금</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '- P'}</span>
+                          </div>
+                        `}
                       </div>
+                      
                       <div class="flex items-center justify-between pt-2 border-t mt-auto">
                         <span>${channelIcon}</span>
                         <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i><span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명</span>
@@ -332,7 +405,7 @@ class ReviewSphere {
                         </div>
                       </div>
                     `}
-                    <div class="p-4 flex flex-col" style="height: 200px;">
+                    <div class="p-4 flex flex-col" style="min-height: 220px;">
                       <div class="flex items-start justify-between mb-2">
                         <h4 class="font-bold text-base line-clamp-1 flex-1">${c.title}</h4>
                         <span class="px-2 py-1 rounded-full text-xs font-semibold ${this.getStatusBadge(c.status, c)} ml-2 whitespace-nowrap">
@@ -340,12 +413,85 @@ class ReviewSphere {
                         </span>
                       </div>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2" style="height: 40px;">${c.description || '캠페인 설명이 없습니다'}</p>
-                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
-                        <div class="flex items-center justify-between text-xs">
-                          <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
-                        </div>
+                      
+                      <!-- 과금 방식 정보 -->
+                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2 space-y-1">
+                        ${c.pricing_type === 'points_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">포인트만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'purchase_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">구매금</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '- P'}</span>
+                          </div>
+                        `}
                       </div>
+                      
                       <div class="flex items-center justify-between pt-2 border-t mt-auto">
                         <span>${channelIcon}</span>
                         <span class="text-sm text-gray-600"><i class="fas fa-users mr-1"></i><span class="font-semibold text-purple-600">${c.application_count || 0}</span>/${c.slots}명</span>
@@ -582,15 +728,88 @@ class ReviewSphere {
                         <i class="fas fa-trophy text-white text-6xl opacity-50"></i>
                       </div>
                     `}
-                    <div class="p-4 flex flex-col" style="height: 200px;">
+                    <div class="p-4 flex flex-col" style="min-height: 220px;">
                       <h3 class="font-bold text-base mb-2 line-clamp-1">${c.title}</h3>
                       <p class="text-gray-600 text-sm mb-3 line-clamp-2" style="height: 40px;">${c.description || ''}</p>
-                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2" style="height: 32px;">
-                        <div class="flex items-center justify-between text-xs">
-                          <span class="text-purple-700"><i class="fas fa-coins mr-1"></i>포인트</span>
-                          <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '-'}</span>
-                        </div>
+                      
+                      <!-- 과금 방식 정보 -->
+                      <div class="bg-purple-50 px-3 py-2 rounded-lg mb-2 space-y-1">
+                        ${c.pricing_type === 'points_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">포인트만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'purchase_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">구매금</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_with_points' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권 + 포인트</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
+                          </div>
+                        ` : c.pricing_type === 'product_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">상품만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">상품</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : c.pricing_type === 'voucher_only' ? `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-purple-700 font-semibold">이용권만</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">이용권</span>
+                            <span class="font-bold text-green-600">제공</span>
+                          </div>
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-gray-500">- P</span>
+                          </div>
+                        ` : `
+                          <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">포인트</span>
+                            <span class="font-bold text-purple-600">${(c.sphere_points > 0 || c.point_reward > 0) ? (c.sphere_points || c.point_reward).toLocaleString() + ' P' : '- P'}</span>
+                          </div>
+                        `}
                       </div>
+                      
                       <div class="pt-2 border-t mt-auto flex items-center justify-between">
                         <span class="text-xs text-gray-500">지원 현황</span>
                         <span class="text-sm text-gray-600">
