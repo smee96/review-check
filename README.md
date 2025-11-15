@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://c4b477eb.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://527d60b2.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
@@ -351,6 +351,13 @@ webapp/
 - 모바일에서도 1-2줄로 표시
 
 ## 📝 개발 로그
+
+### 2025-11-14 (v68)
+- ✅ **관리자 캐페인 승인 후 오류 수정**
+  - null innerHTML 에러 수정 (Cannot set properties of null)
+  - adminContent 요소 존재 여부 확인 추가
+  - 요소가 없을 경우 마이페이지로 이동
+  - 승인 후 팝업 오류 방지
 
 ### 2025-11-14 (v67)
 - ✅ **모집인원 변경 시 자동 재계산 추가**
