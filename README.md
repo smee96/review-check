@@ -70,7 +70,7 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 
 ### 프로덕션 환경
 - **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://0df0bca3.review-spheres-v1.pages.dev
+- **Latest Deployment**: https://64d38652.review-spheres-v1.pages.dev
 
 ### API 엔드포인트
 
