@@ -5573,32 +5573,40 @@ class ReviewSphere {
 
               <p class="text-gray-600 mb-2">${c.description || ''}</p>
               
-              ${c.point_reward > 0 ? `
-                <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-2 text-sm">
-                  <div class="grid grid-cols-2 gap-2">
+              <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-2 text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                  ${c.product_value > 0 ? `
+                    <div>
+                      <p class="text-gray-600">상품/이용권 가치</p>
+                      <p class="font-semibold text-lg">${c.product_value.toLocaleString()}원</p>
+                    </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 ? `
                     <div>
                       <p class="text-gray-600">인당 포인트</p>
-                      <p class="font-semibold text-lg">${c.point_reward.toLocaleString()}P</p>
+                      <p class="font-semibold text-lg">${c.sphere_points.toLocaleString()}P</p>
                     </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 ? `
                     <div>
                       <p class="text-gray-600">총 포인트</p>
-                      <p class="font-semibold text-lg">${(c.point_reward * c.slots).toLocaleString()}P</p>
+                      <p class="font-semibold text-lg">${(c.sphere_points * c.slots).toLocaleString()}P</p>
                     </div>
-                    <div>
-                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
-                      <p class="font-semibold text-lg text-green-600">${Math.floor(c.point_reward * c.slots * 0.20).toLocaleString()}원</p>
-                    </div>
-                    <div>
-                      <p class="text-gray-600">결제 상태</p>
-                      <p>
-                        <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                          ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
-                        </span>
-                      </p>
-                    </div>
+                  ` : ''}
+                  <div>
+                    <p class="text-gray-600">과금 방식</p>
+                    <p class="font-semibold">${c.pricing_type === 'points_only' ? '포인트만' : c.pricing_type === 'purchase_with_points' ? '구매+포인트' : c.pricing_type === 'product_only' ? '상품만' : c.pricing_type === 'product_with_points' ? '상품+포인트' : c.pricing_type === 'voucher_only' ? '이용권만' : c.pricing_type === 'voucher_with_points' ? '이용권+포인트' : '상품만'}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">결제 상태</p>
+                    <p>
+                      <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                        ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
+                      </span>
+                    </p>
                   </div>
                 </div>
-              ` : ''}
+              </div>
               
               <div class="flex space-x-2 mt-3">
                 ${c.status === 'pending' ? `
