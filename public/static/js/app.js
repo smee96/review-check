@@ -224,23 +224,140 @@ class ReviewSphere {
 
         <!-- Hero Section -->
         <div class="bg-gradient-to-br from-purple-600 to-blue-500 text-white py-12 sm:py-16">
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
-              진짜 리뷰, 리뷰스피어
-            </h2>
-            <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
-              리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
-                <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
-              </button>
-              <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
-                <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
-              </button>
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            
+            <!-- 프로모션 배너 슬라이더 -->
+            <div class="mb-8 relative">
+              <div class="overflow-hidden rounded-xl">
+                <div id="promoBannerSlider" class="flex transition-transform duration-500 ease-in-out">
+                  <!-- 배너 1: 신규 가입 혜택 -->
+                  <div class="min-w-full px-2">
+                    <div class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-6 text-center shadow-2xl">
+                      <div class="flex items-center justify-center mb-3">
+                        <i class="fas fa-gift text-4xl text-white mr-3"></i>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">🎉 신규 가입 이벤트</h3>
+                      </div>
+                      <p class="text-white text-lg sm:text-xl font-semibold mb-2">
+                        인플루언서 신규 가입 시
+                      </p>
+                      <p class="text-white text-2xl sm:text-3xl font-extrabold mb-2">
+                        스피어 포인트 1,000P 지급!
+                      </p>
+                      <p class="text-yellow-100 text-sm">
+                        지금 바로 가입하고 포인트를 받아보세요 💰
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <!-- 배너 2: 광고주 프로모션 -->
+                  <div class="min-w-full px-2">
+                    <div class="bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl p-6 text-center shadow-2xl">
+                      <div class="flex items-center justify-center mb-3">
+                        <i class="fas fa-percentage text-4xl text-white mr-3"></i>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">🔥 광고주 특별 프로모션</h3>
+                      </div>
+                      <p class="text-white text-lg sm:text-xl font-semibold mb-2">
+                        캠페인 등록비
+                      </p>
+                      <p class="text-white text-2xl sm:text-3xl font-extrabold mb-2">
+                        <span class="line-through opacity-70">30,000원</span> → <span class="text-yellow-300">10,000원</span>
+                      </p>
+                      <p class="text-pink-100 text-sm">
+                        기간 한정! 지금이 기회입니다 🚀
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <!-- 배너 3: 스타트업 소개 -->
+                  <div class="min-w-full px-2">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-6 text-center shadow-2xl">
+                      <div class="flex items-center justify-center mb-3">
+                        <i class="fas fa-rocket text-4xl text-white mr-3"></i>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white">🌟 함께 성장하는 플랫폼</h3>
+                      </div>
+                      <p class="text-white text-lg sm:text-xl font-semibold mb-2">
+                        리뷰스피어는 지금 막 시작하는 스타트업입니다
+                      </p>
+                      <p class="text-white text-base sm:text-lg mb-2">
+                        광고주와 인플루언서가 함께 성장하는 플랫폼
+                      </p>
+                      <p class="text-blue-100 text-sm">
+                        여러분의 소중한 피드백과 참여를 기다립니다 💙
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 슬라이더 인디케이터 -->
+              <div class="flex justify-center mt-4 gap-2">
+                <button onclick="app.setPromoBanner(0)" class="promo-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="0"></button>
+                <button onclick="app.setPromoBanner(1)" class="promo-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="1"></button>
+                <button onclick="app.setPromoBanner(2)" class="promo-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="2"></button>
+              </div>
+            </div>
+            
+            <!-- 메인 타이틀 및 버튼 -->
+            <div class="text-center">
+              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
+                진짜 리뷰, 리뷰스피어
+              </h2>
+              <p class="text-base sm:text-lg lg:text-xl text-purple-100 mb-8">
+                리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
+              </p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
+                  <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+                </button>
+                <button onclick="app.showLogin()" class="bg-white text-purple-600 px-8 py-3 rounded-lg text-base font-bold hover:bg-purple-50 transition shadow-lg w-64">
+                  <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        
+        <script>
+          // 프로모션 배너 자동 슬라이드
+          let promoBannerIndex = 0;
+          let promoBannerInterval;
+          
+          app.setPromoBanner = function(index) {
+            promoBannerIndex = index;
+            const slider = document.getElementById('promoBannerSlider');
+            const indicators = document.querySelectorAll('.promo-indicator');
+            
+            if (slider) {
+              slider.style.transform = \`translateX(-\${index * 100}%)\`;
+            }
+            
+            indicators.forEach((indicator, i) => {
+              if (i === index) {
+                indicator.classList.remove('opacity-50');
+                indicator.classList.add('opacity-100', 'w-6');
+              } else {
+                indicator.classList.remove('opacity-100', 'w-6');
+                indicator.classList.add('opacity-50');
+              }
+            });
+          };
+          
+          app.startPromoBannerAutoSlide = function() {
+            if (promoBannerInterval) {
+              clearInterval(promoBannerInterval);
+            }
+            promoBannerInterval = setInterval(() => {
+              promoBannerIndex = (promoBannerIndex + 1) % 3;
+              app.setPromoBanner(promoBannerIndex);
+            }, 5000); // 5초마다 자동 전환
+          };
+          
+          // 초기화
+          setTimeout(() => {
+            app.setPromoBanner(0);
+            app.startPromoBannerAutoSlide();
+          }, 100);
+        </script>
 
         <!-- Ongoing Campaigns Section -->
         <div class="py-8 sm:py-12 bg-white">
