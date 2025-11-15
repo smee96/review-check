@@ -560,8 +560,8 @@ class ReviewSphere {
         <div class="min-h-screen flex flex-col bg-gray-50">
           ${this.renderNav()}
           
-          <div class="flex-grow">
-            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6">
+          <div class="flex-grow pt-6 pb-20">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
               <h2 class="text-2xl font-bold mb-2">
                 <i class="fas fa-crown text-yellow-500 mr-2"></i>베스트 캠페인
               </h2>
@@ -621,8 +621,8 @@ class ReviewSphere {
       <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="flex-grow">
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6">
+        <div class="flex-grow pt-6 pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <h2 class="text-2xl font-bold mb-2">
               <i class="fas fa-star text-yellow-500 mr-2"></i>베스트 리뷰
             </h2>
@@ -1292,7 +1292,7 @@ class ReviewSphere {
       <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="flex-grow">
+        <div class="flex-grow pb-20">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
             <div class="mb-4 sm:mb-8">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
@@ -1620,7 +1620,7 @@ class ReviewSphere {
         <div class="min-h-screen flex flex-col bg-gray-50">
           ${this.renderNav()}
           
-          <div class="flex-grow">
+          <div class="flex-grow pb-20">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
               <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>마이페이지로
@@ -3190,7 +3190,7 @@ class ReviewSphere {
         <div class="min-h-screen flex flex-col bg-gray-50">
           ${this.renderNav()}
           
-          <div class="flex-grow">
+          <div class="flex-grow pb-20">
             <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
               <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>마이페이지로
@@ -5271,7 +5271,7 @@ class ReviewSphere {
       <div class="min-h-screen flex flex-col bg-gray-50">
         ${this.renderNav()}
         
-        <div class="flex-grow">
+        <div class="flex-grow pb-20">
           <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
             <div class="mb-4 sm:mb-8">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
