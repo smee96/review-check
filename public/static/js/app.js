@@ -5493,7 +5493,7 @@ class ReviewSphere {
                       <i class="fas fa-check mr-1"></i>승인
                     </button>
                   ` : ''}
-                  ${(c.status === 'recruiting' || c.status === 'in_progress') && c.point_reward > 0 && c.payment_status === 'unpaid' ? `
+                  ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
                     <button onclick="app.markAsPaid(${c.id})" 
                       class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs sm:text-sm">
                       <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
@@ -5607,7 +5607,7 @@ class ReviewSphere {
                     <i class="fas fa-check mr-1"></i>승인
                   </button>
                 ` : ''}
-                ${(c.status === 'recruiting' || c.status === 'in_progress') && c.point_reward > 0 && c.payment_status === 'unpaid' ? `
+                ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
                   <button onclick="app.markAsPaid(${c.id})" 
                     class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
                     <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
