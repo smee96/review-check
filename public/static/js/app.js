@@ -295,30 +295,30 @@ class ReviewSphere {
           </div>
           
           <!-- 좌우 화살표 네비게이션 -->
-          <button id="heroPrevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center transition z-10">
+          <button onclick="heroPrev()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center transition z-10">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <button id="heroNextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center transition z-10">
+          <button onclick="heroNext()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center transition z-10">
             <i class="fas fa-chevron-right"></i>
           </button>
           
           <!-- 하단 인디케이터 (점) -->
           <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">
-            <div class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="0"></div>
-            <div class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="1"></div>
-            <div class="hero-indicator w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="2"></div>
+            <div class="hero-indicator cursor-pointer" w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="0" onclick="setHeroSlide(0)"></div>
+            <div class="hero-indicator cursor-pointer" w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="1" onclick="setHeroSlide(1)"></div>
+            <div class="hero-indicator cursor-pointer" w-2 h-2 rounded-full bg-white opacity-50 transition-all" data-index="2" onclick="setHeroSlide(2)"></div>
           </div>
         </div>
         
         <script>
-          (function() {
+          
             // 히어로 슬라이더 자동 슬라이드 및 터치 스와이프
             let heroSlideIndex = 0;
             let heroSlideInterval;
             let touchStartX = 0;
             let touchEndX = 0;
             
-            window.setHeroSlide = function(index) {
+            setHeroSlide = function(index) {
               heroSlideIndex = index;
               const slider = document.getElementById('heroSlider');
               const indicators = document.querySelectorAll('.hero-indicator');
@@ -338,13 +338,13 @@ class ReviewSphere {
               });
             };
             
-            window.heroNext = function() {
+            heroNext = function() {
               heroSlideIndex = (heroSlideIndex + 1) % 3;
               setHeroSlide(heroSlideIndex);
               startHeroAutoSlide();
             };
             
-            window.heroPrev = function() {
+            heroPrev = function() {
               heroSlideIndex = (heroSlideIndex - 1 + 3) % 3;
               setHeroSlide(heroSlideIndex);
               startHeroAutoSlide();
@@ -403,7 +403,7 @@ class ReviewSphere {
               if (prevBtn) prevBtn.addEventListener('click', heroPrev);
               if (nextBtn) nextBtn.addEventListener('click', heroNext);
             }, 100);
-          })();
+          
         </script>
 
         <!-- Ongoing Campaigns Section -->
