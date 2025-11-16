@@ -1794,40 +1794,6 @@ class ReviewSphere {
 
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
-              <!-- 캠페인 등록 -->
-              <div class="bg-purple-600 text-white rounded-lg shadow-lg">
-                <button onclick="app.showCreateCampaign()" class="w-full p-5 sm:p-6 text-left hover:bg-purple-700 transition">
-                  <div class="flex items-center space-x-3">
-                    <i class="fas fa-plus-circle text-2xl sm:text-3xl"></i>
-                    <div>
-                      <h3 class="font-semibold text-base sm:text-lg">캠페인 등록</h3>
-                      <p class="text-xs sm:text-sm opacity-90">새 캠페인 만들기</p>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              <!-- 내 캠페인 목록 -->
-              <div class="bg-white rounded-lg shadow">
-                <button onclick="app.toggleAdvertiserAccordion('myCampaigns')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <i class="fas fa-list text-purple-600 text-xl sm:text-2xl"></i>
-                      <div>
-                        <h3 class="font-semibold text-base sm:text-lg">내 캠페인 목록</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">등록한 캠페인 관리</p>
-                      </div>
-                    </div>
-                    <i id="myCampaigns-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                  </div>
-                </button>
-                <div id="myCampaigns-content" class="hidden border-t">
-                  <div class="p-4 sm:p-6">
-                    <p class="text-gray-600">로딩 중...</p>
-                  </div>
-                </div>
-              </div>
-
               <!-- 프로필 관리 -->
               <div class="bg-white rounded-lg shadow ${profileIncomplete ? 'border-2 border-orange-400' : ''}">
                 <button onclick="app.toggleAdvertiserAccordion('profile')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
@@ -1872,16 +1838,18 @@ class ReviewSphere {
       </div>
     `;
     
-    // 자동으로 내 캠페인 목록 열기
-    setTimeout(async () => {
-      await this.toggleAdvertiserAccordion('myCampaigns');
-    }, 100);
+    // 프로필이 미완성이면 자동으로 프로필 열기
+    if (profileIncomplete) {
+      setTimeout(async () => {
+        await this.toggleAdvertiserAccordion('profile');
+      }, 100);
+    }
   }
 
   async toggleAdvertiserAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['myCampaigns', 'profile'];
+    const allSections = ['profile'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -1907,9 +1875,6 @@ class ReviewSphere {
 
     try {
       switch (sectionId) {
-        case 'myCampaigns':
-          await this.loadAdvertiserCampaignsContent(content);
-          break;
         case 'profile':
           await this.loadAdvertiserProfileContent(content);
           break;
@@ -1917,95 +1882,6 @@ class ReviewSphere {
     } catch (error) {
       console.error('Failed to load accordion content:', error);
       content.innerHTML = '<p class="text-red-600 p-4">콘텐츠를 불러오는데 실패했습니다</p>';
-    }
-  }
-
-  async loadAdvertiserCampaignsContent(container) {
-    try {
-      const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
-      const campaigns = response.data;
-
-      container.innerHTML = `
-        <div class="p-4 sm:p-6">
-          <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">내 캠페인 목록</h2>
-          ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
-          <div class="space-y-3 sm:space-y-4">
-            ${campaigns.map(c => `
-              <div class="border rounded-lg hover:shadow-md transition overflow-hidden">
-                <div class="flex flex-col sm:flex-row">
-                  <!-- 썸네일 이미지 -->
-                  ${c.thumbnail_image ? `
-                    <div class="w-full sm:w-32 h-32 flex-shrink-0">
-                      <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
-                    </div>
-                  ` : `
-                    <div class="w-full sm:w-32 h-32 flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                      <i class="fas fa-image text-gray-400 text-3xl"></i>
-                    </div>
-                  `}
-                  
-                  <!-- 캠페인 정보 -->
-                  <div class="flex-1 p-3 sm:p-4">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-                      <div class="flex items-center gap-2 flex-wrap">
-                        <h3 class="font-bold text-base sm:text-lg">${c.title}</h3>
-                        ${c.channel_type ? `
-                          <span class="text-xs font-semibold text-gray-700 flex items-center">
-                            ${c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block mr-1"> 인스타그램' :
-                              c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block mr-1"> 블로그' :
-                              c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block mr-1"> 유튜브' :
-                              c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="스마트스토어"> 스마트스토어' : ''}
-                          </span>
-                        ` : ''}
-                      </div>
-                      <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status, c)} whitespace-nowrap self-start">
-                        ${this.getStatusText(c.status, c)}
-                      </span>
-                    </div>
-                    <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-500 mb-2">
-                      <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
-                      <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
-                      ${c.point_reward > 0 ? `
-                        <span class="col-span-2 text-purple-600 font-semibold">
-                          <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
-                        </span>
-                      ` : ''}
-                    </div>
-                    <div class="mt-3 sm:mt-4 flex flex-wrap gap-2">
-                      ${c.status === 'pending' ? `
-                        <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-xs sm:text-sm" id="editBtn${c.id}">
-                          <i class="fas fa-edit mr-1"></i>수정
-                        </button>
-                      ` : `
-                        <button class="text-gray-400 cursor-not-allowed text-xs sm:text-sm" disabled title="승인된 캠페인은 수정할 수 없습니다">
-                          <i class="fas fa-edit mr-1"></i>수정
-                        </button>
-                      `}
-                      <button onclick="app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
-                        <i class="fas fa-copy mr-1"></i>복사하기
-                      </button>
-                      ${c.status === 'recruiting' || c.status === 'in_progress' ? `
-                        <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
-                          <i class="fas fa-users mr-1"></i>지원자 보기
-                        </button>
-                      ` : ''}
-                      ${c.status === 'recruiting' ? `
-                        <button onclick="app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
-                          <i class="fas fa-play-circle mr-1"></i>이대로 진행
-                        </button>
-                      ` : ''}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    } catch (error) {
-      console.error('Failed to load campaigns:', error);
-      container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
     }
   }
 
@@ -2409,6 +2285,279 @@ class ReviewSphere {
       await this.loadAdminSettlementsPageContent();
     } catch (error) {
       alert(error.response?.data?.error || '거절에 실패했습니다');
+    }
+  }
+
+  // ============================================
+  // Advertiser Pages (광고주 전용 페이지)
+  // ============================================
+
+  async showAdvertiserCampaigns() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8 flex justify-between items-center">
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                  <i class="fas fa-bullhorn text-purple-600 mr-2"></i>캠페인 관리
+                </h1>
+                <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">내 캠페인 목록 및 관리</p>
+              </div>
+              <button onclick="app.showCreateCampaign()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                <i class="fas fa-plus mr-2"></i>캠페인 등록
+              </button>
+            </div>
+
+            <div id="advertiserCampaignsContent">
+              <p class="text-gray-600">로딩 중...</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'campaigns')}
+        ${this.renderFooter()}
+      </div>
+    `;
+
+    // 캠페인 목록 로드
+    await this.loadAdvertiserCampaignsPageContent();
+  }
+
+  async loadAdvertiserCampaignsPageContent() {
+    try {
+      const response = await axios.get('/api/campaigns/my', this.getAuthHeaders());
+      const campaigns = response.data;
+      const container = document.getElementById('advertiserCampaignsContent');
+
+      container.innerHTML = `
+        <div class="space-y-3 sm:space-y-4">
+          ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
+          ${campaigns.map(c => `
+            <div class="border rounded-lg hover:shadow-md transition overflow-hidden bg-white">
+              <div class="flex flex-col sm:flex-row">
+                <!-- 썸네일 이미지 -->
+                ${c.thumbnail_image ? `
+                  <div class="w-full sm:w-32 h-32 flex-shrink-0">
+                    <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                  </div>
+                ` : `
+                  <div class="w-full sm:w-32 h-32 flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                  </div>
+                `}
+                
+                <!-- 캠페인 정보 -->
+                <div class="flex-1 p-3 sm:p-4">
+                  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="font-bold text-base sm:text-lg">${c.title}</h3>
+                      ${c.channel_type ? `
+                        <span class="text-xs font-semibold text-gray-700 flex items-center">
+                          ${c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block mr-1"> 인스타그램' :
+                            c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block mr-1"> 블로그' :
+                            c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block mr-1"> 유튜브' :
+                            c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="스마트스토어"> 스마트스토어' : ''}
+                        </span>
+                      ` : ''}
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status, c)} whitespace-nowrap self-start">
+                      ${this.getStatusText(c.status, c)}
+                    </span>
+                  </div>
+                  <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
+                  <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-500 mb-2">
+                    <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
+                    <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
+                    ${c.point_reward > 0 ? `
+                      <span class="col-span-2 text-purple-600 font-semibold">
+                        <i class="fas fa-coins mr-1"></i>포인트: ${c.point_reward.toLocaleString()}P/인 (총 ${(c.point_reward * c.slots).toLocaleString()}P)
+                      </span>
+                    ` : ''}
+                  </div>
+                  <div class="mt-3 sm:mt-4 flex flex-wrap gap-2">
+                    ${c.status === 'pending' ? `
+                      <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-xs sm:text-sm">
+                        <i class="fas fa-edit mr-1"></i>수정
+                      </button>
+                    ` : `
+                      <button class="text-gray-400 cursor-not-allowed text-xs sm:text-sm" disabled title="승인된 캠페인은 수정할 수 없습니다">
+                        <i class="fas fa-edit mr-1"></i>수정
+                      </button>
+                    `}
+                    <button onclick="app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
+                      <i class="fas fa-copy mr-1"></i>복사하기
+                    </button>
+                    ${c.status === 'recruiting' || c.status === 'in_progress' ? `
+                      <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
+                        <i class="fas fa-users mr-1"></i>지원자 보기 ${c.application_count > 0 ? `(${c.application_count})` : ''}
+                      </button>
+                    ` : ''}
+                    ${c.status === 'recruiting' ? `
+                      <button onclick="app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
+                        <i class="fas fa-play-circle mr-1"></i>이대로 진행
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load advertiser campaigns:', error);
+      const container = document.getElementById('advertiserCampaignsContent');
+      container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async showAdvertiserReviews() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-star text-purple-600 mr-2"></i>리뷰 관리
+              </h1>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">제출된 리뷰 확인 및 평가</p>
+            </div>
+
+            <div id="advertiserReviewsContent">
+              <p class="text-gray-600">로딩 중...</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'reviews')}
+        ${this.renderFooter()}
+      </div>
+    `;
+
+    // 리뷰 목록 로드
+    await this.loadAdvertiserReviewsPageContent();
+  }
+
+  async loadAdvertiserReviewsPageContent() {
+    try {
+      // 내 캠페인의 모든 리뷰 가져오기
+      const response = await axios.get('/api/campaigns/my/reviews', this.getAuthHeaders());
+      const reviews = response.data;
+      const container = document.getElementById('advertiserReviewsContent');
+
+      if (reviews.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 sm:py-12">
+            <i class="fas fa-inbox text-4xl sm:text-6xl text-gray-300 mb-4"></i>
+            <p class="text-sm sm:text-base text-gray-600 mb-2">제출된 리뷰가 없습니다</p>
+            <p class="text-xs sm:text-sm text-gray-500">인플루언서가 리뷰를 제출하면 여기에 표시됩니다</p>
+          </div>
+        `;
+        return;
+      }
+
+      // 캠페인별로 그룹화
+      const reviewsByCampaign = {};
+      reviews.forEach(review => {
+        if (!reviewsByCampaign[review.campaign_id]) {
+          reviewsByCampaign[review.campaign_id] = {
+            campaign_title: review.campaign_title,
+            reviews: []
+          };
+        }
+        reviewsByCampaign[review.campaign_id].reviews.push(review);
+      });
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          ${Object.entries(reviewsByCampaign).map(([campaignId, data]) => `
+            <div class="bg-white rounded-lg shadow-md p-4">
+              <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${data.campaign_title}
+              </h2>
+              <div class="space-y-4">
+                ${data.reviews.map(review => `
+                  <div class="border rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-3">
+                      <div>
+                        <p class="font-semibold text-gray-800">${review.influencer_nickname}</p>
+                        <p class="text-sm text-gray-500">${review.influencer_email}</p>
+                      </div>
+                      <span class="text-xs text-gray-500">${new Date(review.submitted_at || review.created_at).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                    
+                    ${review.review_image ? `
+                      <div class="mb-3">
+                        <img src="${review.review_image}" alt="리뷰 이미지" class="max-w-full h-auto rounded-lg">
+                      </div>
+                    ` : ''}
+                    
+                    <div class="mb-3">
+                      <p class="text-sm text-gray-700 whitespace-pre-wrap">${review.review_text || '리뷰 내용 없음'}</p>
+                    </div>
+                    
+                    ${review.post_url ? `
+                      <div class="mb-3">
+                        <a href="${review.post_url}" target="_blank" class="text-blue-600 hover:underline text-sm">
+                          <i class="fas fa-external-link-alt mr-1"></i>게시물 보기
+                        </a>
+                      </div>
+                    ` : ''}
+                    
+                    <div class="flex gap-2 mt-4">
+                      <button onclick="app.approveReview(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                        <i class="fas fa-check mr-1"></i>승인
+                      </button>
+                      <button onclick="app.rejectReview(${review.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                        <i class="fas fa-times mr-1"></i>거절
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load advertiser reviews:', error);
+      const container = document.getElementById('advertiserReviewsContent');
+      container.innerHTML = '<p class="text-red-600 p-4">리뷰 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async approveReview(reviewId) {
+    if (!confirm('이 리뷰를 승인하시겠습니까?')) return;
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/approve`, {}, this.getAuthHeaders());
+      alert('리뷰가 승인되었습니다');
+      await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '리뷰 승인에 실패했습니다');
+    }
+  }
+
+  async rejectReview(reviewId) {
+    const reason = prompt('거절 사유를 입력해주세요:');
+    if (!reason) {
+      alert('거절 사유를 입력해야 합니다');
+      return;
+    }
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/reject`, { reason }, this.getAuthHeaders());
+      alert('리뷰가 거절되었습니다');
+      await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '리뷰 거절에 실패했습니다');
     }
   }
 

@@ -554,4 +554,32 @@ campaigns.get('/:id/shipping-info', authMiddleware, requireRole('advertiser', 'a
   }
 });
 
+// 내 캠페인의 모든 리뷰 조회 (광고주)
+campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency', 'rep'), async (c) => {
+  try {
+    const user = c.get('user');
+    const { env } = c;
+    
+    // 내 캠페인의 모든 리뷰 조회
+    const reviews = await env.DB.prepare(`
+      SELECT 
+        r.*,
+        c.title as campaign_title,
+        c.id as campaign_id,
+        u.email as influencer_email,
+        u.nickname as influencer_nickname
+      FROM reviews r
+      JOIN campaigns c ON r.campaign_id = c.id
+      JOIN users u ON r.influencer_id = u.id
+      WHERE c.advertiser_id = ?
+      ORDER BY r.created_at DESC
+    `).bind(user.id).all();
+    
+    return c.json(reviews.results || []);
+  } catch (error) {
+    console.error('Get my campaigns reviews error:', error);
+    return c.json({ error: '리뷰 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default campaigns;

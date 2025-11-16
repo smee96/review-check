@@ -449,4 +449,107 @@ app.put('/api/admin/withdrawals/:id/reject', async (c) => {
   }
 });
 
+// 리뷰 승인 (광고주)
+app.put('/api/reviews/:id/approve', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+
+    const reviewId = c.req.param('id');
+
+    // 리뷰 정보 조회 및 권한 확인
+    const review = await c.env.DB.prepare(`
+      SELECT r.*, c.advertiser_id 
+      FROM reviews r
+      JOIN campaigns c ON r.campaign_id = c.id
+      WHERE r.id = ?
+    `).bind(reviewId).first();
+
+    if (!review) {
+      return c.json({ error: '리뷰를 찾을 수 없습니다' }, 404);
+    }
+
+    // 광고주 본인의 캠페인 리뷰인지 확인
+    if (review.advertiser_id !== decoded.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+
+    // 리뷰 승인 처리 (status를 approved로 변경)
+    await c.env.DB.prepare(`
+      UPDATE reviews 
+      SET status = 'approved'
+      WHERE id = ?
+    `).bind(reviewId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '리뷰가 승인되었습니다'
+    });
+  } catch (error) {
+    console.error('Approve review error:', error);
+    return c.json({ error: '리뷰 승인 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 리뷰 거절 (광고주)
+app.put('/api/reviews/:id/reject', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+
+    const reviewId = c.req.param('id');
+    const { reason } = await c.req.json();
+
+    if (!reason) {
+      return c.json({ error: '거절 사유를 입력해주세요' }, 400);
+    }
+
+    // 리뷰 정보 조회 및 권한 확인
+    const review = await c.env.DB.prepare(`
+      SELECT r.*, c.advertiser_id 
+      FROM reviews r
+      JOIN campaigns c ON r.campaign_id = c.id
+      WHERE r.id = ?
+    `).bind(reviewId).first();
+
+    if (!review) {
+      return c.json({ error: '리뷰를 찾을 수 없습니다' }, 404);
+    }
+
+    // 광고주 본인의 캠페인 리뷰인지 확인
+    if (review.advertiser_id !== decoded.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+
+    // 리뷰 거절 처리 (status를 rejected로 변경하고 거절 사유 저장)
+    await c.env.DB.prepare(`
+      UPDATE reviews 
+      SET status = 'rejected', rejection_reason = ?
+      WHERE id = ?
+    `).bind(reason, reviewId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '리뷰가 거절되었습니다'
+    });
+  } catch (error) {
+    console.error('Reject review error:', error);
+    return c.json({ error: '리뷰 거절 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default app;
