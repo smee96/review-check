@@ -6035,7 +6035,6 @@ class ReviewSphere {
                     </button>
                   `;
                 })() : ''}
-                ` : ''}
                 ${a.status === 'approved' ? `
                   <p class="text-sm text-gray-600">
                     <i class="fas fa-info-circle mr-1"></i>리뷰 등록은 마이페이지 > 나의 컨텐츠에서 진행해주세요
