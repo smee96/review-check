@@ -2517,7 +2517,7 @@ class ReviewSphere {
                     
                     ${review.review_image ? `
                       <div class="mb-3">
-                        <img src="${review.review_image}" alt="리뷰 이미지" class="max-w-full h-auto rounded-lg">
+                        <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="max-w-full h-auto rounded-lg" onerror="this.style.display='none'">
                       </div>
                     ` : ''}
                     
