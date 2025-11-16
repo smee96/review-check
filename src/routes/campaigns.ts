@@ -560,19 +560,24 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
     const user = c.get('user');
     const { env } = c;
     
-    // 내 캠페인의 모든 리뷰 조회
+    // 내 캠페인의 모든 리뷰 조회 (applications 테이블을 통해)
     const reviews = await env.DB.prepare(`
       SELECT 
         r.*,
+        r.image_url as review_image,
+        r.post_url,
         c.title as campaign_title,
         c.id as campaign_id,
+        a.influencer_id,
         u.email as influencer_email,
-        u.nickname as influencer_nickname
+        u.nickname as influencer_nickname,
+        r.submitted_at as created_at
       FROM reviews r
-      JOIN campaigns c ON r.campaign_id = c.id
-      JOIN users u ON r.influencer_id = u.id
+      JOIN applications a ON r.application_id = a.id
+      JOIN campaigns c ON a.campaign_id = c.id
+      JOIN users u ON a.influencer_id = u.id
       WHERE c.advertiser_id = ?
-      ORDER BY r.created_at DESC
+      ORDER BY r.submitted_at DESC
     `).bind(user.id).all();
     
     return c.json(reviews.results || []);

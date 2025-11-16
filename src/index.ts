@@ -464,11 +464,12 @@ app.put('/api/reviews/:id/approve', async (c) => {
 
     const reviewId = c.req.param('id');
 
-    // 리뷰 정보 조회 및 권한 확인
+    // 리뷰 정보 조회 및 권한 확인 (applications 테이블을 통해)
     const review = await c.env.DB.prepare(`
       SELECT r.*, c.advertiser_id 
       FROM reviews r
-      JOIN campaigns c ON r.campaign_id = c.id
+      JOIN applications a ON r.application_id = a.id
+      JOIN campaigns c ON a.campaign_id = c.id
       WHERE r.id = ?
     `).bind(reviewId).first();
 
@@ -481,10 +482,10 @@ app.put('/api/reviews/:id/approve', async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
-    // 리뷰 승인 처리 (status를 approved로 변경)
+    // 리뷰 승인 처리 - updated_at 업데이트
     await c.env.DB.prepare(`
       UPDATE reviews 
-      SET status = 'approved'
+      SET updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(reviewId).run();
 
@@ -518,11 +519,12 @@ app.put('/api/reviews/:id/reject', async (c) => {
       return c.json({ error: '거절 사유를 입력해주세요' }, 400);
     }
 
-    // 리뷰 정보 조회 및 권한 확인
+    // 리뷰 정보 조회 및 권한 확인 (applications 테이블을 통해)
     const review = await c.env.DB.prepare(`
       SELECT r.*, c.advertiser_id 
       FROM reviews r
-      JOIN campaigns c ON r.campaign_id = c.id
+      JOIN applications a ON r.application_id = a.id
+      JOIN campaigns c ON a.campaign_id = c.id
       WHERE r.id = ?
     `).bind(reviewId).first();
 
@@ -535,12 +537,12 @@ app.put('/api/reviews/:id/reject', async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
-    // 리뷰 거절 처리 (status를 rejected로 변경하고 거절 사유 저장)
+    // 리뷰 삭제 처리 (거절 사유는 로그에만 기록)
+    console.log(`Review ${reviewId} rejected by user ${decoded.userId}. Reason: ${reason}`);
+    
     await c.env.DB.prepare(`
-      UPDATE reviews 
-      SET status = 'rejected', rejection_reason = ?
-      WHERE id = ?
-    `).bind(reason, reviewId).run();
+      DELETE FROM reviews WHERE id = ?
+    `).bind(reviewId).run();
 
     return c.json({ 
       success: true, 

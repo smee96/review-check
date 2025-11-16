@@ -2576,8 +2576,8 @@ class ReviewSphere {
           
           <div class="flex-grow pb-20">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>마이페이지로
+              <button onclick="app.user.role === 'admin' ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>캠페인관리로
               </button>
               
               <div id="campaignFormContainer"></div>
@@ -3458,7 +3458,15 @@ class ReviewSphere {
 
       const response = await axios.post('/api/campaigns', data, this.getAuthHeaders());
       alert('캠페인 등록 신청이 완료되었습니다.\n관리자 승인 후 진행됩니다.');
-      this.showMyPage();
+      
+      // 역할에 따라 적절한 페이지로 이동
+      if (this.user.role === 'admin') {
+        this.showAdminCampaigns();
+      } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
+        this.showAdvertiserCampaigns();
+      } else {
+        this.showMyPage();
+      }
     } catch (error) {
       alert(error.response?.data?.error || '캠페인 등록에 실패했습니다');
     }
@@ -3476,7 +3484,15 @@ class ReviewSphere {
         this.getAuthHeaders()
       );
       alert('캠페인이 진행중 상태로 변경되었습니다.');
-      this.showMyPage(); // 새로고침
+      
+      // 역할에 따라 적절한 페이지로 이동
+      if (this.user.role === 'admin') {
+        this.showAdminCampaigns();
+      } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
+        this.showAdvertiserCampaigns();
+      } else {
+        this.showMyPage();
+      }
     } catch (error) {
       console.error('Campaign proceed error:', error);
       alert(error.response?.data?.error || '상태 변경에 실패했습니다');
@@ -3926,8 +3942,14 @@ class ReviewSphere {
       const response = await axios.put(`/api/campaigns/${campaignId}`, data, this.getAuthHeaders());
       alert('캠페인이 수정되었습니다.');
       
-      // 마이페이지로 이동
-      this.showMyPage();
+      // 역할에 따라 적절한 페이지로 이동
+      if (this.user.role === 'admin') {
+        this.showAdminCampaigns();
+      } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
+        this.showAdvertiserCampaigns();
+      } else {
+        this.showMyPage();
+      }
     } catch (error) {
       console.error('Update campaign error:', error);
       alert(error.response?.data?.error || '캠페인 수정에 실패했습니다');
@@ -4148,8 +4170,8 @@ class ReviewSphere {
           
           <div class="flex-grow pb-20">
             <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>마이페이지로
+              <button onclick="app.user.role === 'admin' ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>캠페인관리로
               </button>
 
               <div class="flex justify-between items-center mb-6">
