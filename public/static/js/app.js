@@ -1623,48 +1623,46 @@ class ReviewSphere {
                   ` : ''}
                   
                   <!-- 지원하기 버튼 -->
-                  ${campaign.payment_status === 'paid' ? `
-                    <div class="mt-8">
-                      ${campaign.status === 'pending' ? `
-                        <div class="w-full bg-blue-100 border-2 border-blue-300 text-blue-800 py-4 rounded-lg text-lg font-bold text-center">
-                          <i class="fas fa-hourglass-half mr-2"></i>관리자 승인 대기중
-                        </div>
-                        <p class="text-sm text-blue-600 text-center mt-2">
-                          <i class="fas fa-info-circle mr-1"></i>승인 후 곧 모집이 시작됩니다!
-                        </p>
-                      ` : (campaign.status === 'recruiting' || campaign.status === 'in_progress') ? `
-                        ${this.user?.role === 'influencer' ? `
-                          ${campaign.has_applied ? `
-                            <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
-                              <i class="fas fa-check-circle mr-2"></i>지원 완료
-                            </div>
-                            <p class="text-sm text-gray-500 text-center mt-2">이미 지원한 캠페인입니다</p>
-                          ` : campaign.can_apply === false ? `
-                            <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
-                              <i class="fas fa-calendar-times mr-2"></i>신청 기간이 아닙니다
-                            </div>
-                            <p class="text-sm text-gray-500 text-center mt-2">
-                              ${campaign.application_start_date ? `신청 기간: ${campaign.application_start_date} ~ ${campaign.application_end_date || '미정'}` : '신청 기간이 설정되지 않았습니다'}
-                            </p>
-                          ` : `
-                            <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
-                              <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
-                            </button>
-                            <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
-                          `}
-                        ` : !this.user ? `
+                  <div class="mt-8">
+                    ${campaign.status === 'pending' ? `
+                      <div class="w-full bg-blue-100 border-2 border-blue-300 text-blue-800 py-4 rounded-lg text-lg font-bold text-center">
+                        <i class="fas fa-hourglass-half mr-2"></i>관리자 승인 대기중
+                      </div>
+                      <p class="text-sm text-blue-600 text-center mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>승인 후 곧 모집이 시작됩니다!
+                      </p>
+                    ` : campaign.payment_status === 'paid' && (campaign.status === 'recruiting' || campaign.status === 'in_progress') ? `
+                      ${this.user?.role === 'influencer' ? `
+                        ${campaign.has_applied ? `
+                          <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
+                            <i class="fas fa-check-circle mr-2"></i>지원 완료
+                          </div>
+                          <p class="text-sm text-gray-500 text-center mt-2">이미 지원한 캠페인입니다</p>
+                        ` : campaign.can_apply === false ? `
+                          <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
+                            <i class="fas fa-calendar-times mr-2"></i>신청 기간이 아닙니다
+                          </div>
+                          <p class="text-sm text-gray-500 text-center mt-2">
+                            ${campaign.application_start_date ? `신청 기간: ${campaign.application_start_date} ~ ${campaign.application_end_date || '미정'}` : '신청 기간이 설정되지 않았습니다'}
+                          </p>
+                        ` : `
                           <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
                             <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
                           </button>
-                          <p class="text-sm text-gray-500 text-center mt-2">지원하려면 인플루언서 계정으로 로그인해주세요</p>
-                        ` : `
-                          <div class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg text-lg font-bold text-center">
-                            <i class="fas fa-info-circle mr-2"></i>인플루언서만 지원 가능합니다
-                          </div>
+                          <p class="text-sm text-gray-500 text-center mt-2">지원 후 광고주가 확인하면 알림을 받으실 수 있습니다</p>
                         `}
-                      ` : ''}
-                    </div>
-                  ` : ''}
+                      ` : !this.user ? `
+                        <button onclick="app.applyCampaign(${campaign.id})" class="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition shadow-lg">
+                          <i class="fas fa-paper-plane mr-2"></i>이 캠페인에 지원하기
+                        </button>
+                        <p class="text-sm text-gray-500 text-center mt-2">지원하려면 인플루언서 계정으로 로그인해주세요</p>
+                      ` : `
+                        <div class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg text-lg font-bold text-center">
+                          <i class="fas fa-info-circle mr-2"></i>인플루언서만 지원 가능합니다
+                        </div>
+                      `}
+                    ` : ''}
+                  </div>
                 </div>
               </div>
             </div>
