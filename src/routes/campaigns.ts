@@ -9,7 +9,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const campaigns = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const campaigns = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // 캠페인 등록 (광고주)
 campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
