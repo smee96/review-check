@@ -1,5 +1,8 @@
--- 포인트 출금 신청 테이블
-CREATE TABLE IF NOT EXISTS withdrawal_requests (
+-- 기존 출금 신청 테이블 삭제 (구조가 다르므로)
+DROP TABLE IF EXISTS withdrawal_requests;
+
+-- 포인트 출금 신청 테이블 재생성
+CREATE TABLE withdrawal_requests (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   amount INTEGER NOT NULL, -- 출금 요청 포인트
@@ -16,5 +19,5 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
 );
 
 -- 인덱스 추가
-CREATE INDEX IF NOT EXISTS idx_withdrawal_user ON withdrawal_requests(user_id);
-CREATE INDEX IF NOT EXISTS idx_withdrawal_status ON withdrawal_requests(status);
+CREATE INDEX idx_withdrawal_user ON withdrawal_requests(user_id);
+CREATE INDEX idx_withdrawal_status ON withdrawal_requests(status);
