@@ -560,18 +560,22 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
     const user = c.get('user');
     const { env } = c;
     
+    console.log('[My Reviews] User ID:', user.id);
+    
     // 내 캠페인의 모든 리뷰 조회 (applications 테이블을 통해)
     const reviews = await env.DB.prepare(`
       SELECT 
-        r.*,
-        r.image_url as review_image,
+        r.id,
+        r.application_id,
         r.post_url,
+        r.image_url as review_image,
+        r.submitted_at,
+        r.updated_at,
         c.title as campaign_title,
         c.id as campaign_id,
         a.influencer_id,
         u.email as influencer_email,
-        u.nickname as influencer_nickname,
-        r.submitted_at as created_at
+        u.nickname as influencer_nickname
       FROM reviews r
       JOIN applications a ON r.application_id = a.id
       JOIN campaigns c ON a.campaign_id = c.id
@@ -580,10 +584,17 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
       ORDER BY r.submitted_at DESC
     `).bind(user.id).all();
     
+    console.log('[My Reviews] Results count:', reviews.results?.length || 0);
+    
     return c.json(reviews.results || []);
   } catch (error) {
-    console.error('Get my campaigns reviews error:', error);
-    return c.json({ error: '리뷰 조회 중 오류가 발생했습니다' }, 500);
+    console.error('[My Reviews] Error:', error);
+    console.error('[My Reviews] Error message:', (error as Error).message);
+    console.error('[My Reviews] Error stack:', (error as Error).stack);
+    return c.json({ 
+      error: '리뷰 조회 중 오류가 발생했습니다',
+      details: (error as Error).message 
+    }, 500);
   }
 });
 

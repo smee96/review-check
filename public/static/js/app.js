@@ -2396,11 +2396,17 @@ class ReviewSphere {
                         <i class="fas fa-users mr-1"></i>지원자 보기 ${c.application_count > 0 ? `(${c.application_count})` : ''}
                       </button>
                     ` : ''}
-                    ${c.status === 'recruiting' ? `
-                      <button onclick="app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
-                        <i class="fas fa-play-circle mr-1"></i>이대로 진행
-                      </button>
-                    ` : ''}
+                    ${(() => {
+                      // 실제 상태 계산 (UIUtils 사용)
+                      const actualStatus = UIUtils.calculateCampaignStatus(c);
+                      // recruiting 상태이고 지원자가 있을 때만 표시
+                      const canProceed = actualStatus === 'recruiting' && (c.application_count || 0) > 0;
+                      return canProceed ? `
+                        <button onclick="app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
+                          <i class="fas fa-play-circle mr-1"></i>이대로 진행
+                        </button>
+                      ` : '';
+                    })()}
                   </div>
                 </div>
               </div>
