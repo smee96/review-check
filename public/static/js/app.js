@@ -4977,13 +4977,17 @@ class ReviewSphere {
                         app.status === 'approved' ? '확정' : '거절'}
                     </span>
                     ${app.status === 'pending' ? (() => {
-                      // 지원 마감일 체크 (23:59:59까지 허용)
+                      // 지원 마감일 체크 (23:59:59까지 허용, 한국 시간 기준)
                       if (app.application_end_date) {
-                        const now = new Date();
-                        const endDate = new Date(app.application_end_date);
-                        endDate.setHours(23, 59, 59, 999);
+                        const nowUTC = new Date();
+                        const kstOffset = 9 * 60 * 60 * 1000;
+                        const nowKST = new Date(nowUTC.getTime() + kstOffset);
                         
-                        if (now > endDate) {
+                        const [year, month, day] = app.application_end_date.split('-').map(Number);
+                        const endDate = new Date(Date.UTC(year, month - 1, day, -9, 0, 0, 0));
+                        endDate.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+                        
+                        if (nowKST > endDate) {
                           return '<span class="text-xs text-gray-500">지원 마감됨</span>';
                         }
                       }
@@ -6019,13 +6023,17 @@ class ReviewSphere {
 
               <div class="flex gap-2 mt-2">
                 ${a.status === 'pending' ? (() => {
-                  // 지원 마감일 체크 (23:59:59까지 허용)
+                  // 지원 마감일 체크 (23:59:59까지 허용, 한국 시간 기준)
                   if (a.application_end_date) {
-                    const now = new Date();
-                    const endDate = new Date(a.application_end_date);
-                    endDate.setHours(23, 59, 59, 999);
+                    const nowUTC = new Date();
+                    const kstOffset = 9 * 60 * 60 * 1000;
+                    const nowKST = new Date(nowUTC.getTime() + kstOffset);
                     
-                    if (now > endDate) {
+                    const [year, month, day] = a.application_end_date.split('-').map(Number);
+                    const endDate = new Date(Date.UTC(year, month - 1, day, -9, 0, 0, 0));
+                    endDate.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+                    
+                    if (nowKST > endDate) {
                       return '<span class="text-sm text-gray-500 px-4 py-2">지원 마감됨</span>';
                     }
                   }

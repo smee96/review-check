@@ -24,23 +24,43 @@ const UIUtils = {
       return campaign.status;
     }
     
-    const now = new Date();
-    const applicationEndDate = campaign.application_end_date ? new Date(campaign.application_end_date) : null;
-    const resultAnnouncementDate = campaign.result_announcement_date ? new Date(campaign.result_announcement_date) : null;
+    // 한국 시간(KST, UTC+9) 기준으로 현재 시간 계산
+    const nowUTC = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000; // 9시간을 밀리초로
+    const nowKST = new Date(nowUTC.getTime() + kstOffset);
+    
+    // 날짜 문자열을 한국 시간 기준으로 파싱하는 함수
+    const parseKSTDate = (dateString) => {
+      if (!dateString) return null;
+      const [year, month, day] = dateString.split('-').map(Number);
+      // 한국 시간 00:00:00 기준
+      return new Date(Date.UTC(year, month - 1, day, -9, 0, 0, 0));
+    };
+    
+    const applicationEndDate = parseKSTDate(campaign.application_end_date);
+    const resultAnnouncementDate = parseKSTDate(campaign.result_announcement_date);
     
     // 날짜 정보가 없으면 기존 상태 사용
     if (!applicationEndDate) {
       return campaign.status;
     }
     
-    // 모집기간 중 (모집종료일 이전)
-    if (now <= applicationEndDate) {
+    // 모집종료일 23:59:59까지는 모집중
+    const applicationEndDateTime = new Date(applicationEndDate);
+    applicationEndDateTime.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+    
+    if (nowKST <= applicationEndDateTime) {
       return 'recruiting';
     }
     
-    // 결과발표일이 설정되어 있고 결과발표일이 지났으면
-    if (resultAnnouncementDate && now > resultAnnouncementDate) {
-      return 'completed';
+    // 결과발표일 23:59:59까지 체크
+    if (resultAnnouncementDate) {
+      const resultAnnouncementDateTime = new Date(resultAnnouncementDate);
+      resultAnnouncementDateTime.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+      
+      if (nowKST > resultAnnouncementDateTime) {
+        return 'completed';
+      }
     }
     
     // 모집기간은 지났지만 결과발표일 전이면 진행중
