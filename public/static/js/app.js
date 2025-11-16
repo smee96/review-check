@@ -2098,6 +2098,320 @@ class ReviewSphere {
     }
   }
 
+  // ============================================
+  // Admin Pages (관리자 전용 페이지)
+  // ============================================
+
+  showAdminDashboard() {
+    // 관리자 홈 페이지 - 일반 사용자와 동일한 홈 화면 표시
+    this.showHome();
+  }
+
+  async showAdminCampaigns() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>캠페인 관리
+              </h1>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">전체 캠페인 승인 및 관리</p>
+            </div>
+
+            <div id="adminCampaignsContent">
+              <p class="text-gray-600">로딩 중...</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'campaigns')}
+        ${this.renderFooter()}
+      </div>
+    `;
+
+    // 캠페인 목록 로드
+    await this.loadAdminCampaignsPageContent();
+  }
+
+  async loadAdminCampaignsPageContent() {
+    try {
+      const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
+      const campaigns = response.data;
+      const container = document.getElementById('adminCampaignsContent');
+
+      container.innerHTML = `
+        <div class="space-y-3 sm:space-y-4">
+          ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
+          ${campaigns.map(c => {
+            const channelIcon = c.channel_type === 'instagram' ? '<img src="/static/icons/instagram.ico" alt="Instagram" class="w-4 h-4 inline-block">' : 
+              c.channel_type === 'blog' ? '<img src="/static/icons/blog.ico" alt="Blog" class="w-4 h-4 inline-block">' : 
+              c.channel_type === 'youtube' ? '<img src="/static/icons/youtube.ico" alt="YouTube" class="w-4 h-4 inline-block">' : 
+              c.channel_type === 'smartstore' ? '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />' : 
+              '<i class="fas fa-mobile-alt text-gray-500"></i>';
+            
+            return `
+            <div class="border rounded-lg p-3 sm:p-4 bg-white">
+              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-bold text-base sm:text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
+                      <i class="fas fa-edit mr-1"></i>${c.title}
+                    </h3>
+                    <span>${channelIcon}</span>
+                  </div>
+                  <p class="text-xs sm:text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status, c)} whitespace-nowrap self-start">
+                  ${this.getStatusText(c.status, c)}
+                </span>
+              </div>
+
+              <p class="text-sm sm:text-base text-gray-600 mb-2">${c.description || ''}</p>
+              
+              <div class="bg-blue-50 border border-blue-200 rounded p-2 sm:p-3 mb-2 text-xs sm:text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                  ${c.product_value > 0 ? `
+                    <div>
+                      <p class="text-gray-600">상품/이용권 가치</p>
+                      <p class="font-semibold text-base sm:text-lg">${c.product_value.toLocaleString()}원</p>
+                    </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
+                    <div>
+                      <p class="text-gray-600">인당 포인트</p>
+                      <p class="font-semibold text-base sm:text-lg">${(c.sphere_points || c.point_reward).toLocaleString()}P</p>
+                    </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
+                    <div>
+                      <p class="text-gray-600">총 포인트</p>
+                      <p class="font-semibold text-base sm:text-lg">${((c.sphere_points || c.point_reward) * c.slots).toLocaleString()}P</p>
+                    </div>
+                  ` : ''}
+                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
+                    <div>
+                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
+                      <p class="font-semibold text-base sm:text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.2).toLocaleString()}P</p>
+                    </div>
+                  ` : ''}
+                  <div>
+                    <p class="text-gray-600">과금 방식</p>
+                    <p class="font-semibold">${c.pricing_type === 'points_only' ? '포인트만' : c.pricing_type === 'purchase_with_points' ? '구매+포인트' : c.pricing_type === 'product_only' ? '상품만' : c.pricing_type === 'product_with_points' ? '상품+포인트' : c.pricing_type === 'voucher_only' ? '이용권만' : c.pricing_type === 'voucher_with_points' ? '이용권+포인트' : '상품만'}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">결제 상태</p>
+                    <p>
+                      <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                        ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mt-3">
+                ${c.status === 'pending' ? `
+                  <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
+                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
+                    <i class="fas fa-check mr-1"></i>승인
+                  </button>
+                ` : ''}
+                ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
+                  <button onclick="app.markAsPaid(${c.id})" 
+                    class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs sm:text-sm">
+                    <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
+                  </button>
+                ` : ''}
+                ${(c.status === 'recruiting' || c.status === 'in_progress') ? `
+                  <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
+                    class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-xs sm:text-sm">
+                    <i class="fas fa-pause mr-1"></i>일시중지
+                  </button>
+                ` : ''}
+                ${c.status === 'suspended' ? `
+                  <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
+                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
+                    <i class="fas fa-play mr-1"></i>재개
+                  </button>
+                ` : ''}
+                <button onclick="app.updateCampaignStatus(${c.id}, 'cancelled')" 
+                  class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs sm:text-sm">
+                  <i class="fas fa-ban mr-1"></i>취소
+                </button>
+              </div>
+            </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load admin campaigns:', error);
+      const container = document.getElementById('adminCampaignsContent');
+      container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async showAdminSettlements() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-money-bill-wave text-purple-600 mr-2"></i>정산 관리
+              </h1>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">출금 승인 및 정산 내역 관리</p>
+            </div>
+
+            <div id="adminSettlementsContent">
+              <p class="text-gray-600">로딩 중...</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'settlements')}
+        ${this.renderFooter()}
+      </div>
+    `;
+
+    // 정산 내역 로드
+    await this.loadAdminSettlementsPageContent();
+  }
+
+  async loadAdminSettlementsPageContent() {
+    const container = document.getElementById('adminSettlementsContent');
+    
+    try {
+      // 출금 요청 목록 가져오기
+      const response = await axios.get('/api/admin/withdrawals', this.getAuthHeaders());
+      const withdrawals = response.data;
+
+      container.innerHTML = `
+        <div class="space-y-4">
+          ${withdrawals.length === 0 ? `
+            <div class="text-center py-8 sm:py-12">
+              <i class="fas fa-inbox text-4xl sm:text-6xl text-gray-300 mb-4"></i>
+              <p class="text-sm sm:text-base text-gray-600 mb-2">출금 요청이 없습니다</p>
+              <p class="text-xs sm:text-sm text-gray-500">대기 중인 출금 요청이 없습니다</p>
+            </div>
+          ` : ''}
+          
+          ${withdrawals.map(w => `
+            <div class="border rounded-lg p-4 bg-white">
+              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
+                <div class="flex-1">
+                  <h3 class="font-bold text-base sm:text-lg">${w.user_nickname || '사용자'}</h3>
+                  <p class="text-xs sm:text-sm text-gray-600">${w.user_email || ''}</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap self-start ${
+                  w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                  w.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  w.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                }">
+                  ${w.status === 'pending' ? '⏳ 대기중' : w.status === 'approved' ? '✓ 승인됨' : w.status === 'rejected' ? '✗ 거절됨' : w.status}
+                </span>
+              </div>
+
+              <div class="bg-gray-50 border border-gray-200 rounded p-3 mb-3 space-y-2 text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <p class="text-gray-600">출금 금액</p>
+                    <p class="font-semibold text-lg">${w.amount.toLocaleString()}P</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600">세금 (22%)</p>
+                    <p class="font-semibold text-lg text-red-600">-${w.tax_amount.toLocaleString()}P</p>
+                  </div>
+                  <div class="col-span-2">
+                    <p class="text-gray-600">실지급액</p>
+                    <p class="font-bold text-xl text-green-600">${w.net_amount.toLocaleString()}원</p>
+                  </div>
+                </div>
+                <hr class="my-2">
+                <div>
+                  <p class="text-gray-600">은행: ${w.bank_name}</p>
+                  <p class="text-gray-600">계좌번호: ${w.account_number}</p>
+                  <p class="text-gray-600">예금주: ${w.account_holder}</p>
+                </div>
+              </div>
+
+              <div class="text-xs text-gray-500 mb-3">
+                <p>신청일: ${new Date(w.created_at).toLocaleString('ko-KR')}</p>
+                ${w.processed_at ? `<p>처리일: ${new Date(w.processed_at).toLocaleString('ko-KR')}</p>` : ''}
+              </div>
+
+              ${w.status === 'pending' ? `
+                <div class="flex flex-wrap gap-2">
+                  <button onclick="app.approveWithdrawal(${w.id})" 
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                    <i class="fas fa-check mr-1"></i>승인
+                  </button>
+                  <button onclick="app.rejectWithdrawal(${w.id})" 
+                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                    <i class="fas fa-times mr-1"></i>거절
+                  </button>
+                </div>
+              ` : ''}
+              
+              ${w.admin_memo ? `
+                <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                  <p class="font-semibold text-yellow-800">관리자 메모:</p>
+                  <p class="text-yellow-700">${w.admin_memo}</p>
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load admin settlements:', error);
+      container.innerHTML = '<p class="text-red-600 p-4">정산 내역을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async approveWithdrawal(withdrawalId) {
+    if (!confirm('이 출금 요청을 승인하시겠습니까?')) return;
+    
+    const memo = prompt('관리자 메모 (선택사항):');
+    
+    try {
+      await axios.put(`/api/admin/withdrawals/${withdrawalId}/approve`, 
+        { memo }, 
+        this.getAuthHeaders()
+      );
+      alert('출금 요청이 승인되었습니다');
+      await this.loadAdminSettlementsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '승인에 실패했습니다');
+    }
+  }
+
+  async rejectWithdrawal(withdrawalId) {
+    const memo = prompt('거절 사유를 입력해주세요:');
+    if (!memo) {
+      alert('거절 사유를 입력해야 합니다');
+      return;
+    }
+    
+    try {
+      await axios.put(`/api/admin/withdrawals/${withdrawalId}/reject`, 
+        { memo }, 
+        this.getAuthHeaders()
+      );
+      alert('출금 요청이 거절되었습니다');
+      await this.loadAdminSettlementsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '거절에 실패했습니다');
+    }
+  }
+
   showCreateCampaign() {
     // 컨테이너 찾기: adminContent, advertiserContent, 또는 전체 페이지
     let content = document.getElementById('adminContent') || document.getElementById('advertiserContent');
@@ -5810,48 +6124,6 @@ class ReviewSphere {
 
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
-              <!-- 캠페인 관리 -->
-              <div class="bg-white rounded-lg shadow">
-                <button onclick="app.toggleAdminAccordion('campaignManagement')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <i class="fas fa-list text-purple-600 text-xl sm:text-2xl"></i>
-                      <div>
-                        <h3 class="font-semibold text-base sm:text-lg">캠페인 관리</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">전체 캠페인 승인 및 관리</p>
-                      </div>
-                    </div>
-                    <i id="campaignManagement-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                  </div>
-                </button>
-                <div id="campaignManagement-content" class="hidden border-t">
-                  <div class="p-4 sm:p-6">
-                    <p class="text-gray-600">로딩 중...</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 정산 내역 -->
-              <div class="bg-white rounded-lg shadow">
-                <button onclick="app.toggleAdminAccordion('settlements')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <i class="fas fa-file-excel text-purple-600 text-xl sm:text-2xl"></i>
-                      <div>
-                        <h3 class="font-semibold text-base sm:text-lg">정산 내역</h3>
-                        <p class="text-xs sm:text-sm text-gray-600">캠페인 정산 내역 조회</p>
-                      </div>
-                    </div>
-                    <i id="settlements-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
-                  </div>
-                </button>
-                <div id="settlements-content" class="hidden border-t">
-                  <div class="p-4 sm:p-6">
-                    <p class="text-gray-600">로딩 중...</p>
-                  </div>
-                </div>
-              </div>
-
               <!-- 시스템 설정 -->
               <div class="bg-white rounded-lg shadow border-2 border-blue-200">
                 <button onclick="app.toggleAdminAccordion('systemSettings')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
@@ -5893,28 +6165,12 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
-    
-    // 승인 대기 중인 캠페인이 있는지 확인하고 자동으로 표시
-    setTimeout(async () => {
-      try {
-        const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
-        const campaigns = response.data;
-        const pendingCampaigns = campaigns.filter(c => c.status === 'pending');
-        
-        if (pendingCampaigns.length > 0) {
-          // 승인 대기 중인 캠페인이 있으면 자동으로 캠페인 관리 열기
-          await this.toggleAdminAccordion('campaignManagement');
-        }
-      } catch (error) {
-        console.error('Check pending campaigns error:', error);
-      }
-    }, 100);
   }
 
   async toggleAdminAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['campaignManagement', 'settlements', 'systemSettings'];
+    const allSections = ['systemSettings'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -5940,12 +6196,6 @@ class ReviewSphere {
 
     try {
       switch (sectionId) {
-        case 'campaignManagement':
-          await this.loadCampaignManagementContent(content);
-          break;
-        case 'settlements':
-          await this.loadSettlementsContent(content);
-          break;
         case 'systemSettings':
           await this.loadSystemSettingsContent(content);
           break;

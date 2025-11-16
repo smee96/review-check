@@ -131,6 +131,57 @@ const UIUtils = {
   renderBottomNav(user, currentPage = 'home') {
     if (!user) return '';
     
+    // 관리자용 네비게이션
+    if (user.role === 'admin') {
+      return `
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-bottom">
+          <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-4 h-16">
+              <button 
+                onclick="app.showAdminDashboard()" 
+                class="flex flex-col items-center justify-center space-y-1 transition ${
+                  currentPage === 'home' || currentPage === 'dashboard' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+                }">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs">홈</span>
+              </button>
+              
+              <button 
+                onclick="app.showAdminCampaigns()" 
+                class="flex flex-col items-center justify-center space-y-1 transition ${
+                  currentPage === 'campaigns' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+                }">
+                <i class="fas fa-bullhorn text-xl"></i>
+                <span class="text-xs">캠페인관리</span>
+              </button>
+              
+              <button 
+                onclick="app.showAdminSettlements()" 
+                class="flex flex-col items-center justify-center space-y-1 transition ${
+                  currentPage === 'settlements' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+                }">
+                <i class="fas fa-money-bill-wave text-xl"></i>
+                <span class="text-xs">정산관리</span>
+              </button>
+              
+              <button 
+                onclick="app.showMyPage()" 
+                class="flex flex-col items-center justify-center space-y-1 transition ${
+                  currentPage === 'mypage' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+                }">
+                <i class="fas fa-user-circle text-xl"></i>
+                <span class="text-xs">마이페이지</span>
+              </button>
+            </div>
+          </div>
+        </nav>
+        
+        <!-- Bottom navigation spacer -->
+        <div class="h-16"></div>
+      `;
+    }
+    
+    // 일반 사용자용 네비게이션
     return `
       <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-bottom">
         <div class="max-w-7xl mx-auto">

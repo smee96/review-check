@@ -205,16 +205,25 @@ app.get('/api/withdrawal/history', async (c) => {
       return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
     }
     
+    console.log('[Withdrawal History] User ID:', decoded.userId);
+    
     const withdrawals = await c.env.DB.prepare(`
       SELECT * FROM withdrawal_requests 
       WHERE user_id = ? 
-      ORDER BY created_at DESC
+      ORDER BY id DESC
     `).bind(decoded.userId).all();
+
+    console.log('[Withdrawal History] Results:', withdrawals.results?.length || 0);
 
     return c.json(withdrawals.results || []);
   } catch (error) {
-    console.error('Withdrawal history error:', error);
-    return c.json({ error: '출금 내역 조회 중 오류가 발생했습니다' }, 500);
+    console.error('[Withdrawal History] Error:', error);
+    console.error('[Withdrawal History] Error message:', (error as Error).message);
+    console.error('[Withdrawal History] Error stack:', (error as Error).stack);
+    return c.json({ 
+      error: '출금 내역 조회 중 오류가 발생했습니다',
+      details: (error as Error).message 
+    }, 500);
   }
 });
 
@@ -323,6 +332,120 @@ app.post('/api/admin/withdrawal/:id/process', async (c) => {
   } catch (error) {
     console.error('Process withdrawal error:', error);
     return c.json({ error: '출금 처리 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 출금 승인 (RESTful)
+app.put('/api/admin/withdrawals/:id/approve', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+    
+    // 관리자 권한 확인
+    const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (user?.role !== 'admin') {
+      return c.json({ error: '관리자 권한이 필요합니다' }, 403);
+    }
+
+    const withdrawalId = c.req.param('id');
+    const { memo } = await c.req.json();
+
+    // 출금 신청 정보 조회
+    const withdrawal = await c.env.DB.prepare('SELECT * FROM withdrawal_requests WHERE id = ?')
+      .bind(withdrawalId).first();
+
+    if (!withdrawal) {
+      return c.json({ error: '출금 신청을 찾을 수 없습니다' }, 404);
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return c.json({ error: '이미 처리된 출금 신청입니다' }, 400);
+    }
+
+    // 출금 신청 승인 처리
+    await c.env.DB.prepare(`
+      UPDATE withdrawal_requests 
+      SET status = 'approved', admin_memo = ?, processed_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(memo || null, withdrawalId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '출금이 승인되었습니다'
+    });
+  } catch (error) {
+    console.error('Approve withdrawal error:', error);
+    return c.json({ error: '출금 승인 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 출금 거절 (RESTful)
+app.put('/api/admin/withdrawals/:id/reject', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+    
+    // 관리자 권한 확인
+    const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (user?.role !== 'admin') {
+      return c.json({ error: '관리자 권한이 필요합니다' }, 403);
+    }
+
+    const withdrawalId = c.req.param('id');
+    const { memo } = await c.req.json();
+
+    if (!memo) {
+      return c.json({ error: '거절 사유를 입력해주세요' }, 400);
+    }
+
+    // 출금 신청 정보 조회
+    const withdrawal = await c.env.DB.prepare('SELECT * FROM withdrawal_requests WHERE id = ?')
+      .bind(withdrawalId).first();
+
+    if (!withdrawal) {
+      return c.json({ error: '출금 신청을 찾을 수 없습니다' }, 404);
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return c.json({ error: '이미 처리된 출금 신청입니다' }, 400);
+    }
+
+    // 포인트 복구
+    await c.env.DB.prepare('UPDATE users SET sphere_points = sphere_points + ? WHERE id = ?')
+      .bind(withdrawal.amount, withdrawal.user_id).run();
+
+    // 출금 신청 거절 처리
+    await c.env.DB.prepare(`
+      UPDATE withdrawal_requests 
+      SET status = 'rejected', admin_memo = ?, processed_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(memo, withdrawalId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '출금이 거절되었습니다'
+    });
+  } catch (error) {
+    console.error('Reject withdrawal error:', error);
+    return c.json({ error: '출금 거절 중 오류가 발생했습니다' }, 500);
   }
 });
 
