@@ -564,7 +564,8 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
     const user = c.get('user');
     const { env } = c;
     
-    console.log('[My Reviews] User ID:', user.id);
+    console.log('[My Reviews] User:', user);
+    console.log('[My Reviews] User ID:', user.userId);
     
     // 내 캠페인의 모든 리뷰 조회 (applications 테이블을 통해)
     const reviews = await env.DB.prepare(`
@@ -586,7 +587,7 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
       JOIN users u ON a.influencer_id = u.id
       WHERE c.advertiser_id = ?
       ORDER BY r.submitted_at DESC
-    `).bind(user.id).all();
+    `).bind(user.userId).all();
     
     console.log('[My Reviews] Results count:', reviews.results?.length || 0);
     
