@@ -4146,7 +4146,7 @@ class ReviewSphere {
 
             <!-- 포인트 카드 -->
             <div class="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-5 sm:p-6 rounded-lg shadow-lg mb-4 sm:mb-6">
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between mb-4">
                 <div>
                   <p class="text-xs sm:text-sm opacity-90 mb-1">보유 스피어포인트</p>
                   <h2 class="text-3xl sm:text-4xl font-bold">${pointsBalance.toLocaleString()} <span class="text-xl">P</span></h2>
@@ -4155,9 +4155,20 @@ class ReviewSphere {
                   <i class="fas fa-coins"></i>
                 </div>
               </div>
-              <p class="text-xs sm:text-sm opacity-75 mt-3">
-                <i class="fas fa-info-circle mr-1"></i>포인트는 캠페인 완료 시 지급됩니다
-              </p>
+              <div class="flex items-center justify-between">
+                <p class="text-xs sm:text-sm opacity-75">
+                  <i class="fas fa-info-circle mr-1"></i>포인트는 캠페인 완료 시 지급됩니다
+                </p>
+                ${pointsBalance >= 50000 ? `
+                  <button onclick="app.showWithdrawalRequest()" class="bg-white text-purple-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition">
+                    <i class="fas fa-money-bill-wave mr-1"></i>출금 신청
+                  </button>
+                ` : `
+                  <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-bold cursor-not-allowed">
+                    <i class="fas fa-lock mr-1"></i>50,000P 이상
+                  </button>
+                `}
+              </div>
             </div>
 
             <!-- 아코디언 메뉴 -->
@@ -4248,6 +4259,27 @@ class ReviewSphere {
                 </div>
               </div>
 
+              <!-- 5. 출금 내역 -->
+              <div class="bg-white rounded-lg shadow">
+                <button onclick="app.toggleAccordion('withdrawalHistory')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-money-bill-wave text-purple-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg">출금 내역</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">포인트 출금 신청 및 내역</p>
+                      </div>
+                    </div>
+                    <i id="withdrawalHistory-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="withdrawalHistory-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+
               <!-- 로그아웃 -->
               <button onclick="app.logout()" class="w-full bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
                 <div class="flex items-center space-x-3">
@@ -4272,7 +4304,7 @@ class ReviewSphere {
   async toggleAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['myCampaigns', 'favoriteCampaigns', 'myContents', 'profile'];
+    const allSections = ['myCampaigns', 'favoriteCampaigns', 'myContents', 'profile', 'withdrawalHistory'];
     
     // 현재 섹션이 열려있는지 확인
     const isOpen = !content.classList.contains('hidden');
@@ -4312,6 +4344,9 @@ class ReviewSphere {
         break;
       case 'profile':
         await this.loadProfileContent(contentDiv);
+        break;
+      case 'withdrawalHistory':
+        await this.loadWithdrawalHistoryContent(contentDiv);
         break;
     }
   }
@@ -6415,10 +6450,13 @@ class ReviewSphere {
                         <li>기타 회사가 정하는 보너스 포인트</li>
                       </ul>
                     </li>
-                    <li>적립된 포인트는 5,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
+                    <li>적립된 포인트는 50,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
                     <li>출금 신청 시 등록된 계좌로 영업일 기준 7일 이내에 지급됩니다.</li>
+                    <li>포인트 출금 시 소득세법에 따라 기타소득세(22%, 지방소득세 포함)가 원천징수됩니다.</li>
+                    <li>회원은 출금 신청 시 본인 명의의 은행 계좌를 등록해야 하며, 타인 명의 계좌로는 출금이 불가능합니다.</li>
                     <li>부정한 방법으로 포인트를 적립한 경우, 회사는 해당 포인트를 회수하고 회원 자격을 제한할 수 있습니다.</li>
                     <li>포인트의 유효기간은 적립일로부터 2년입니다.</li>
+                    <li>연간 출금 금액이 500만원을 초과하는 경우, 회원은 다음 연도에 종합소득세 신고 의무가 있습니다.</li>
                   </ol>
                 </section>
 
@@ -7291,6 +7329,225 @@ class ReviewSphere {
     } catch (error) {
       console.error('Calculate pricing error:', error);
       summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">비용 계산 중 오류가 발생했습니다</p>';
+    }
+  }
+}
+
+  // 출금 내역 로드
+  async loadWithdrawalHistoryContent(contentDiv) {
+    try {
+      const response = await axios.get('/api/withdrawal/history', this.getAuthHeaders());
+      const withdrawals = response.data;
+
+      if (withdrawals.length === 0) {
+        contentDiv.innerHTML = `
+          <div class="text-center py-8">
+            <i class="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600">출금 신청 내역이 없습니다</p>
+            <button onclick="app.showWithdrawalRequest()" class="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
+              <i class="fas fa-money-bill-wave mr-2"></i>첫 출금 신청하기
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const statusBadge = (status) => {
+        const badges = {
+          pending: '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">대기중</span>',
+          approved: '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">승인</span>',
+          completed: '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">완료</span>',
+          rejected: '<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">거부</span>'
+        };
+        return badges[status] || status;
+      };
+
+      contentDiv.innerHTML = `
+        <div class="space-y-3">
+          ${withdrawals.map(w => `
+            <div class="border rounded-lg p-4 hover:shadow-md transition">
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <p class="font-semibold text-lg">${w.amount.toLocaleString()}P 출금 신청</p>
+                  <p class="text-sm text-gray-600">${new Date(w.created_at).toLocaleDateString('ko-KR')}</p>
+                </div>
+                ${statusBadge(w.status)}
+              </div>
+              <div class="text-sm text-gray-700 space-y-1">
+                <div class="flex justify-between">
+                  <span>신청 금액:</span>
+                  <span class="font-semibold">${w.amount.toLocaleString()}원</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>원천징수 (22%):</span>
+                  <span class="text-red-600">-${w.tax_amount.toLocaleString()}원</span>
+                </div>
+                <div class="flex justify-between border-t pt-1">
+                  <span class="font-semibold">실지급액:</span>
+                  <span class="font-bold text-purple-600">${w.net_amount.toLocaleString()}원</span>
+                </div>
+                <div class="flex justify-between mt-2 pt-2 border-t">
+                  <span>은행:</span>
+                  <span>${w.bank_name}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>계좌:</span>
+                  <span>${w.account_number}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>예금주:</span>
+                  <span>${w.account_holder}</span>
+                </div>
+                ${w.admin_memo ? `
+                  <div class="mt-2 pt-2 border-t">
+                    <p class="text-xs text-gray-600">관리자 메모:</p>
+                    <p class="text-sm">${w.admin_memo}</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Load withdrawal history error:', error);
+      contentDiv.innerHTML = '<p class="text-red-600 text-center">출금 내역을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  // 출금 신청 모달
+  async showWithdrawalRequest() {
+    // 프로필 정보 확인
+    try {
+      const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
+      const profile = response.data;
+      const pointsBalance = profile.points_balance || 0;
+
+      if (pointsBalance < 50000) {
+        alert('출금 가능한 포인트가 부족합니다. (최소 50,000P)');
+        return;
+      }
+
+      if (!profile.bank_name || !profile.account_number || !profile.account_holder_name) {
+        alert('먼저 프로필에서 계좌 정보를 등록해주세요.');
+        return;
+      }
+
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+          <h2 class="text-2xl font-bold mb-4">포인트 출금 신청</h2>
+          
+          <div class="space-y-4">
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-700 mb-1">보유 포인트</p>
+              <p class="text-2xl font-bold text-purple-600">${pointsBalance.toLocaleString()} P</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2">출금 금액 (포인트)</label>
+              <input type="number" id="withdrawalAmount" class="w-full px-4 py-2 border rounded-lg" 
+                min="50000" max="${pointsBalance}" step="10000" placeholder="최소 50,000P">
+              <p class="text-xs text-gray-600 mt-1">* 최소 출금 금액: 50,000P</p>
+            </div>
+
+            <div id="taxInfo" class="bg-yellow-50 p-4 rounded-lg hidden">
+              <p class="text-sm font-semibold mb-2">출금 상세 정보</p>
+              <div class="text-sm space-y-1">
+                <div class="flex justify-between">
+                  <span>신청 금액:</span>
+                  <span id="requestAmount" class="font-semibold"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>원천징수 (22%):</span>
+                  <span id="taxAmount" class="text-red-600"></span>
+                </div>
+                <div class="flex justify-between border-t pt-1 mt-1">
+                  <span class="font-semibold">실지급액:</span>
+                  <span id="netAmount" class="font-bold text-purple-600"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm font-semibold mb-2">입금 계좌 정보</p>
+              <div class="text-sm space-y-1">
+                <div><span class="text-gray-600">은행:</span> ${profile.bank_name}</div>
+                <div><span class="text-gray-600">계좌번호:</span> ${profile.account_number}</div>
+                <div><span class="text-gray-600">예금주:</span> ${profile.account_holder_name}</div>
+              </div>
+              <p class="text-xs text-gray-600 mt-2">* 계좌 정보가 틀린 경우 프로필에서 수정해주세요</p>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                취소
+              </button>
+              <button onclick="app.submitWithdrawal()" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                신청하기
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      // 금액 입력 시 세금 계산
+      document.getElementById('withdrawalAmount').addEventListener('input', (e) => {
+        const amount = parseInt(e.target.value) || 0;
+        const taxInfo = document.getElementById('taxInfo');
+
+        if (amount >= 50000) {
+          const tax = Math.floor(amount * 0.22);
+          const net = amount - tax;
+
+          document.getElementById('requestAmount').textContent = amount.toLocaleString() + '원';
+          document.getElementById('taxAmount').textContent = '-' + tax.toLocaleString() + '원';
+          document.getElementById('netAmount').textContent = net.toLocaleString() + '원';
+          taxInfo.classList.remove('hidden');
+        } else {
+          taxInfo.classList.add('hidden');
+        }
+      });
+
+    } catch (error) {
+      console.error('Show withdrawal request error:', error);
+      alert('출금 신청을 불러오는데 실패했습니다');
+    }
+  }
+
+  // 출금 신청 제출
+  async submitWithdrawal() {
+    const amount = parseInt(document.getElementById('withdrawalAmount').value);
+
+    if (!amount || amount < 50000) {
+      alert('최소 출금 금액은 50,000P입니다');
+      return;
+    }
+
+    try {
+      const profile = await axios.get('/api/profile/influencer', this.getAuthHeaders());
+      const profileData = profile.data;
+
+      const response = await axios.post('/api/withdrawal/request', {
+        amount,
+        bank_name: profileData.bank_name,
+        account_number: profileData.account_number,
+        account_holder: profileData.account_holder_name
+      }, this.getAuthHeaders());
+
+      alert(`출금 신청이 완료되었습니다!\n실지급액: ${response.data.net_amount.toLocaleString()}원\n영업일 기준 7일 이내에 입금됩니다.`);
+      
+      // 모달 닫기
+      document.querySelector('.fixed.inset-0').remove();
+      
+      // 페이지 새로고침
+      this.showInfluencerMyPage();
+    } catch (error) {
+      console.error('Submit withdrawal error:', error);
+      alert(error.response?.data?.error || '출금 신청에 실패했습니다');
     }
   }
 }

@@ -128,4 +128,186 @@ app.get('/', (c) => {
   `);
 });
 
+// ============================================
+// 포인트 출금 API
+// ============================================
+
+// 출금 신청
+app.post('/api/withdrawal/request', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyToken(token);
+    const { amount, bank_name, account_number, account_holder } = await c.req.json();
+
+    // 최소 출금 금액 확인
+    if (amount < 50000) {
+      return c.json({ error: '최소 출금 금액은 50,000 포인트입니다' }, 400);
+    }
+
+    // 사용자 포인트 확인
+    const user = await c.env.DB.prepare('SELECT sphere_points FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (!user || user.sphere_points < amount) {
+      return c.json({ error: '출금 가능한 포인트가 부족합니다' }, 400);
+    }
+
+    // 세금 계산 (22% 원천징수)
+    const tax_amount = Math.floor(amount * 0.22);
+    const net_amount = amount - tax_amount;
+
+    // 출금 신청 생성
+    const result = await c.env.DB.prepare(`
+      INSERT INTO withdrawal_requests 
+      (user_id, amount, tax_amount, net_amount, bank_name, account_number, account_holder, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+    `).bind(decoded.userId, amount, tax_amount, net_amount, bank_name, account_number, account_holder).run();
+
+    // 포인트 차감 (pending 상태로 예약)
+    await c.env.DB.prepare('UPDATE users SET sphere_points = sphere_points - ? WHERE id = ?')
+      .bind(amount, decoded.userId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '출금 신청이 완료되었습니다',
+      withdrawal_id: result.meta.last_row_id,
+      amount,
+      tax_amount,
+      net_amount
+    });
+  } catch (error) {
+    console.error('Withdrawal request error:', error);
+    return c.json({ error: '출금 신청 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 출금 신청 내역 조회
+app.get('/api/withdrawal/history', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyToken(token);
+    
+    const withdrawals = await c.env.DB.prepare(`
+      SELECT * FROM withdrawal_requests 
+      WHERE user_id = ? 
+      ORDER BY created_at DESC
+    `).bind(decoded.userId).all();
+
+    return c.json(withdrawals.results || []);
+  } catch (error) {
+    console.error('Withdrawal history error:', error);
+    return c.json({ error: '출금 내역 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 관리자: 출금 신청 목록 조회
+app.get('/api/admin/withdrawals', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyToken(token);
+    
+    // 관리자 권한 확인
+    const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (user?.role !== 'admin') {
+      return c.json({ error: '관리자 권한이 필요합니다' }, 403);
+    }
+
+    const status = c.req.query('status') || 'all';
+    let query = `
+      SELECT w.*, u.email, u.nickname 
+      FROM withdrawal_requests w
+      JOIN users u ON w.user_id = u.id
+    `;
+    
+    if (status !== 'all') {
+      query += ` WHERE w.status = ?`;
+    }
+    
+    query += ` ORDER BY w.created_at DESC`;
+
+    const withdrawals = status !== 'all'
+      ? await c.env.DB.prepare(query).bind(status).all()
+      : await c.env.DB.prepare(query).all();
+
+    return c.json(withdrawals.results || []);
+  } catch (error) {
+    console.error('Admin withdrawals error:', error);
+    return c.json({ error: '출금 신청 목록 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 관리자: 출금 승인/거부
+app.post('/api/admin/withdrawal/:id/process', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyToken(token);
+    
+    // 관리자 권한 확인
+    const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (user?.role !== 'admin') {
+      return c.json({ error: '관리자 권한이 필요합니다' }, 403);
+    }
+
+    const withdrawalId = c.req.param('id');
+    const { status, admin_memo } = await c.req.json(); // status: 'approved' or 'rejected'
+
+    if (!['approved', 'rejected'].includes(status)) {
+      return c.json({ error: '잘못된 상태 값입니다' }, 400);
+    }
+
+    // 출금 신청 정보 조회
+    const withdrawal = await c.env.DB.prepare('SELECT * FROM withdrawal_requests WHERE id = ?')
+      .bind(withdrawalId).first();
+
+    if (!withdrawal) {
+      return c.json({ error: '출금 신청을 찾을 수 없습니다' }, 404);
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return c.json({ error: '이미 처리된 출금 신청입니다' }, 400);
+    }
+
+    // 거부 시 포인트 복구
+    if (status === 'rejected') {
+      await c.env.DB.prepare('UPDATE users SET sphere_points = sphere_points + ? WHERE id = ?')
+        .bind(withdrawal.amount, withdrawal.user_id).run();
+    }
+
+    // 출금 신청 상태 업데이트
+    await c.env.DB.prepare(`
+      UPDATE withdrawal_requests 
+      SET status = ?, admin_memo = ?, processed_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(status, admin_memo || null, withdrawalId).run();
+
+    return c.json({ 
+      success: true, 
+      message: status === 'approved' ? '출금이 승인되었습니다' : '출금이 거부되었습니다'
+    });
+  } catch (error) {
+    console.error('Process withdrawal error:', error);
+    return c.json({ error: '출금 처리 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default app;
