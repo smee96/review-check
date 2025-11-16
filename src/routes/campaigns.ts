@@ -138,15 +138,21 @@ campaigns.get('/', async (c) => {
       
       return c.json(campaigns.results);
     } else {
-      // 진행중인 캠페인: 모집중이고 결제 완료된 모든 캠페인
+      // 진행중인 캠페인: 모집중 + 승인대기 캠페인 (결제 완료된 것만)
       // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
+      // - 승인대기 캠페인도 미리보기로 표시 (지원 불가 안내)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.status = ? AND c.payment_status = ?
-         ORDER BY c.created_at DESC`
-      ).bind('recruiting', 'paid').all();
+         WHERE c.status IN (?, ?) AND c.payment_status = ?
+         ORDER BY 
+           CASE 
+             WHEN c.status = 'recruiting' THEN 0
+             WHEN c.status = 'pending' THEN 1
+           END,
+           c.created_at DESC`
+      ).bind('recruiting', 'pending', 'paid').all();
       
       return c.json(campaigns.results);
     }
