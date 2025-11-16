@@ -250,7 +250,7 @@ app.get('/api/admin/withdrawals', async (c) => {
 
     const status = c.req.query('status') || 'all';
     let query = `
-      SELECT w.*, u.email, u.nickname 
+      SELECT w.*, u.email as user_email, u.nickname as user_nickname 
       FROM withdrawal_requests w
       JOIN users u ON w.user_id = u.id
     `;

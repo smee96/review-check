@@ -6465,13 +6465,18 @@ class ReviewSphere {
       await axios.put(`/api/admin/campaigns/${campaignId}/status`, { status }, this.getAuthHeaders());
       alert('상태가 변경되었습니다');
       
-      // adminContent 요소가 있는지 확인
-      const adminContent = document.getElementById('adminContent');
-      if (adminContent) {
-        this.showAllCampaigns();
+      // adminCampaignsContent 요소가 있는지 확인 (새로운 캠페인관리 페이지)
+      const adminCampaignsContent = document.getElementById('adminCampaignsContent');
+      if (adminCampaignsContent) {
+        // 캠페인관리 페이지에 있으면 목록만 새로고침
+        await this.loadAdminCampaignsPageContent();
       } else {
-        // adminContent가 없으면 관리자 페이지로 이동
-        this.showMyPage();
+        // 그 외의 경우 관리자라면 캠페인관리 페이지로 이동
+        if (this.user.role === 'admin') {
+          this.showAdminCampaigns();
+        } else {
+          this.showMyPage();
+        }
       }
     } catch (error) {
       alert(error.response?.data?.error || '상태 변경에 실패했습니다');
@@ -6487,13 +6492,18 @@ class ReviewSphere {
       await axios.put(`/api/admin/campaigns/${campaignId}/payment`, { payment_status: 'paid' }, this.getAuthHeaders());
       alert('결제 완료 처리되었습니다. 이제 인플루언서들이 참여 신청을 할 수 있습니다.');
       
-      // adminContent 요소가 있는지 확인
-      const adminContent = document.getElementById('adminContent');
-      if (adminContent) {
-        this.showAllCampaigns();
+      // adminCampaignsContent 요소가 있는지 확인 (새로운 캠페인관리 페이지)
+      const adminCampaignsContent = document.getElementById('adminCampaignsContent');
+      if (adminCampaignsContent) {
+        // 캠페인관리 페이지에 있으면 목록만 새로고침
+        await this.loadAdminCampaignsPageContent();
       } else {
-        // adminContent가 없으면 관리자 페이지로 이동
-        this.showMyPage();
+        // 그 외의 경우 관리자라면 캠페인관리 페이지로 이동
+        if (this.user.role === 'admin') {
+          this.showAdminCampaigns();
+        } else {
+          this.showMyPage();
+        }
       }
     } catch (error) {
       alert(error.response?.data?.error || '결제 처리에 실패했습니다');
