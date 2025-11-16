@@ -1631,6 +1631,13 @@ class ReviewSphere {
                       <p class="text-sm text-blue-600 text-center mt-2">
                         <i class="fas fa-info-circle mr-1"></i>승인 후 곧 모집이 시작됩니다!
                       </p>
+                    ` : campaign.status === 'recruiting' && campaign.payment_status === 'unpaid' ? `
+                      <div class="w-full bg-orange-100 border-2 border-orange-300 text-orange-800 py-4 rounded-lg text-lg font-bold text-center">
+                        <i class="fas fa-credit-card mr-2"></i>결제 대기중
+                      </div>
+                      <p class="text-sm text-orange-600 text-center mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>광고주의 결제 완료 후 지원 가능합니다!
+                      </p>
                     ` : campaign.payment_status === 'paid' && (campaign.status === 'recruiting' || campaign.status === 'in_progress') ? `
                       ${this.user?.role === 'influencer' ? `
                         ${campaign.has_applied ? `
