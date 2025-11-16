@@ -9,6 +9,9 @@ class ReviewSphere {
   }
 
   init() {
+    // Eruda 모바일 디버깅 도구 로드
+    this.loadEruda();
+    
     // History API 이벤트 리스너 등록
     window.addEventListener('popstate', (event) => {
       if (event.state) {
@@ -24,6 +27,19 @@ class ReviewSphere {
     const state = { page: 'home', data: {} };
     window.history.replaceState(state, 'R.SPHERE - 홈', '#home');
     this.showHome(false);
+  }
+
+  loadEruda() {
+    // Eruda 디버깅 도구 로드 (모바일에서 개발자 도구)
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+    script.onload = () => {
+      if (window.eruda) {
+        window.eruda.init();
+        console.log('📱 Eruda 모바일 디버깅 도구가 활성화되었습니다. 화면 우측 하단 버튼을 클릭하세요.');
+      }
+    };
+    document.head.appendChild(script);
   }
 
   // 히어로 슬라이더 초기화
