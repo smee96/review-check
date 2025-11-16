@@ -8,7 +8,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const profiles = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const profiles = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // All routes require authentication
 profiles.use('*', authMiddleware);

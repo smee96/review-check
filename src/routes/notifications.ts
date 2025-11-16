@@ -7,7 +7,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const notifications = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const notifications = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // All routes require authentication
 notifications.use('*', authMiddleware);

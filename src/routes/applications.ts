@@ -9,7 +9,11 @@ type Bindings = {
   R2: R2Bucket;
 };
 
-const applications = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const applications = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // R2 이미지 가져오기 (공개 - 인증 불필요)
 applications.get('/review-image/:key', async (c) => {

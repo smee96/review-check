@@ -8,7 +8,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const admin = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const admin = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // All routes require admin authentication
 admin.use('*', authMiddleware, requireRole('admin'));

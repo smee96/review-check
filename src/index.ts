@@ -18,7 +18,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const app = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // CORS middleware
 app.use('/api/*', cors());

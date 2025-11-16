@@ -17,7 +17,11 @@ type Bindings = {
   DB: D1Database;
 };
 
-const auth = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  user: any;
+};
+
+const auth = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // 회원가입
 auth.post('/register', async (c) => {
