@@ -11,6 +11,9 @@ import admin from './routes/admin';
 import notifications from './routes/notifications';
 import settings from './routes/settings';
 
+// Import utilities
+import { verifyJWT } from './utils';
+
 type Bindings = {
   DB: D1Database;
 };
@@ -140,7 +143,11 @@ app.post('/api/withdrawal/request', async (c) => {
       return c.json({ error: '인증이 필요합니다' }, 401);
     }
 
-    const decoded = await verifyToken(token);
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+
     const { amount, bank_name, account_number, account_holder } = await c.req.json();
 
     // 최소 출금 금액 확인
@@ -193,7 +200,10 @@ app.get('/api/withdrawal/history', async (c) => {
       return c.json({ error: '인증이 필요합니다' }, 401);
     }
 
-    const decoded = await verifyToken(token);
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
     
     const withdrawals = await c.env.DB.prepare(`
       SELECT * FROM withdrawal_requests 
@@ -216,7 +226,10 @@ app.get('/api/admin/withdrawals', async (c) => {
       return c.json({ error: '인증이 필요합니다' }, 401);
     }
 
-    const decoded = await verifyToken(token);
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
     
     // 관리자 권한 확인
     const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
@@ -258,7 +271,10 @@ app.post('/api/admin/withdrawal/:id/process', async (c) => {
       return c.json({ error: '인증이 필요합니다' }, 401);
     }
 
-    const decoded = await verifyToken(token);
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
     
     // 관리자 권한 확인
     const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
