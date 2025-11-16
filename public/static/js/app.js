@@ -4997,23 +4997,32 @@ class ReviewSphere {
                           <span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
                             <i class="fas fa-check-circle mr-1"></i>광고주 승인완료
                           </span>
+                          <span class="text-xs text-gray-500">수정 불가</span>
                         ` : app.review_approval_status === 'rejected' ? `
                           <span class="inline-block px-2 py-1 text-xs rounded bg-red-100 text-red-800">
                             <i class="fas fa-times-circle mr-1"></i>광고주 거절됨
                           </span>
+                          <button 
+                            data-app-id="${app.id}"
+                            data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
+                            data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
+                            onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
+                            class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                            <i class="fas fa-edit mr-1"></i>수정하기
+                          </button>
                         ` : `
                           <span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
                             <i class="fas fa-clock mr-1"></i>검토 대기중
                           </span>
+                          <button 
+                            data-app-id="${app.id}"
+                            data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
+                            data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
+                            onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
+                            class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                            <i class="fas fa-edit mr-1"></i>수정하기
+                          </button>
                         `}
-                        <button 
-                          data-app-id="${app.id}"
-                          data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
-                          data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
-                          onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
-                          class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
-                          <i class="fas fa-edit mr-1"></i>수정하기
-                        </button>
                       </div>
                       ${app.review_approval_status === 'rejected' && app.rejection_reason ? `
                         <div class="p-2 bg-red-50 rounded text-xs">
@@ -5533,17 +5542,44 @@ class ReviewSphere {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               ${applications.map(app => `
                 <div class="border rounded-lg p-4 hover:shadow-lg transition">
-                  <h3 class="font-bold text-lg mb-2">${app.campaign_title}</h3>
+                  <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-lg">${app.campaign_title}</h3>
+                    ${app.review_url || app.review_image_url ? `
+                      ${app.review_approval_status === 'approved' ? `
+                        <span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                          <i class="fas fa-check-circle mr-1"></i>승인완료
+                        </span>
+                      ` : app.review_approval_status === 'rejected' ? `
+                        <span class="inline-block px-2 py-1 text-xs rounded bg-red-100 text-red-800">
+                          <i class="fas fa-times-circle mr-1"></i>거절됨
+                        </span>
+                      ` : `
+                        <span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                          <i class="fas fa-clock mr-1"></i>검토중
+                        </span>
+                      `}
+                    ` : ''}
+                  </div>
                   ${app.review_url ? `
                     <a href="${app.review_url}" target="_blank" class="text-purple-600 hover:text-purple-800 text-sm">
                       <i class="fas fa-external-link-alt mr-1"></i>컨텐츠 보기
                     </a>
+                  ` : app.review_image_url ? `
+                    <p class="text-sm text-green-600 mb-2">
+                      <i class="fas fa-image mr-1"></i>이미지 리뷰 등록됨
+                    </p>
                   ` : `
                     <p class="text-sm text-gray-500">아직 컨텐츠를 등록하지 않았습니다</p>
                     <button onclick="app.submitReview(${app.id})" class="mt-2 text-purple-600 hover:text-purple-800 text-sm font-semibold">
                       <i class="fas fa-plus mr-1"></i>리뷰 등록하기
                     </button>
                   `}
+                  ${app.review_approval_status === 'rejected' && app.rejection_reason ? `
+                    <div class="mt-2 p-2 bg-red-50 rounded text-xs">
+                      <p class="font-semibold text-red-800 mb-1">거절 사유:</p>
+                      <p class="text-red-700">${app.rejection_reason}</p>
+                    </div>
+                  ` : ''}
                 </div>
               `).join('')}
             </div>

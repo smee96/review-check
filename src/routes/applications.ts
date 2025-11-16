@@ -325,6 +325,11 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       return c.json({ error: '등록된 리뷰가 없습니다' }, 404);
     }
     
+    // 승인완료된 리뷰는 수정 불가
+    if (existing.approval_status === 'approved') {
+      return c.json({ error: '광고주가 승인한 리뷰는 수정할 수 없습니다' }, 403);
+    }
+    
     // Check if within review submission period (content_start_date ~ result_announcement_date + 3일)
     if (application.content_start_date && application.result_announcement_date) {
       const now = new Date();
@@ -392,11 +397,25 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
       existingImageUrl: existing.image_url
     });
     
+    // 리뷰 수정 시 승인 상태 초기화 (거절된 리뷰를 수정하면 다시 검토 대기로)
     await env.DB.prepare(
-      'UPDATE reviews SET post_url = ?, image_url = ?, updated_at = ? WHERE application_id = ?'
+      `UPDATE reviews 
+       SET post_url = ?, 
+           image_url = ?, 
+           updated_at = ?,
+           approval_status = 'pending',
+           rejection_reason = NULL,
+           reviewed_by = NULL,
+           reviewed_at = NULL
+       WHERE application_id = ?`
     ).bind(finalPostUrl, finalImageUrl, getCurrentDateTime(), applicationId).run();
     
-    return c.json({ success: true, message: '리뷰가 수정되었습니다' });
+    return c.json({ 
+      success: true, 
+      message: existing.approval_status === 'rejected' 
+        ? '리뷰가 수정되었습니다. 광고주의 재검토를 기다려주세요.' 
+        : '리뷰가 수정되었습니다' 
+    });
   } catch (error) {
     console.error('Update review error:', error);
     console.error('Error details:', {
