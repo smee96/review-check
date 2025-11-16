@@ -94,14 +94,16 @@ applications.delete('/:id', requireRole('influencer'), async (c) => {
       return c.json({ error: '대기중인 지원만 취소할 수 있습니다' }, 400);
     }
     
-    // Check if application period has ended
+    // Check if application period has ended (한국 시간 기준)
     if (application.application_end_date) {
-      const now = new Date();
-      const endDate = new Date(application.application_end_date);
-      endDate.setHours(23, 59, 59, 999); // 마감일 23:59:59까지 허용
+      const { getKSTDate, parseKSTDate } = await import('../utils');
       
-      if (now > endDate) {
-        return c.json({ error: '지원 마감일이 지나 취소할 수 없습니다' }, 400);
+      const nowKST = getKSTDate();
+      const endDate = parseKSTDate(application.application_end_date);
+      endDate.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+      
+      if (nowKST > endDate) {
+        return c.json({ error: '지원 마감일이 지나 취소할 수 없습니다 (한국 시간 기준)' }, 400);
       }
     }
     
@@ -235,22 +237,24 @@ applications.post('/:id/review', requireRole('influencer'), async (c) => {
     }
     
     // Check if within review submission period (content_start_date ~ result_announcement_date + 3일)
+    // 한국 시간 기준으로 체크
     if (application.content_start_date && application.result_announcement_date) {
-      const now = new Date();
-      const startDate = new Date(application.content_start_date);
-      const announcementDate = new Date(application.result_announcement_date);
+      const { getKSTDate, parseKSTDate } = await import('../utils');
       
-      if (!isNaN(startDate.getTime()) && !isNaN(announcementDate.getTime())) {
-        // result_announcement_date + 3일
-        const endDate = new Date(announcementDate);
-        endDate.setDate(endDate.getDate() + 3);
-        
-        if (now < startDate) {
-          return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다' }, 400);
-        }
-        if (now > endDate) {
-          return c.json({ error: '리뷰 등록 기간이 종료되었습니다 (결과발표일 +3일까지)' }, 400);
-        }
+      const nowKST = getKSTDate();
+      const startDate = parseKSTDate(application.content_start_date);
+      const announcementDate = parseKSTDate(application.result_announcement_date);
+      
+      // result_announcement_date + 3일, 23:59:59까지
+      const endDate = new Date(announcementDate);
+      endDate.setUTCDate(endDate.getUTCDate() + 3);
+      endDate.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+      
+      if (nowKST < startDate) {
+        return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다 (한국 시간 기준)' }, 400);
+      }
+      if (nowKST > endDate) {
+        return c.json({ error: '리뷰 등록 기간이 종료되었습니다 (결과발표일 +3일까지, 한국 시간 기준)' }, 400);
       }
     }
     
@@ -346,22 +350,24 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
     }
     
     // Check if within review submission period (content_start_date ~ result_announcement_date + 3일)
+    // 한국 시간 기준으로 체크
     if (application.content_start_date && application.result_announcement_date) {
-      const now = new Date();
-      const startDate = new Date(application.content_start_date);
-      const announcementDate = new Date(application.result_announcement_date);
+      const { getKSTDate, parseKSTDate } = await import('../utils');
       
-      if (!isNaN(startDate.getTime()) && !isNaN(announcementDate.getTime())) {
-        // result_announcement_date + 3일
-        const endDate = new Date(announcementDate);
-        endDate.setDate(endDate.getDate() + 3);
-        
-        if (now < startDate) {
-          return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다' }, 400);
-        }
-        if (now > endDate) {
-          return c.json({ error: '리뷰 등록 기간이 종료되어 수정할 수 없습니다 (결과발표일 +3일까지)' }, 400);
-        }
+      const nowKST = getKSTDate();
+      const startDate = parseKSTDate(application.content_start_date);
+      const announcementDate = parseKSTDate(application.result_announcement_date);
+      
+      // result_announcement_date + 3일, 23:59:59까지
+      const endDate = new Date(announcementDate);
+      endDate.setUTCDate(endDate.getUTCDate() + 3);
+      endDate.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+      
+      if (nowKST < startDate) {
+        return c.json({ error: '리뷰 등록 기간이 아직 시작되지 않았습니다 (한국 시간 기준)' }, 400);
+      }
+      if (nowKST > endDate) {
+        return c.json({ error: '리뷰 등록 기간이 종료되어 수정할 수 없습니다 (결과발표일 +3일까지, 한국 시간 기준)' }, 400);
       }
     }
     

@@ -117,3 +117,56 @@ export function formatDate(date: Date | string): string {
 export function getCurrentDateTime(): string {
   return new Date().toISOString();
 }
+
+// 한국 시간대(KST, UTC+9) 관련 유틸리티 함수
+export function getKSTDate(): Date {
+  // 현재 UTC 시간에 9시간을 더해 한국 시간 생성
+  const now = new Date();
+  const kstOffset = 9 * 60 * 60 * 1000; // 9시간을 밀리초로
+  return new Date(now.getTime() + kstOffset);
+}
+
+// 날짜 문자열(YYYY-MM-DD)을 한국 시간 기준 Date 객체로 변환
+export function parseKSTDate(dateString: string): Date {
+  // dateString은 "2025-11-17" 형식
+  // 한국 시간 기준 00:00:00으로 파싱
+  const [year, month, day] = dateString.split('-').map(Number);
+  // UTC 시간으로 생성 후 9시간 빼기 (한국 시간 00:00:00이 UTC -9시간)
+  return new Date(Date.UTC(year, month - 1, day, -9, 0, 0, 0));
+}
+
+// 한국 시간 기준으로 날짜 비교 (시간 무시, 날짜만)
+export function isWithinKSTDateRange(startDateStr: string | null, endDateStr: string | null): {
+  started: boolean;
+  ended: boolean;
+  message?: string;
+} {
+  const nowKST = getKSTDate();
+  
+  if (startDateStr) {
+    const startDate = parseKSTDate(startDateStr);
+    if (nowKST < startDate) {
+      return { 
+        started: false, 
+        ended: false, 
+        message: '기간이 아직 시작되지 않았습니다' 
+      };
+    }
+  }
+  
+  if (endDateStr) {
+    const endDate = parseKSTDate(endDateStr);
+    // 종료일 23:59:59까지 허용
+    endDate.setUTCHours(14, 59, 59, 999); // UTC 기준 14:59:59 = KST 23:59:59
+    
+    if (nowKST > endDate) {
+      return { 
+        started: true, 
+        ended: true, 
+        message: '기간이 종료되었습니다' 
+      };
+    }
+  }
+  
+  return { started: true, ended: false };
+}
