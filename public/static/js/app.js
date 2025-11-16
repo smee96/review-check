@@ -4976,11 +4976,23 @@ class ReviewSphere {
                       ${app.status === 'pending' ? '대기중' :
                         app.status === 'approved' ? '확정' : '거절'}
                     </span>
-                    ${app.status === 'pending' ? `
-                      <button onclick="app.cancelApplication(${app.id})" class="text-red-600 hover:text-red-800 text-sm font-semibold">
-                        <i class="fas fa-times mr-1"></i>지원취소
-                      </button>
-                    ` : ''}
+                    ${app.status === 'pending' ? (() => {
+                      // 지원 마감일 체크 (23:59:59까지 허용)
+                      if (app.application_end_date) {
+                        const now = new Date();
+                        const endDate = new Date(app.application_end_date);
+                        endDate.setHours(23, 59, 59, 999);
+                        
+                        if (now > endDate) {
+                          return '<span class="text-xs text-gray-500">지원 마감됨</span>';
+                        }
+                      }
+                      return `
+                        <button onclick="app.cancelApplication(${app.id})" class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                          <i class="fas fa-times mr-1"></i>지원취소
+                        </button>
+                      `;
+                    })() : ''}
                     ${app.status === 'approved' && !app.review_url && !app.review_image_url ? `
                       <button onclick="app.submitReview(${app.id})" class="bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-purple-700 transition">
                         <i class="fas fa-pen mr-1"></i>리뷰 등록하기
@@ -6006,10 +6018,23 @@ class ReviewSphere {
               ${a.budget ? `<p class="text-sm mb-2"><strong>예산:</strong> ${a.budget.toLocaleString()}원</p>` : ''}
 
               <div class="flex gap-2 mt-2">
-                ${a.status === 'pending' ? `
-                  <button onclick="app.cancelApplication(${a.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
-                    <i class="fas fa-times mr-1"></i>지원 취소
-                  </button>
+                ${a.status === 'pending' ? (() => {
+                  // 지원 마감일 체크 (23:59:59까지 허용)
+                  if (a.application_end_date) {
+                    const now = new Date();
+                    const endDate = new Date(a.application_end_date);
+                    endDate.setHours(23, 59, 59, 999);
+                    
+                    if (now > endDate) {
+                      return '<span class="text-sm text-gray-500 px-4 py-2">지원 마감됨</span>';
+                    }
+                  }
+                  return `
+                    <button onclick="app.cancelApplication(${a.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                      <i class="fas fa-times mr-1"></i>지원 취소
+                    </button>
+                  `;
+                })() : ''}
                 ` : ''}
                 ${a.status === 'approved' ? `
                   <p class="text-sm text-gray-600">

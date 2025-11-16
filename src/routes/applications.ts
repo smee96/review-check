@@ -53,6 +53,7 @@ applications.get('/my', requireRole('influencer'), async (c) => {
     
     const applications = await env.DB.prepare(
       `SELECT a.*, c.title as campaign_title, c.product_name, c.budget,
+              c.application_end_date, c.announcement_date,
               r.post_url as review_url, r.image_url as review_image_url, r.submitted_at,
               r.approval_status as review_approval_status, r.rejection_reason, r.reviewed_at
        FROM applications a
@@ -76,9 +77,12 @@ applications.delete('/:id', requireRole('influencer'), async (c) => {
     const user = c.get('user');
     const { env } = c;
     
-    // Check if application exists and belongs to user
+    // Check if application exists and belongs to user, with campaign info
     const application = await env.DB.prepare(
-      'SELECT * FROM applications WHERE id = ? AND influencer_id = ?'
+      `SELECT a.*, c.application_end_date 
+       FROM applications a
+       JOIN campaigns c ON a.campaign_id = c.id
+       WHERE a.id = ? AND a.influencer_id = ?`
     ).bind(applicationId, user.userId).first();
     
     if (!application) {
@@ -88,6 +92,17 @@ applications.delete('/:id', requireRole('influencer'), async (c) => {
     // Can only cancel pending applications
     if (application.status !== 'pending') {
       return c.json({ error: '대기중인 지원만 취소할 수 있습니다' }, 400);
+    }
+    
+    // Check if application period has ended
+    if (application.application_end_date) {
+      const now = new Date();
+      const endDate = new Date(application.application_end_date);
+      endDate.setHours(23, 59, 59, 999); // 마감일 23:59:59까지 허용
+      
+      if (now > endDate) {
+        return c.json({ error: '지원 마감일이 지나 취소할 수 없습니다' }, 400);
+      }
     }
     
     // Delete application
