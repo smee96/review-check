@@ -7331,7 +7331,6 @@ class ReviewSphere {
       summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">비용 계산 중 오류가 발생했습니다</p>';
     }
   }
-}
 
   // 출금 내역 로드
   async loadWithdrawalHistoryContent(contentDiv) {
