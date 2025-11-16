@@ -33,23 +33,36 @@ class ReviewSphere {
       clearInterval(window.heroSlideInterval);
     }
     
+    const totalRealSlides = 4; // 실제 슬라이드 개수
+    const totalSlides = 5; // 복제본 포함 총 개수
+    
     // 전역 변수 초기화
     window.heroSlideIndex = 0;
     window.touchStartX = 0;
     window.touchEndX = 0;
+    window.heroIsTransitioning = false;
     
     // 슬라이드 설정 함수
-    window.setHeroSlide = (index) => {
-      window.heroSlideIndex = index;
+    window.setHeroSlide = (index, instant = false) => {
       const slider = document.getElementById('heroSlider');
       const indicators = document.querySelectorAll('.hero-indicator');
       
       if (slider) {
+        // 트랜지션 설정
+        if (instant) {
+          slider.style.transition = 'none';
+        } else {
+          slider.style.transition = 'transform 0.5s ease-in-out';
+        }
+        
         slider.style.transform = `translateX(-${index * 100}%)`;
+        window.heroSlideIndex = index;
       }
       
+      // 인디케이터 업데이트 (실제 슬라이드 인덱스 기준)
+      const realIndex = index >= totalRealSlides ? 0 : index;
       indicators.forEach((indicator, i) => {
-        if (i === index) {
+        if (i === realIndex) {
           indicator.classList.remove('opacity-50');
           indicator.classList.add('opacity-100', 'w-6');
         } else {
@@ -59,16 +72,56 @@ class ReviewSphere {
       });
     };
     
-    // 다음/이전 슬라이드 함수
+    // 다음 슬라이드
     window.heroNext = () => {
-      window.heroSlideIndex = (window.heroSlideIndex + 1) % 3;
+      if (window.heroIsTransitioning) return;
+      window.heroIsTransitioning = true;
+      
+      window.heroSlideIndex++;
       window.setHeroSlide(window.heroSlideIndex);
+      
+      // 복제된 슬라이드(인덱스 3)에 도달하면 트랜지션 후 첫 슬라이드로 순간이동
+      if (window.heroSlideIndex >= totalRealSlides) {
+        setTimeout(() => {
+          window.heroSlideIndex = 0;
+          window.setHeroSlide(0, true);
+          setTimeout(() => {
+            window.heroIsTransitioning = false;
+          }, 50);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          window.heroIsTransitioning = false;
+        }, 500);
+      }
+      
       this.startHeroAutoSlide();
     };
     
+    // 이전 슬라이드
     window.heroPrev = () => {
-      window.heroSlideIndex = (window.heroSlideIndex - 1 + 3) % 3;
-      window.setHeroSlide(window.heroSlideIndex);
+      if (window.heroIsTransitioning) return;
+      window.heroIsTransitioning = true;
+      
+      if (window.heroSlideIndex <= 0) {
+        // 첫 슬라이드에서 이전으로 가면 복제 슬라이드로 순간이동 후 마지막 슬라이드로 이동
+        window.heroSlideIndex = totalRealSlides;
+        window.setHeroSlide(window.heroSlideIndex, true);
+        setTimeout(() => {
+          window.heroSlideIndex = totalRealSlides - 1;
+          window.setHeroSlide(window.heroSlideIndex);
+          setTimeout(() => {
+            window.heroIsTransitioning = false;
+          }, 500);
+        }, 50);
+      } else {
+        window.heroSlideIndex--;
+        window.setHeroSlide(window.heroSlideIndex);
+        setTimeout(() => {
+          window.heroIsTransitioning = false;
+        }, 500);
+      }
+      
       this.startHeroAutoSlide();
     };
     
@@ -77,7 +130,7 @@ class ReviewSphere {
     
     // DOM이 준비된 후 이벤트 리스너 추가
     setTimeout(() => {
-      window.setHeroSlide(0);
+      window.setHeroSlide(0, true);
       
       // 터치 이벤트
       const slider = document.getElementById('heroSlider');
@@ -108,8 +161,15 @@ class ReviewSphere {
       const indicators = document.querySelectorAll('.hero-indicator');
       indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
-          window.setHeroSlide(index);
-          this.startHeroAutoSlide();
+          if (!window.heroIsTransitioning) {
+            window.heroIsTransitioning = true;
+            window.heroSlideIndex = index;
+            window.setHeroSlide(index);
+            setTimeout(() => {
+              window.heroIsTransitioning = false;
+            }, 500);
+            this.startHeroAutoSlide();
+          }
         });
       });
     }, 100);
@@ -121,8 +181,7 @@ class ReviewSphere {
       clearInterval(window.heroSlideInterval);
     }
     window.heroSlideInterval = setInterval(() => {
-      window.heroSlideIndex = (window.heroSlideIndex + 1) % 3;
-      window.setHeroSlide(window.heroSlideIndex);
+      window.heroNext();
     }, 5000);
   }
 
@@ -324,7 +383,7 @@ class ReviewSphere {
 
           <!-- Hero Section Slider -->
           <div class="relative overflow-hidden">
-            <div id="heroSlider" class="flex transition-transform duration-500 ease-in-out touch-pan-y">
+            <div id="heroSlider" class="flex touch-pan-y">
             
             <!-- 슬라이드 1: 메인 화면 -->
             <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-10 sm:py-14">
@@ -392,6 +451,55 @@ class ReviewSphere {
               </div>
             </div>
             
+            <!-- 슬라이드 4: 성장 메시지 -->
+            <div class="min-w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-10 sm:py-14">
+              <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                  <i class="fas fa-rocket text-4xl sm:text-5xl text-white mr-3"></i>
+                  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
+                    리뷰스피어가 성장하고 있어요
+                  </h2>
+                </div>
+                <div class="space-y-3 mb-6">
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 많은 캠페인</p>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 많은 인플루언서</p>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 큰 기회</p>
+                  </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-extrabold text-pink-200">
+                  많관부 💜
+                </p>
+              </div>
+            </div>
+            
+            <!-- 슬라이드 5: 첫 번째 슬라이드 복제 (무한 루프용) -->
+            <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-10 sm:py-14">
+              <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3">
+                  진짜 리뷰, 리뷰스피어
+                </h2>
+                <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
+                  리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+                  </button>
+                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+                  </button>
+                </div>
+              </div>
+            </div>
+            
           </div>
           
           <!-- 하단 인디케이터 (점) -->
@@ -399,6 +507,7 @@ class ReviewSphere {
             <button class="hero-indicator cursor-pointer w-2 h-2 rounded-full bg-white opacity-50 transition-all hover:opacity-75" data-index="0"></button>
             <button class="hero-indicator cursor-pointer w-2 h-2 rounded-full bg-white opacity-50 transition-all hover:opacity-75" data-index="1"></button>
             <button class="hero-indicator cursor-pointer w-2 h-2 rounded-full bg-white opacity-50 transition-all hover:opacity-75" data-index="2"></button>
+            <button class="hero-indicator cursor-pointer w-2 h-2 rounded-full bg-white opacity-50 transition-all hover:opacity-75" data-index="3"></button>
           </div>
         </div>
 
