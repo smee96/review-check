@@ -2505,11 +2505,21 @@ class ReviewSphere {
                 <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${data.campaign_title}
               </h2>
               <div class="space-y-4">
-                ${data.reviews.map(review => `
-                  <div class="border rounded-lg p-4 hover:shadow-md transition">
+                ${data.reviews.map(review => {
+                  const statusBadge = review.approval_status === 'approved' 
+                    ? '<span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>승인완료</span>'
+                    : review.approval_status === 'rejected'
+                    ? '<span class="inline-block px-2 py-1 text-xs rounded bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i>거절됨</span>'
+                    : '<span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800"><i class="fas fa-clock mr-1"></i>검토대기</span>';
+                  
+                  return `
+                  <div class="border rounded-lg p-4 hover:shadow-md transition ${review.approval_status === 'rejected' ? 'bg-red-50' : ''}">
                     <div class="flex justify-between items-start mb-3">
-                      <div>
-                        <p class="font-semibold text-gray-800">${review.influencer_nickname}</p>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <p class="font-semibold text-gray-800">${review.influencer_nickname}</p>
+                          ${statusBadge}
+                        </div>
                         <p class="text-sm text-gray-500">${review.influencer_email}</p>
                       </div>
                       <span class="text-xs text-gray-500">${new Date(review.submitted_at || review.created_at).toLocaleDateString('ko-KR')}</span>
@@ -2533,16 +2543,34 @@ class ReviewSphere {
                       </div>
                     ` : ''}
                     
+                    ${review.approval_status === 'rejected' && review.rejection_reason ? `
+                      <div class="mb-3 p-3 bg-red-100 rounded-lg">
+                        <p class="text-sm font-semibold text-red-800 mb-1">거절 사유:</p>
+                        <p class="text-sm text-red-700">${review.rejection_reason}</p>
+                      </div>
+                    ` : ''}
+                    
                     <div class="flex gap-2 mt-4">
-                      <button onclick="app.approveReview(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                        <i class="fas fa-check mr-1"></i>승인
-                      </button>
-                      <button onclick="app.rejectReview(${review.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
-                        <i class="fas fa-times mr-1"></i>거절
-                      </button>
+                      ${review.approval_status === 'pending' ? `
+                        <button onclick="app.approveReview(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                          <i class="fas fa-check mr-1"></i>승인
+                        </button>
+                        <button onclick="app.rejectReviewWithReason(${review.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                          <i class="fas fa-times mr-1"></i>거절
+                        </button>
+                      ` : review.approval_status === 'approved' ? `
+                        <button onclick="app.cancelReviewApproval(${review.id})" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 text-sm">
+                          <i class="fas fa-undo mr-1"></i>승인취소
+                        </button>
+                      ` : `
+                        <button onclick="app.cancelReviewApproval(${review.id})" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                          <i class="fas fa-undo mr-1"></i>거절취소
+                        </button>
+                      `}
                     </div>
                   </div>
-                `).join('')}
+                  `;
+                }).join('')}
               </div>
             </div>
           `).join('')}
@@ -2567,6 +2595,56 @@ class ReviewSphere {
     }
   }
 
+  async rejectReviewWithReason(reviewId) {
+    // 사유 입력 모달 생성
+    const modalHtml = `
+      <div id="rejectReasonModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <h3 class="text-xl font-bold mb-4 text-gray-800">
+            <i class="fas fa-times-circle text-red-600 mr-2"></i>리뷰 거절 사유
+          </h3>
+          <p class="text-sm text-gray-600 mb-4">
+            인플루언서가 수정할 수 있도록 구체적인 사유를 입력해주세요.
+          </p>
+          <textarea 
+            id="rejectionReasonInput" 
+            class="w-full border rounded-lg p-3 mb-4 h-32 resize-none"
+            placeholder="예: 제품명이 명확하게 표시되지 않았습니다.\n예: 필수 해시태그가 누락되었습니다.\n예: 이미지 품질이 낮습니다."
+          ></textarea>
+          <div class="flex gap-2 justify-end">
+            <button onclick="document.getElementById('rejectReasonModal').remove()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+              취소
+            </button>
+            <button onclick="app.submitReviewRejection(${reviewId})" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+              <i class="fas fa-times mr-1"></i>거절하기
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('rejectionReasonInput').focus();
+  }
+
+  async submitReviewRejection(reviewId) {
+    const reason = document.getElementById('rejectionReasonInput').value.trim();
+    
+    if (!reason) {
+      alert('거절 사유를 입력해주세요');
+      return;
+    }
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/reject`, { reason }, this.getAuthHeaders());
+      document.getElementById('rejectReasonModal').remove();
+      alert('리뷰가 거절되었습니다');
+      await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '리뷰 거절에 실패했습니다');
+    }
+  }
+
   async rejectReview(reviewId) {
     const reason = prompt('거절 사유를 입력해주세요:');
     if (!reason) {
@@ -2580,6 +2658,18 @@ class ReviewSphere {
       await this.loadAdvertiserReviewsPageContent();
     } catch (error) {
       alert(error.response?.data?.error || '리뷰 거절에 실패했습니다');
+    }
+  }
+
+  async cancelReviewApproval(reviewId) {
+    if (!confirm('승인/거절을 취소하고 검토 대기 상태로 되돌리시겠습니까?')) return;
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/cancel-approval`, {}, this.getAuthHeaders());
+      alert('상태가 검토 대기로 변경되었습니다');
+      await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '취소에 실패했습니다');
     }
   }
 
@@ -4901,18 +4991,37 @@ class ReviewSphere {
                     </button>
                   </div>
                   ${app.status === 'approved' && (app.review_url || app.review_image_url) ? `
-                    <div class="mt-2 flex items-center gap-2">
-                      <span class="text-sm text-green-600">
-                        <i class="fas fa-check-circle mr-1"></i>리뷰 등록 완료
-                      </span>
-                      <button 
-                        data-app-id="${app.id}"
-                        data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
-                        data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
-                        onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
-                        class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
-                        <i class="fas fa-edit mr-1"></i>수정하기
-                      </button>
+                    <div class="mt-2">
+                      <div class="flex items-center gap-2 mb-2">
+                        ${app.review_approval_status === 'approved' ? `
+                          <span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-1"></i>광고주 승인완료
+                          </span>
+                        ` : app.review_approval_status === 'rejected' ? `
+                          <span class="inline-block px-2 py-1 text-xs rounded bg-red-100 text-red-800">
+                            <i class="fas fa-times-circle mr-1"></i>광고주 거절됨
+                          </span>
+                        ` : `
+                          <span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-clock mr-1"></i>검토 대기중
+                          </span>
+                        `}
+                        <button 
+                          data-app-id="${app.id}"
+                          data-review-url="${(app.review_url || '').replace(/"/g, '&quot;')}"
+                          data-review-image="${(app.review_image_url || '').replace(/"/g, '&quot;')}"
+                          onclick="app.editReview(this.dataset.appId, this.dataset.reviewUrl, this.dataset.reviewImage)" 
+                          class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                          <i class="fas fa-edit mr-1"></i>수정하기
+                        </button>
+                      </div>
+                      ${app.review_approval_status === 'rejected' && app.rejection_reason ? `
+                        <div class="p-2 bg-red-50 rounded text-xs">
+                          <p class="font-semibold text-red-800 mb-1">거절 사유:</p>
+                          <p class="text-red-700">${app.rejection_reason}</p>
+                          <p class="text-red-600 mt-1">💡 사유를 확인하고 리뷰를 수정해주세요</p>
+                        </div>
+                      ` : ''}
                     </div>
                   ` : ''}
                 </div>

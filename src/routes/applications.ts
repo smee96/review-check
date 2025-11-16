@@ -53,7 +53,8 @@ applications.get('/my', requireRole('influencer'), async (c) => {
     
     const applications = await env.DB.prepare(
       `SELECT a.*, c.title as campaign_title, c.product_name, c.budget,
-              r.post_url as review_url, r.image_url as review_image_url, r.submitted_at
+              r.post_url as review_url, r.image_url as review_image_url, r.submitted_at,
+              r.approval_status as review_approval_status, r.rejection_reason, r.reviewed_at
        FROM applications a
        JOIN campaigns c ON a.campaign_id = c.id
        LEFT JOIN reviews r ON a.id = r.application_id

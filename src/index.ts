@@ -486,12 +486,15 @@ app.put('/api/reviews/:id/approve', async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
-    // 리뷰 승인 처리 - updated_at 업데이트
+    // 리뷰 승인 처리
     await c.env.DB.prepare(`
       UPDATE reviews 
-      SET updated_at = CURRENT_TIMESTAMP
+      SET approval_status = 'approved',
+          reviewed_by = ?,
+          reviewed_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).bind(reviewId).run();
+    `).bind(decoded.userId, reviewId).run();
 
     return c.json({ 
       success: true, 
@@ -519,7 +522,7 @@ app.put('/api/reviews/:id/reject', async (c) => {
     const reviewId = c.req.param('id');
     const { reason } = await c.req.json();
 
-    if (!reason) {
+    if (!reason || reason.trim() === '') {
       return c.json({ error: '거절 사유를 입력해주세요' }, 400);
     }
 
@@ -541,12 +544,16 @@ app.put('/api/reviews/:id/reject', async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
-    // 리뷰 삭제 처리 (거절 사유는 로그에만 기록)
-    console.log(`Review ${reviewId} rejected by user ${decoded.userId}. Reason: ${reason}`);
-    
+    // 리뷰 거절 처리 (삭제하지 않고 상태만 변경)
     await c.env.DB.prepare(`
-      DELETE FROM reviews WHERE id = ?
-    `).bind(reviewId).run();
+      UPDATE reviews 
+      SET approval_status = 'rejected',
+          rejection_reason = ?,
+          reviewed_by = ?,
+          reviewed_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(reason, decoded.userId, reviewId).run();
 
     return c.json({ 
       success: true, 
@@ -555,6 +562,60 @@ app.put('/api/reviews/:id/reject', async (c) => {
   } catch (error) {
     console.error('Reject review error:', error);
     return c.json({ error: '리뷰 거절 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 리뷰 승인 취소 (광고주)
+app.put('/api/reviews/:id/cancel-approval', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+
+    const reviewId = c.req.param('id');
+
+    // 리뷰 정보 조회 및 권한 확인
+    const review = await c.env.DB.prepare(`
+      SELECT r.*, c.advertiser_id 
+      FROM reviews r
+      JOIN applications a ON r.application_id = a.id
+      JOIN campaigns c ON a.campaign_id = c.id
+      WHERE r.id = ?
+    `).bind(reviewId).first();
+
+    if (!review) {
+      return c.json({ error: '리뷰를 찾을 수 없습니다' }, 404);
+    }
+
+    // 광고주 본인의 캠페인 리뷰인지 확인
+    if (review.advertiser_id !== decoded.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+
+    // 승인 취소 처리 (대기 상태로 변경)
+    await c.env.DB.prepare(`
+      UPDATE reviews 
+      SET approval_status = 'pending',
+          rejection_reason = NULL,
+          reviewed_by = NULL,
+          reviewed_at = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(reviewId).run();
+
+    return c.json({ 
+      success: true, 
+      message: '승인이 취소되었습니다'
+    });
+  } catch (error) {
+    console.error('Cancel approval error:', error);
+    return c.json({ error: '승인 취소 중 오류가 발생했습니다' }, 500);
   }
 });
 
