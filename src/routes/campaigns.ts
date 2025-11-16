@@ -184,10 +184,8 @@ campaigns.get('/:id', authMiddleware, async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 인플루언서는 모집중이고 결제 완료된 캠페인만 조회 가능
-    if (user.role === 'influencer' && (campaign.status !== 'recruiting' || campaign.payment_status !== 'paid')) {
-      return c.json({ error: '승인되고 결제 완료된 캠페인만 조회할 수 있습니다' }, 403);
-    }
+    // 인플루언서는 모든 캠페인 조회 가능 (pending 포함)
+    // 단, 지원은 recruiting + paid 캠페인만 가능 (아래 can_apply에서 제어)
     
     // 인플루언서인 경우 지원 여부 및 신청 가능 여부 확인
     let has_applied = false;
@@ -197,6 +195,11 @@ campaigns.get('/:id', authMiddleware, async (c) => {
         'SELECT id FROM applications WHERE campaign_id = ? AND influencer_id = ?'
       ).bind(campaignId, user.userId).first();
       has_applied = !!application;
+      
+      // pending 상태나 미결제 캠페인은 지원 불가
+      if (campaign.status === 'pending' || campaign.payment_status !== 'paid') {
+        can_apply = false;
+      }
       
       // 신청 기간 체크 (한국 시간 기준 UTC+9)
       const now = new Date();
