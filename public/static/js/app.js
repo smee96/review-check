@@ -3711,35 +3711,51 @@ class ReviewSphere {
 8. 체험하신 블로거분들의 리뷰 콘텐츠는 업체 홍보로 이용될 수 있습니다.`;
         
         // 과금 방식 선택
+        console.log('[editCampaign] 캠페인 데이터:', {
+          pricing_type: campaign.pricing_type,
+          product_value: campaign.product_value,
+          sphere_points: campaign.sphere_points,
+          point_reward: campaign.point_reward
+        });
+        
         if (campaign.pricing_type) {
           const pricingRadio = document.querySelector(`input[name="pricingType"][value="${campaign.pricing_type}"]`);
+          console.log('[editCampaign] 과금 방식 라디오 버튼:', pricingRadio);
           if (pricingRadio) {
             pricingRadio.checked = true;
+            console.log('[editCampaign] handlePricingTypeChange 호출 전');
             this.handlePricingTypeChange(); // 과금 방식에 따른 필드 표시
+            console.log('[editCampaign] handlePricingTypeChange 호출 후');
           }
         }
         
         // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후 DOM 업데이트 대기)
         setTimeout(() => {
+          console.log('[editCampaign] setTimeout 150ms 후 필드 값 설정 시작');
+          
           // 제품 가액
           const productValueField = document.getElementById('campaignProductValue');
+          console.log('[editCampaign] 제품 가액 필드:', productValueField, '값:', campaign.product_value);
           if (productValueField && campaign.product_value) {
             productValueField.value = campaign.product_value.toLocaleString();
           }
           
           // 스피어포인트
           const spherePointsField = document.getElementById('campaignSpherePoints');
+          console.log('[editCampaign] 스피어포인트 필드:', spherePointsField, '값:', campaign.sphere_points);
           if (spherePointsField && campaign.sphere_points) {
             spherePointsField.value = campaign.sphere_points.toLocaleString();
           }
           
           // 포인트 리워드
           const pointRewardField = document.getElementById('campaignPointReward');
+          console.log('[editCampaign] 포인트 리워드 필드:', pointRewardField, '값:', campaign.point_reward);
           if (pointRewardField && campaign.point_reward) {
             pointRewardField.value = campaign.point_reward.toLocaleString();
           }
           
           // 비용 재계산
+          console.log('[editCampaign] calculateNewPricingCost 호출');
           this.calculateNewPricingCost();
         }, 150); // DOM 업데이트 완료 대기
         
