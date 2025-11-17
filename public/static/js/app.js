@@ -7181,7 +7181,7 @@ class ReviewSphere {
         
         <div class="flex-grow">
           <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-            <button onclick="${app.showHome()}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+            <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
               <i class="fas fa-arrow-left mr-2"></i>돌아가기
             </button>
             
@@ -7504,7 +7504,7 @@ class ReviewSphere {
         
         <div class="flex-grow">
           <div class="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-            <button onclick="${app.showHome()}" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+            <button onclick="app.goBack()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
               <i class="fas fa-arrow-left mr-2"></i>돌아가기
             </button>
             
