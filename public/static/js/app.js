@@ -2330,65 +2330,73 @@ class ReviewSphere {
           
           ${withdrawals.map(w => `
             <div class="border rounded-lg p-4 bg-white">
-              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                <div class="flex-1">
-                  <h3 class="font-bold text-base sm:text-lg">${w.user_nickname || '사용자'}</h3>
-                  <p class="text-xs sm:text-sm text-gray-600">${w.user_email || ''}</p>
+              <!-- PC 최적화: 정보를 가로로 배치 -->
+              <div class="flex items-start justify-between mb-3 gap-4">
+                <!-- 사용자 정보 -->
+                <div class="flex-shrink-0" style="min-width: 180px;">
+                  <h3 class="font-bold text-base">${w.user_nickname || '사용자'}</h3>
+                  <p class="text-sm text-gray-600">${w.user_email || ''}</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap self-start ${
-                  w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  w.status === 'approved' ? 'bg-green-100 text-green-800' :
-                  w.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                }">
-                  ${w.status === 'pending' ? '⏳ 대기중' : w.status === 'approved' ? '✓ 승인됨' : w.status === 'rejected' ? '✗ 거절됨' : w.status}
-                </span>
+
+                <!-- 금액 정보 (가로 배치) -->
+                <div class="flex-1 grid grid-cols-4 gap-4">
+                  <div class="text-center">
+                    <p class="text-xs text-gray-600 mb-1">출금 금액</p>
+                    <p class="font-semibold text-base">${w.amount.toLocaleString()}P</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs text-gray-600 mb-1">세금 (22%)</p>
+                    <p class="font-semibold text-base text-red-600">-${w.tax_amount.toLocaleString()}P</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs text-gray-600 mb-1">실지급액</p>
+                    <p class="font-bold text-lg text-green-600">${w.net_amount.toLocaleString()}원</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs text-gray-600 mb-1">상태</p>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs ${
+                      w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      w.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      w.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                    }">
+                      ${w.status === 'pending' ? '⏳ 대기' : w.status === 'approved' ? '✓ 승인' : w.status === 'rejected' ? '✗ 거절' : w.status}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 액션 버튼 -->
+                <div class="flex-shrink-0 flex gap-2">
+                  ${w.status === 'pending' ? `
+                    <button onclick="app.approveWithdrawal(${w.id})" 
+                      class="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 text-sm">
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button onclick="app.rejectWithdrawal(${w.id})" 
+                      class="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  ` : ''}
+                </div>
               </div>
 
-              <div class="bg-gray-50 border border-gray-200 rounded p-3 mb-3 space-y-2 text-sm">
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <p class="text-gray-600">출금 금액</p>
-                    <p class="font-semibold text-lg">${w.amount.toLocaleString()}P</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-600">세금 (22%)</p>
-                    <p class="font-semibold text-lg text-red-600">-${w.tax_amount.toLocaleString()}P</p>
-                  </div>
-                  <div class="col-span-2">
-                    <p class="text-gray-600">실지급액</p>
-                    <p class="font-bold text-xl text-green-600">${w.net_amount.toLocaleString()}원</p>
-                  </div>
+              <!-- 계좌 정보 및 날짜 (가로 배치) -->
+              <div class="flex items-center justify-between text-sm border-t pt-3 gap-6">
+                <div class="flex items-center gap-6 text-gray-600">
+                  <span><i class="fas fa-university mr-1"></i>${w.bank_name}</span>
+                  <span><i class="fas fa-credit-card mr-1"></i>${w.account_number}</span>
+                  <span><i class="fas fa-user mr-1"></i>${w.account_holder}</span>
+                  ${w.contact_phone ? `<span><i class="fas fa-phone mr-1"></i>${w.contact_phone}</span>` : ''}
                 </div>
-                <hr class="my-2">
-                <div>
-                  <p class="text-gray-600">은행: ${w.bank_name}</p>
-                  <p class="text-gray-600">계좌번호: ${w.account_number}</p>
-                  <p class="text-gray-600">예금주: ${w.account_holder}</p>
+                <div class="flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
+                  <span>신청: ${new Date(w.created_at).toLocaleDateString('ko-KR')}</span>
+                  ${w.processed_at ? `<span>처리: ${new Date(w.processed_at).toLocaleDateString('ko-KR')}</span>` : ''}
                 </div>
               </div>
-
-              <div class="text-xs text-gray-500 mb-3">
-                <p>신청일: ${new Date(w.created_at).toLocaleString('ko-KR')}</p>
-                ${w.processed_at ? `<p>처리일: ${new Date(w.processed_at).toLocaleString('ko-KR')}</p>` : ''}
-              </div>
-
-              ${w.status === 'pending' ? `
-                <div class="flex flex-wrap gap-2">
-                  <button onclick="app.approveWithdrawal(${w.id})" 
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                    <i class="fas fa-check mr-1"></i>승인
-                  </button>
-                  <button onclick="app.rejectWithdrawal(${w.id})" 
-                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
-                    <i class="fas fa-times mr-1"></i>거절
-                  </button>
-                </div>
-              ` : ''}
               
               ${w.admin_memo ? `
                 <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                  <p class="font-semibold text-yellow-800">관리자 메모:</p>
-                  <p class="text-yellow-700">${w.admin_memo}</p>
+                  <span class="font-semibold text-yellow-800">메모:</span>
+                  <span class="text-yellow-700 ml-2">${w.admin_memo}</span>
                 </div>
               ` : ''}
             </div>
