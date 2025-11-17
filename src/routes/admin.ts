@@ -166,4 +166,29 @@ admin.put('/settings/:key', async (c) => {
   }
 });
 
+// 전체 사용자 목록 조회
+admin.get('/users', async (c) => {
+  try {
+    const { env } = c;
+    
+    const users = await env.DB.prepare(
+      `SELECT 
+        id,
+        email,
+        nickname,
+        role,
+        sphere_points,
+        created_at,
+        updated_at
+       FROM users
+       ORDER BY created_at DESC`
+    ).all();
+    
+    return c.json(users.results);
+  } catch (error) {
+    console.error('Get users error:', error);
+    return c.json({ error: '사용자 목록 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default admin;

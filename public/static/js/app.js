@@ -6529,6 +6529,27 @@ class ReviewSphere {
 
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
+              <!-- 가입자 목록 -->
+              <div class="bg-white rounded-lg shadow border-2 border-green-200">
+                <button onclick="app.toggleAdminAccordion('userList')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-users text-green-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-green-600">가입자 목록</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">전체 회원 조회 및 관리</p>
+                      </div>
+                    </div>
+                    <i id="userList-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="userList-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+              
               <!-- 시스템 설정 -->
               <div class="bg-white rounded-lg shadow border-2 border-blue-200">
                 <button onclick="app.toggleAdminAccordion('systemSettings')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
@@ -6575,7 +6596,7 @@ class ReviewSphere {
   async toggleAdminAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['systemSettings'];
+    const allSections = ['userList', 'systemSettings'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -6601,6 +6622,9 @@ class ReviewSphere {
 
     try {
       switch (sectionId) {
+        case 'userList':
+          await this.loadUserListContent(content);
+          break;
         case 'systemSettings':
           await this.loadSystemSettingsContent(content);
           break;
@@ -6608,6 +6632,84 @@ class ReviewSphere {
     } catch (error) {
       console.error('Failed to load accordion content:', error);
       content.innerHTML = '<p class="text-red-600 p-4">콘텐츠를 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async loadUserListContent(contentDiv) {
+    try {
+      const response = await axios.get('/api/admin/users', this.getAuthHeaders());
+      const users = response.data;
+      
+      // 역할별로 분류
+      const advertisers = users.filter(u => u.role === 'advertiser' || u.role === 'agency' || u.role === 'rep');
+      const influencers = users.filter(u => u.role === 'influencer');
+      const admins = users.filter(u => u.role === 'admin');
+      
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <div class="mb-6">
+            <h3 class="text-lg font-bold mb-2">가입자 통계</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="text-sm text-blue-600">전체</p>
+                <p class="text-2xl font-bold text-blue-700">${users.length}명</p>
+              </div>
+              <div class="bg-purple-50 p-3 rounded-lg">
+                <p class="text-sm text-purple-600">광고주</p>
+                <p class="text-2xl font-bold text-purple-700">${advertisers.length}명</p>
+              </div>
+              <div class="bg-green-50 p-3 rounded-lg">
+                <p class="text-sm text-green-600">인플루언서</p>
+                <p class="text-2xl font-bold text-green-700">${influencers.length}명</p>
+              </div>
+              <div class="bg-orange-50 p-3 rounded-lg">
+                <p class="text-sm text-orange-600">관리자</p>
+                <p class="text-2xl font-bold text-orange-700">${admins.length}명</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <h3 class="text-lg font-bold mb-2">전체 가입자 목록</h3>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left font-semibold">이메일</th>
+                  <th class="px-4 py-3 text-left font-semibold">닉네임</th>
+                  <th class="px-4 py-3 text-left font-semibold">역할</th>
+                  <th class="px-4 py-3 text-right font-semibold">포인트</th>
+                  <th class="px-4 py-3 text-left font-semibold">가입일</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${users.map(user => {
+                  const roleBadge = user.role === 'advertiser' || user.role === 'agency' || user.role === 'rep' ? 
+                    '<span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">광고주</span>' :
+                    user.role === 'influencer' ? 
+                    '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">인플루언서</span>' :
+                    '<span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">관리자</span>';
+                  
+                  return `
+                    <tr class="hover:bg-gray-50">
+                      <td class="px-4 py-3">${user.email}</td>
+                      <td class="px-4 py-3 font-semibold">${user.nickname}</td>
+                      <td class="px-4 py-3">${roleBadge}</td>
+                      <td class="px-4 py-3 text-right font-semibold ${user.sphere_points > 0 ? 'text-orange-600' : 'text-gray-400'}">${(user.sphere_points || 0).toLocaleString()} P</td>
+                      <td class="px-4 py-3 text-gray-600">${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load user list:', error);
+      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">사용자 목록을 불러오는데 실패했습니다</p></div>';
     }
   }
 
