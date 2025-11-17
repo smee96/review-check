@@ -2128,10 +2128,15 @@ class ReviewSphere {
               </div>
               
               <div class="flex flex-wrap gap-2 mt-3">
-                ${c.status === 'pending' ? `
+                ${c.status === 'pending' || c.status === 'cancelled' ? `
                   <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
                     class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
                     <i class="fas fa-check mr-1"></i>승인
+                  </button>
+                ` : c.status === 'recruiting' || c.status === 'approved' ? `
+                  <button onclick="app.updateCampaignStatus(${c.id}, 'pending')" 
+                    class="bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 text-xs sm:text-sm">
+                    <i class="fas fa-undo mr-1"></i>승인취소
                   </button>
                 ` : ''}
                 ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
