@@ -3811,7 +3811,7 @@ class ReviewSphere {
           }
         }
         
-        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후 DOM 업데이트 대기)
         setTimeout(() => {
           // 제품 가액
           const productValueField = document.getElementById('campaignProductValue');
@@ -3833,7 +3833,7 @@ class ReviewSphere {
           
           // 비용 재계산
           this.calculateNewPricingCost();
-        }, 50);
+        }, 150); // DOM 업데이트 완료 대기
         
         // 제출 버튼 변경
         const form = document.getElementById('createCampaignForm');
@@ -3847,7 +3847,7 @@ class ReviewSphere {
             };
           }
         }
-      }, 300);
+      }, 400); // 과금 정보 설정을 위해 시간 늘림
       
     } catch (error) {
       console.error('Edit campaign error:', error);
@@ -3991,7 +3991,7 @@ class ReviewSphere {
           }
         }
         
-        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후 DOM 업데이트 대기)
         setTimeout(() => {
           // 제품 가액
           const productValueField = document.getElementById('campaignProductValue');
@@ -4013,7 +4013,7 @@ class ReviewSphere {
           
           // 비용 재계산
           this.calculateNewPricingCost();
-        }, 50);
+        }, 150); // DOM 업데이트 완료 대기
         
         // 제출 버튼은 기본 "캠페인 등록" 그대로 사용
         // 새로운 캠페인으로 등록됨
@@ -4254,7 +4254,7 @@ class ReviewSphere {
           }
         }
         
-        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후에 실행되도록 setTimeout)
+        // 과금 방식별 필드 값 설정 (handlePricingTypeChange 후 DOM 업데이트 대기)
         setTimeout(() => {
           // 제품 가액
           const productValueField = document.getElementById('campaignProductValue');
@@ -4276,7 +4276,7 @@ class ReviewSphere {
           
           // 비용 재계산
           this.calculateNewPricingCost();
-        }, 50);
+        }, 150); // DOM 업데이트 완료 대기
         
         // 관리자 전용: 결제 상태 선택 필드 추가
         const pointSection = document.querySelector('.bg-purple-50');
