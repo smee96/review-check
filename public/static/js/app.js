@@ -3120,6 +3120,22 @@ class ReviewSphere {
             <i class="fas fa-dollar-sign mr-2"></i>과금 방식 선택 *
           </h3>
           
+          <!-- 포인트 지급 추천 안내 -->
+          <div class="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-300 rounded-lg p-3 mb-4">
+            <div class="flex items-start gap-2">
+              <i class="fas fa-star text-orange-500 mt-0.5"></i>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-orange-900 mb-1">
+                  💡 포인트 지급을 추천합니다!
+                </p>
+                <p class="text-xs text-orange-800 leading-relaxed">
+                  포인트를 많이 지급할수록 <strong>완성도 높은 리뷰</strong>를 받을 수 있습니다. 
+                  인플루언서들은 포인트 보상이 클수록 더 정성스럽고 퀄리티 높은 콘텐츠를 제작합니다.
+                </p>
+              </div>
+            </div>
+          </div>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             <!-- 1. 포인트만 지급 -->
             <label class="cursor-pointer">
@@ -3128,10 +3144,14 @@ class ReviewSphere {
               <div class="bg-white border-2 border-gray-300 rounded-lg p-3 peer-checked:border-orange-600 peer-checked:bg-orange-50 hover:border-orange-400 transition">
                 <div class="flex items-center justify-between mb-2">
                   <span class="font-semibold text-gray-800">포인트만 지급</span>
-                  <i class="fas fa-coins text-orange-600"></i>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs bg-orange-600 text-white px-1.5 py-0.5 rounded">추천</span>
+                    <i class="fas fa-coins text-orange-600"></i>
+                  </div>
                 </div>
                 <p class="text-xs text-gray-600">스피어포인트만 지급</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-orange-600 font-semibold mt-1">✨ 가장 높은 리뷰 퀄리티</p>
               </div>
             </label>
             
@@ -3146,6 +3166,7 @@ class ReviewSphere {
                 </div>
                 <p class="text-xs text-gray-600">리뷰어가 직접 구매 + 포인트</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-indigo-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
             
@@ -3174,6 +3195,7 @@ class ReviewSphere {
                 </div>
                 <p class="text-xs text-gray-600">상품 + 스피어포인트</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-blue-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
             
@@ -3202,6 +3224,7 @@ class ReviewSphere {
                 </div>
                 <p class="text-xs text-gray-600">이용권 + 스피어포인트</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-teal-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
           </div>
