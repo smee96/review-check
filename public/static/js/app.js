@@ -1518,6 +1518,28 @@ class ReviewSphere {
                       </div>
                     ` : ''}
                     
+                    ${campaign.pricing_type ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">과금 방식</span>
+                        <p class="font-semibold">${
+                          campaign.pricing_type === 'points_only' ? '포인트만 제공' :
+                          campaign.pricing_type === 'product_only' ? '상품만 제공' :
+                          campaign.pricing_type === 'product_with_points' ? '상품 + 포인트' :
+                          campaign.pricing_type === 'purchase_with_points' ? '구매 + 포인트' :
+                          campaign.pricing_type === 'voucher_only' ? '이용권만 제공' :
+                          campaign.pricing_type === 'voucher_with_points' ? '이용권 + 포인트' :
+                          '상품만 제공'
+                        }</p>
+                      </div>
+                    ` : ''}
+                    
+                    ${campaign.product_value > 0 ? `
+                      <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm text-gray-500">상품/이용권 가치</span>
+                        <p class="font-semibold text-green-600">${campaign.product_value.toLocaleString()}원</p>
+                      </div>
+                    ` : ''}
+                    
                     ${campaign.application_start_date ? `
                       <div class="bg-gray-50 p-4 rounded-lg">
                         <span class="text-sm text-gray-500">모집 시작일</span>
@@ -1609,23 +1631,23 @@ class ReviewSphere {
                   ` : ''}
                   
                   <!-- 포인트 보상 -->
-                  ${campaign.point_reward > 0 ? `
-                    <div class="bg-purple-50 p-6 rounded-lg mb-8 border-2 border-purple-200">
-                      <h3 class="font-semibold text-purple-900 mb-4 flex items-center text-lg">
-                        <i class="fas fa-coins mr-2"></i>스피어포인트 보상
+                  ${(campaign.sphere_points > 0 || campaign.point_reward > 0) ? `
+                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg mb-8 border-2 border-yellow-300">
+                      <h3 class="font-semibold text-orange-900 mb-4 flex items-center text-lg">
+                        <i class="fas fa-coins text-yellow-600 mr-2"></i>스피어포인트 보상
                       </h3>
                       <div class="grid grid-cols-2 gap-4">
                         <div>
-                          <span class="text-sm text-purple-700">인당 지급</span>
-                          <p class="text-2xl font-bold text-purple-600">${campaign.point_reward.toLocaleString()} P</p>
+                          <span class="text-sm text-orange-700">인당 지급</span>
+                          <p class="text-2xl font-bold text-orange-600">${(campaign.sphere_points || campaign.point_reward).toLocaleString()} P</p>
                         </div>
                         <div>
-                          <span class="text-sm text-purple-700">총 포인트</span>
-                          <p class="text-2xl font-bold text-purple-600">${(campaign.point_reward * campaign.slots).toLocaleString()} P</p>
+                          <span class="text-sm text-orange-700">총 포인트</span>
+                          <p class="text-2xl font-bold text-orange-600">${((campaign.sphere_points || campaign.point_reward) * campaign.slots).toLocaleString()} P</p>
                         </div>
                       </div>
-                      <p class="text-xs text-purple-600 mt-4">
-                        <i class="fas fa-info-circle mr-1"></i>캠페인 완료 후 자동으로 지급됩니다 (1P = 1원)
+                      <p class="text-xs text-orange-700 mt-4">
+                        <i class="fas fa-info-circle mr-1"></i>리뷰 승인 후 자동으로 지급됩니다 (1P = 1원)
                       </p>
                     </div>
                   ` : ''}
