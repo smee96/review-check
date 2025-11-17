@@ -679,8 +679,8 @@ app.post('/api/contact/inquiry', async (c) => {
 
     console.log('[Contact Inquiry] Sending email from:', user.email, 'subject:', subject);
     
-    // Gmail 주소 사용 (이미 Resend에서 작동 확인됨)
-    const fromEmail = 'bensmee96@gmail.com';
+    // Resend 기본 발신 주소 사용
+    const fromEmail = 'onboarding@resend.dev';
     const toEmail = 'kyuhan.lee@mobin-inc.com';
     
     const emailPayload = {
