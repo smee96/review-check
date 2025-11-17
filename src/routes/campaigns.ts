@@ -111,25 +111,25 @@ campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 
        ORDER BY c.created_at DESC`
     ).bind(user.userId).all();
     
-    // Calculate payment amount for each campaign
+    // Calculate total payment amount (what advertiser pays to platform)
     const campaignsWithPayment = campaigns.results.map((campaign: any) => {
       let paymentAmount = 0;
       const slots = campaign.slots || 1;
       const spherePoints = campaign.sphere_points || 0;
       
-      // Fixed fee structure based on pricing_type
+      // Total payment = full amount advertiser pays to platform
       switch (campaign.pricing_type) {
         case 'points_only':
-          // Points only: 30% of points amount
-          paymentAmount = Math.floor(spherePoints * 0.3) * slots;
+          // Points only: Full points amount
+          paymentAmount = spherePoints * slots;
           break;
         case 'product_only':
           // Product only: 10,000 KRW fixed fee per influencer
           paymentAmount = 10000 * slots;
           break;
         case 'product_with_points':
-          // Product + Points: 10,000 KRW + 30% of points
-          paymentAmount = (10000 + Math.floor(spherePoints * 0.3)) * slots;
+          // Product + Points: 10,000 KRW + full points amount
+          paymentAmount = (10000 + spherePoints) * slots;
           break;
         case 'purchase_with_points':
         case 'voucher_only':
