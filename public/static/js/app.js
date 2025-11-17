@@ -221,6 +221,12 @@ class ReviewSphere {
       case 'campaignDetail':
         await this.viewCampaignDetail(data.id, false);
         break;
+      case 'advertiserCampaigns':
+        await this.showAdvertiserCampaigns();
+        break;
+      case 'advertiserReviews':
+        await this.showAdvertiserReviews();
+        break;
       case 'login':
         // 로그인 페이지로 뒤로가기 하는 경우 홈으로 리다이렉트
         await this.showHome(false);
@@ -258,6 +264,8 @@ class ReviewSphere {
       bestReviews: 'R.SPHERE - 베스트 리뷰',
       myPage: 'R.SPHERE - 마이페이지',
       campaignDetail: 'R.SPHERE - 캠페인 상세',
+      advertiserCampaigns: 'R.SPHERE - 캠페인 관리',
+      advertiserReviews: 'R.SPHERE - 리뷰 관리',
       login: 'R.SPHERE - 로그인',
       register: 'R.SPHERE - 회원가입'
     };
@@ -2323,6 +2331,7 @@ class ReviewSphere {
   // ============================================
 
   async showAdvertiserCampaigns() {
+    this.pushHistory('advertiserCampaigns');
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="min-h-screen flex flex-col bg-gray-50">
@@ -2452,6 +2461,7 @@ class ReviewSphere {
   }
 
   async showAdvertiserReviews() {
+    this.pushHistory('advertiserReviews');
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="min-h-screen flex flex-col bg-gray-50">
