@@ -2140,22 +2140,49 @@ class ReviewSphere {
                     <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
                   </button>
                 ` : ''}
-                ${(c.status === 'recruiting' || c.status === 'in_progress') ? `
-                  <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
-                    class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-xs sm:text-sm">
-                    <i class="fas fa-pause mr-1"></i>일시중지
-                  </button>
-                ` : ''}
-                ${c.status === 'suspended' ? `
-                  <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
-                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
-                    <i class="fas fa-play mr-1"></i>재개
-                  </button>
-                ` : ''}
-                <button onclick="app.updateCampaignStatus(${c.id}, 'cancelled')" 
-                  class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs sm:text-sm">
-                  <i class="fas fa-ban mr-1"></i>취소
-                </button>
+                ${(() => {
+                  const actualStatus = UIUtils.calculateCampaignStatus(c);
+                  
+                  // 완료된 캠페인은 일시중지/취소 불가
+                  if (actualStatus === 'completed') {
+                    return `
+                      <span class="text-gray-500 text-xs sm:text-sm">
+                        <i class="fas fa-check-circle mr-1"></i>완료된 캠페인
+                      </span>
+                    `;
+                  }
+                  
+                  // 일시중지 버튼 (recruiting, in_progress만)
+                  let buttons = '';
+                  if (c.status === 'recruiting' || c.status === 'in_progress') {
+                    buttons += `
+                      <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
+                        class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-xs sm:text-sm">
+                        <i class="fas fa-pause mr-1"></i>일시중지
+                      </button>
+                    `;
+                  }
+                  
+                  // 재개 버튼 (suspended만)
+                  if (c.status === 'suspended') {
+                    buttons += `
+                      <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
+                        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
+                        <i class="fas fa-play mr-1"></i>재개
+                      </button>
+                    `;
+                  }
+                  
+                  // 취소 버튼 (completed 아닌 경우만)
+                  buttons += `
+                    <button onclick="app.updateCampaignStatus(${c.id}, 'cancelled')" 
+                      class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs sm:text-sm">
+                      <i class="fas fa-ban mr-1"></i>취소
+                    </button>
+                  `;
+                  
+                  return buttons;
+                })()}
               </div>
             </div>
             `;
