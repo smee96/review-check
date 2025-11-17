@@ -2472,8 +2472,7 @@ class ReviewSphere {
                           c.pricing_type === 'voucher_only' ? '이용권만' :
                           c.pricing_type === 'voucher_with_points' ? '이용권+포인트' : '상품만';
                         
-                        const baseAmount = c.payment_amount || c.budget || 0;
-                        const totalWithVAT = Math.floor(baseAmount * 1.1);
+                        const totalWithVAT = c.payment_amount || c.budget || 0;
                         
                         return `${pricingTypeText} = ${totalWithVAT.toLocaleString()}원(부가세포함)`;
                       })()}
