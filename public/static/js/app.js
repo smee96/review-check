@@ -2367,7 +2367,7 @@ class ReviewSphere {
         <div class="space-y-3 sm:space-y-4">
           ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
           ${campaigns.map(c => `
-            <div class="border rounded-lg hover:shadow-md transition overflow-hidden bg-white">
+            <div onclick="app.viewCampaignDetail(${c.id})" class="border rounded-lg hover:shadow-md transition overflow-hidden bg-white cursor-pointer">
               <div class="flex flex-col sm:flex-row">
                 <!-- 썸네일 이미지 -->
                 ${c.thumbnail_image ? `
@@ -2410,7 +2410,7 @@ class ReviewSphere {
                   </div>
                   <div class="mt-3 sm:mt-4 flex flex-wrap gap-2">
                     ${c.status === 'pending' ? `
-                      <button onclick="app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-xs sm:text-sm">
+                      <button onclick="event.stopPropagation(); app.editCampaign(${c.id})" class="text-blue-600 hover:underline text-xs sm:text-sm">
                         <i class="fas fa-edit mr-1"></i>수정
                       </button>
                     ` : `
@@ -2418,11 +2418,11 @@ class ReviewSphere {
                         <i class="fas fa-edit mr-1"></i>수정
                       </button>
                     `}
-                    <button onclick="app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
+                    <button onclick="event.stopPropagation(); app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
                       <i class="fas fa-copy mr-1"></i>복사하기
                     </button>
                     ${c.status === 'recruiting' || c.status === 'in_progress' ? `
-                      <button onclick="app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
+                      <button onclick="event.stopPropagation(); app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
                         <i class="fas fa-users mr-1"></i>지원자 보기 ${c.application_count > 0 ? `(${c.application_count})` : ''}
                       </button>
                     ` : ''}
@@ -2432,7 +2432,7 @@ class ReviewSphere {
                       // recruiting 상태이고 지원자가 있을 때만 표시
                       const canProceed = actualStatus === 'recruiting' && (c.application_count || 0) > 0;
                       return canProceed ? `
-                        <button onclick="app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
+                        <button onclick="event.stopPropagation(); app.proceedCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm font-semibold">
                           <i class="fas fa-play-circle mr-1"></i>이대로 진행
                         </button>
                       ` : '';
