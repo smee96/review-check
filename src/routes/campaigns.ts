@@ -224,6 +224,53 @@ campaigns.get('/:id', authMiddleware, async (c) => {
   }
 });
 
+// 캠페인 상태 변경 (광고주/관리자) - /:id 라우트보다 먼저 정의해야 함
+campaigns.put('/:id/status', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
+  try {
+    const campaignId = c.req.param('id');
+    const { status } = await c.req.json();
+    const user = c.get('user');
+    const { env } = c;
+    
+    // 캠페인 소유권 확인
+    const campaign = await env.DB.prepare(
+      'SELECT advertiser_id FROM campaigns WHERE id = ?'
+    ).bind(campaignId).first() as { advertiser_id: number } | null;
+    
+    if (!campaign) {
+      return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
+    }
+    
+    // 권한 체크: 관리자 또는 캠페인 소유자만
+    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+      return c.json({ error: '권한이 없습니다' }, 403);
+    }
+    
+    // 프론트엔드에서 보낸 상태를 DB 스키마에 맞게 변환
+    // recruiting, in_progress -> approved
+    let dbStatus = status;
+    if (status === 'recruiting' || status === 'in_progress') {
+      dbStatus = 'approved';
+    }
+    
+    // 유효한 상태값 체크
+    const validStatuses = ['pending', 'approved', 'suspended', 'completed', 'cancelled'];
+    if (!validStatuses.includes(dbStatus)) {
+      return c.json({ error: '유효하지 않은 상태입니다' }, 400);
+    }
+    
+    // 상태 업데이트
+    await env.DB.prepare(
+      'UPDATE campaigns SET status = ?, updated_at = ? WHERE id = ?'
+    ).bind(dbStatus, getCurrentDateTime(), campaignId).run();
+    
+    return c.json({ success: true, message: '캠페인 상태가 변경되었습니다' });
+  } catch (error) {
+    console.error('Update campaign status error:', error);
+    return c.json({ error: '상태 변경 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 // 캠페인 수정
 campaigns.put('/:id', authMiddleware, async (c) => {
   try {
@@ -614,53 +661,6 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
       error: '리뷰 조회 중 오류가 발생했습니다',
       details: (error as Error).message 
     }, 500);
-  }
-});
-
-// 캠페인 상태 변경 (광고주/관리자)
-campaigns.put('/:id/status', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
-  try {
-    const campaignId = c.req.param('id');
-    const { status } = await c.req.json();
-    const user = c.get('user');
-    const { env } = c;
-    
-    // 캠페인 소유권 확인
-    const campaign = await env.DB.prepare(
-      'SELECT advertiser_id FROM campaigns WHERE id = ?'
-    ).bind(campaignId).first() as { advertiser_id: number } | null;
-    
-    if (!campaign) {
-      return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
-    }
-    
-    // 권한 체크: 관리자 또는 캠페인 소유자만
-    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
-      return c.json({ error: '권한이 없습니다' }, 403);
-    }
-    
-    // 프론트엔드에서 보낸 상태를 DB 스키마에 맞게 변환
-    // recruiting, in_progress -> approved
-    let dbStatus = status;
-    if (status === 'recruiting' || status === 'in_progress') {
-      dbStatus = 'approved';
-    }
-    
-    // 유효한 상태값 체크
-    const validStatuses = ['pending', 'approved', 'suspended', 'completed', 'cancelled'];
-    if (!validStatuses.includes(dbStatus)) {
-      return c.json({ error: '유효하지 않은 상태입니다' }, 400);
-    }
-    
-    // 상태 업데이트
-    await env.DB.prepare(
-      'UPDATE campaigns SET status = ?, updated_at = ? WHERE id = ?'
-    ).bind(dbStatus, getCurrentDateTime(), campaignId).run();
-    
-    return c.json({ success: true, message: '캠페인 상태가 변경되었습니다' });
-  } catch (error) {
-    console.error('Update campaign status error:', error);
-    return c.json({ error: '상태 변경 중 오류가 발생했습니다' }, 500);
   }
 });
 
