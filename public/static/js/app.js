@@ -4006,6 +4006,15 @@ class ReviewSphere {
       const budget = this.getNumericValue(budgetInput);
       const pointReward = this.getNumericValue(pointRewardInput);
       
+      // 과금 방식 관련 필드
+      const pricingTypeElement = document.querySelector('input[name="pricingType"]:checked');
+      const productValueInput = document.getElementById('campaignProductValue');
+      const spherePointsInput = document.getElementById('campaignSpherePoints');
+      
+      const pricingType = pricingTypeElement ? pricingTypeElement.value : 'product_only';
+      const productValue = this.getNumericValue(productValueInput);
+      const spherePoints = this.getNumericValue(spherePointsInput);
+      
       const data = {
         title: document.getElementById('campaignTitle').value,
         description: document.getElementById('campaignDescription').value,
@@ -4015,6 +4024,11 @@ class ReviewSphere {
         budget: budget || null,
         slots: slots,
         point_reward: pointReward,
+        
+        // 과금 방식
+        pricing_type: pricingType,
+        product_value: productValue || 0,
+        sphere_points: spherePoints || 0,
         
         // 썸네일 이미지 (수정 시 새로 업로드한 경우만)
         thumbnail_image: this.thumbnailData || null,
