@@ -2430,9 +2430,9 @@ class ReviewSphere {
                     <button onclick="event.stopPropagation(); app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
                       <i class="fas fa-copy mr-1"></i>복사하기
                     </button>
-                    ${c.status === 'recruiting' || c.status === 'in_progress' ? `
+                    ${(c.application_count || 0) > 0 ? `
                       <button onclick="event.stopPropagation(); app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
-                        <i class="fas fa-users mr-1"></i>지원자 보기 ${c.application_count > 0 ? `(${c.application_count})` : ''}
+                        <i class="fas fa-users mr-1"></i>지원자 보기 (${c.application_count})
                       </button>
                     ` : ''}
                     ${(() => {
