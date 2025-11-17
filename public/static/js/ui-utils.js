@@ -390,5 +390,27 @@ const UIUtils = {
     }
     // 일반 (XXX-XXXX-XXXX)
     return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  },
+
+  // 채널 아이콘 렌더링 (FontAwesome 사용)
+  getChannelIcon(channelType) {
+    const icons = {
+      instagram: '<i class="fab fa-instagram text-pink-600"></i>',
+      blog: '<i class="fas fa-blog text-green-600"></i>',
+      youtube: '<i class="fab fa-youtube text-red-600"></i>',
+      smartstore: '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />'
+    };
+    return icons[channelType] || '<i class="fas fa-mobile-alt text-gray-500"></i>';
+  },
+
+  // 채널 이름과 아이콘 함께 렌더링
+  getChannelWithIcon(channelType) {
+    const channels = {
+      instagram: `<i class="fab fa-instagram text-pink-600 mr-1"></i>인스타그램`,
+      blog: `<i class="fas fa-blog text-green-600 mr-1"></i>블로그`,
+      youtube: `<i class="fab fa-youtube text-red-600 mr-1"></i>유튜브`,
+      smartstore: `<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="스마트스토어" />스마트스토어`
+    };
+    return channels[channelType] || `<i class="fas fa-mobile-alt text-gray-500 mr-1"></i>기타`;
   }
 };
