@@ -679,9 +679,10 @@ app.post('/api/contact/inquiry', async (c) => {
 
     console.log('[Contact Inquiry] Sending email from:', user.email, 'subject:', subject);
     
-    // Resend 기본 발신 주소 사용
+    // Resend 기본 발신 주소 사용 (테스트 모드)
+    // 인증된 수신자: bensmee96@gmail.com
     const fromEmail = 'onboarding@resend.dev';
-    const toEmail = 'kyuhan.lee@mobin-inc.com';
+    const toEmail = 'bensmee96@gmail.com';
     
     const emailPayload = {
       from: `ReviewSphere <${fromEmail}>`,
