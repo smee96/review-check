@@ -3832,7 +3832,7 @@ class ReviewSphere {
           }
           
           // 비용 재계산
-          this.calculateCampaignCost();
+          this.calculateNewPricingCost();
         }, 50);
         
         // 제출 버튼 변경
@@ -4012,7 +4012,7 @@ class ReviewSphere {
           }
           
           // 비용 재계산
-          this.calculateCampaignCost();
+          this.calculateNewPricingCost();
         }, 50);
         
         // 제출 버튼은 기본 "캠페인 등록" 그대로 사용
@@ -4275,7 +4275,7 @@ class ReviewSphere {
           }
           
           // 비용 재계산
-          this.calculateCampaignCost();
+          this.calculateNewPricingCost();
         }, 50);
         
         // 관리자 전용: 결제 상태 선택 필드 추가
