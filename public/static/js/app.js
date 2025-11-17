@@ -2441,7 +2441,7 @@ class ReviewSphere {
                   </div>
                   <p class="text-gray-600 mb-2 text-sm line-clamp-2">${c.description || ''}</p>
                   <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-500 mb-2">
-                    <span>예산: ${c.budget ? c.budget.toLocaleString() + '원' : '미정'}</span>
+                    <span>결제금액: ${c.payment_amount ? c.payment_amount.toLocaleString() + '원' : (c.budget ? c.budget.toLocaleString() + '원' : '미정')}</span>
                     <span>모집인원: <span class="font-semibold ${c.application_count > 0 ? 'text-purple-600' : ''}">${c.application_count || 0}</span>/${c.slots}명</span>
                     ${c.point_reward > 0 ? `
                       <span class="col-span-2 text-purple-600 font-semibold">

@@ -111,7 +111,43 @@ campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 
        ORDER BY c.created_at DESC`
     ).bind(user.userId).all();
     
-    return c.json(campaigns.results);
+    // Calculate payment amount for each campaign
+    const campaignsWithPayment = campaigns.results.map((campaign: any) => {
+      let paymentAmount = 0;
+      const slots = campaign.slots || 1;
+      const spherePoints = campaign.sphere_points || 0;
+      
+      // Fixed fee structure based on pricing_type
+      switch (campaign.pricing_type) {
+        case 'points_only':
+          // Points only: 30% of points amount
+          paymentAmount = Math.floor(spherePoints * 0.3) * slots;
+          break;
+        case 'product_only':
+          // Product only: 10,000 KRW fixed fee per influencer
+          paymentAmount = 10000 * slots;
+          break;
+        case 'product_with_points':
+          // Product + Points: 10,000 KRW + 30% of points
+          paymentAmount = (10000 + Math.floor(spherePoints * 0.3)) * slots;
+          break;
+        case 'purchase_with_points':
+        case 'voucher_only':
+        case 'voucher_with_points':
+          // Other types: use budget or default to 10,000
+          paymentAmount = campaign.budget || (10000 * slots);
+          break;
+        default:
+          paymentAmount = 10000 * slots;
+      }
+      
+      return {
+        ...campaign,
+        payment_amount: paymentAmount
+      };
+    });
+    
+    return c.json(campaignsWithPayment);
   } catch (error) {
     console.error('Get my campaigns error:', error);
     return c.json({ error: '캠페인 목록 조회 중 오류가 발생했습니다' }, 500);
