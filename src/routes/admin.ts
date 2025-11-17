@@ -191,4 +191,46 @@ admin.get('/users', async (c) => {
   }
 });
 
+// 베스트 캠페인 토글
+admin.put('/campaigns/:id/best', async (c) => {
+  try {
+    const campaignId = c.req.param('id');
+    const { is_best } = await c.req.json();
+    const { env } = c;
+    
+    await env.DB.prepare(
+      'UPDATE campaigns SET is_best = ?, updated_at = ? WHERE id = ?'
+    ).bind(is_best ? 1 : 0, getCurrentDateTime(), campaignId).run();
+    
+    return c.json({ 
+      success: true, 
+      message: is_best ? '베스트 캠페인으로 설정되었습니다' : '베스트 캠페인에서 제외되었습니다' 
+    });
+  } catch (error) {
+    console.error('Toggle best campaign error:', error);
+    return c.json({ error: '베스트 캠페인 설정 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 베스트 리뷰 토글
+admin.put('/reviews/:id/best', async (c) => {
+  try {
+    const reviewId = c.req.param('id');
+    const { is_best } = await c.req.json();
+    const { env } = c;
+    
+    await env.DB.prepare(
+      'UPDATE reviews SET is_best = ?, updated_at = ? WHERE id = ?'
+    ).bind(is_best ? 1 : 0, getCurrentDateTime(), reviewId).run();
+    
+    return c.json({ 
+      success: true, 
+      message: is_best ? '베스트 리뷰로 설정되었습니다' : '베스트 리뷰에서 제외되었습니다' 
+    });
+  } catch (error) {
+    console.error('Toggle best review error:', error);
+    return c.json({ error: '베스트 리뷰 설정 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default admin;

@@ -174,15 +174,14 @@ campaigns.get('/', async (c) => {
     const type = c.req.query('type'); // 'best' or undefined
     
     if (type === 'best') {
-      // 베스트 캠페인: 모집중이고 결제 완료된 캠페인 중 지원자 수가 많은 순
-      // - 모든 캠페인: 결제 완료 필수 (포인트 0원 캠페인도 고정 수수료 11,000원 결제 필요)
+      // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.status = ? AND c.payment_status = ?
-         ORDER BY application_count DESC, c.created_at DESC
-         LIMIT 10`
+         WHERE c.is_best = 1 AND c.status = ? AND c.payment_status = ?
+         ORDER BY c.updated_at DESC
+         LIMIT 20`
       ).bind('recruiting', 'paid').all();
       
       return c.json(campaigns.results);

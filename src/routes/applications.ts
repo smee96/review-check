@@ -450,4 +450,30 @@ applications.put('/:id/review', requireRole('influencer'), async (c) => {
   }
 });
 
+// 베스트 리뷰 조회 (로그인 필수)
+applications.get('/reviews/best', authMiddleware, async (c) => {
+  try {
+    const { env } = c;
+    
+    const reviews = await env.DB.prepare(
+      `SELECT r.*, 
+       c.title as campaign_title,
+       c.thumbnail_image as campaign_thumbnail,
+       u.nickname as influencer_nickname
+       FROM reviews r
+       JOIN applications a ON r.application_id = a.id
+       JOIN campaigns c ON a.campaign_id = c.id
+       JOIN users u ON a.influencer_id = u.id
+       WHERE r.is_best = 1 AND r.approval_status = 'approved'
+       ORDER BY r.updated_at DESC
+       LIMIT 20`
+    ).all();
+    
+    return c.json(reviews.results);
+  } catch (error) {
+    console.error('Get best reviews error:', error);
+    return c.json({ error: '베스트 리뷰 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default applications;
