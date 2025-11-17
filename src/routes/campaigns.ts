@@ -227,15 +227,25 @@ campaigns.get('/:id', authMiddleware, async (c) => {
 // 캠페인 상태 변경 (광고주/관리자) - /:id 라우트보다 먼저 정의해야 함
 campaigns.put('/:id/status', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
   try {
+    console.log('[Status Update] Starting...');
     const campaignId = c.req.param('id');
+    console.log('[Status Update] Campaign ID:', campaignId);
+    
     const { status } = await c.req.json();
+    console.log('[Status Update] Requested status:', status);
+    
     const user = c.get('user');
+    console.log('[Status Update] User:', user?.userId, user?.role);
+    
     const { env } = c;
     
     // 캠페인 소유권 확인
+    console.log('[Status Update] Fetching campaign...');
     const campaign = await env.DB.prepare(
       'SELECT advertiser_id FROM campaigns WHERE id = ?'
     ).bind(campaignId).first() as { advertiser_id: number } | null;
+    
+    console.log('[Status Update] Campaign found:', campaign);
     
     if (!campaign) {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
@@ -267,7 +277,12 @@ campaigns.put('/:id/status', authMiddleware, requireRole('advertiser', 'agency',
     return c.json({ success: true, message: '캠페인 상태가 변경되었습니다' });
   } catch (error) {
     console.error('Update campaign status error:', error);
-    return c.json({ error: '상태 변경 중 오류가 발생했습니다' }, 500);
+    console.error('Error details:', (error as Error).message);
+    console.error('Error stack:', (error as Error).stack);
+    return c.json({ 
+      error: '상태 변경 중 오류가 발생했습니다',
+      details: (error as Error).message 
+    }, 500);
   }
 });
 
