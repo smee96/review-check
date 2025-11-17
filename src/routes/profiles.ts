@@ -27,7 +27,17 @@ profiles.get('/influencer', requireRole('influencer'), async (c) => {
       'SELECT * FROM influencer_profiles WHERE user_id = ?'
     ).bind(user.userId).first();
     
-    return c.json(profile || {});
+    // sphere_points 조회
+    const userData = await env.DB.prepare(
+      'SELECT sphere_points FROM users WHERE id = ?'
+    ).bind(user.userId).first() as { sphere_points: number } | null;
+    
+    const result = {
+      ...(profile || {}),
+      sphere_points: userData?.sphere_points || 0
+    };
+    
+    return c.json(result);
   } catch (error) {
     console.error('Get influencer profile error:', error);
     return c.json({ error: '프로필 조회 중 오류가 발생했습니다' }, 500);

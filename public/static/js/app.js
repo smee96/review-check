@@ -419,12 +419,24 @@ class ReviewSphere {
                   리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
-                    <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
-                  </button>
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
-                    <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
-                  </button>
+                  ${this.user ? (
+                    this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
+                      <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                        <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
+                      </button>
+                    ` : `
+                      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                        <i class="fas fa-search mr-2"></i>캠페인 둘러보기
+                      </button>
+                    `
+                  ) : `
+                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+                    </button>
+                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+                    </button>
+                  `}
                 </div>
               </div>
             </div>
@@ -446,9 +458,19 @@ class ReviewSphere {
                     <span class="line-through opacity-70">30,000원</span> → <span class="text-yellow-300">10,000원</span>
                   </p>
                 </div>
-                <button onclick="app.showLogin()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
-                  <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
-                </button>
+                ${this.user && (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') ? `
+                  <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
+                    <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
+                  </button>
+                ` : this.user ? `
+                  <button disabled class="bg-gray-300 text-gray-500 px-6 py-2 rounded-lg text-sm font-bold cursor-not-allowed shadow-lg w-56 opacity-60">
+                    <i class="fas fa-bullhorn mr-2"></i>광고주 전용
+                  </button>
+                ` : `
+                  <button onclick="app.showLogin()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
+                    <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+                  </button>
+                `}
               </div>
             </div>
             
@@ -469,9 +491,19 @@ class ReviewSphere {
                     스피어 포인트 <span class="text-3xl sm:text-4xl">1,000P 지급!</span>
                   </p>
                 </div>
-                <button onclick="app.showLogin()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
-                  <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
-                </button>
+                ${this.user && this.user.role === 'influencer' ? `
+                  <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
+                    <i class="fas fa-search mr-2"></i>캠페인 둘러보기
+                  </button>
+                ` : this.user ? `
+                  <button disabled class="bg-gray-300 text-gray-500 px-6 py-2 rounded-lg text-sm font-bold cursor-not-allowed shadow-lg w-56 opacity-60">
+                    <i class="fas fa-star mr-2"></i>인플루언서 전용
+                  </button>
+                ` : `
+                  <button onclick="app.showLogin()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
+                    <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+                  </button>
+                `}
               </div>
             </div>
             
@@ -514,12 +546,24 @@ class ReviewSphere {
                   리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
-                    <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
-                  </button>
-                  <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
-                    <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
-                  </button>
+                  ${this.user ? (
+                    this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
+                      <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                        <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
+                      </button>
+                    ` : `
+                      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                        <i class="fas fa-search mr-2"></i>캠페인 둘러보기
+                      </button>
+                    `
+                  ) : `
+                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
+                    </button>
+                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
+                    </button>
+                  `}
                 </div>
               </div>
             </div>
@@ -1877,6 +1921,19 @@ class ReviewSphere {
                 </div>
               </div>
 
+              <!-- 1:1 문의 -->
+              <div class="bg-white rounded-lg shadow border-2 border-blue-200">
+                <button onclick="app.showContactInquiry()" class="w-full p-5 sm:p-6 text-left hover:bg-blue-50 transition">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-envelope text-blue-600 text-xl sm:text-2xl"></i>
+                    <div>
+                      <h3 class="font-semibold text-base sm:text-lg text-blue-600">1:1 문의</h3>
+                      <p class="text-xs sm:text-sm text-gray-600">궁금한 사항을 문의해주세요</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
               <!-- 로그아웃 -->
               <div class="bg-white rounded-lg shadow border-2 border-red-200">
                 <button onclick="app.logout()" class="w-full p-5 sm:p-6 text-left hover:bg-red-50 transition">
@@ -2497,11 +2554,9 @@ class ReviewSphere {
                     <button onclick="event.stopPropagation(); app.copyCampaign(${c.id})" class="text-green-600 hover:underline text-xs sm:text-sm">
                       <i class="fas fa-copy mr-1"></i>복사하기
                     </button>
-                    ${(c.application_count || 0) > 0 ? `
-                      <button onclick="event.stopPropagation(); app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
-                        <i class="fas fa-users mr-1"></i>지원자 보기 (${c.application_count})
-                      </button>
-                    ` : ''}
+                    <button onclick="event.stopPropagation(); app.viewApplications(${c.id})" class="text-purple-600 hover:underline text-xs sm:text-sm">
+                      <i class="fas fa-users mr-1"></i>지원자 보기 (${c.application_count || 0})
+                    </button>
                     ${(() => {
                       // 실제 상태 계산 (UIUtils 사용)
                       const actualStatus = UIUtils.calculateCampaignStatus(c);
@@ -4743,7 +4798,10 @@ class ReviewSphere {
     try {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
       profileData = response.data;
-      pointsBalance = profileData.points_balance || 0;
+      pointsBalance = Number(profileData.sphere_points) || 0;
+      console.log('[Mypage] Profile data:', profileData);
+      console.log('[Mypage] Points balance:', pointsBalance);
+      console.log('[Mypage] Can withdraw?', pointsBalance >= 50000);
       
       // 필수 항목 체크: 실명, 생년월일, 성별, 연락처, 은행명, 계좌번호, 예금주명, 배송지 정보
       if (!profileData.real_name || !profileData.birth_date || !profileData.gender || 
@@ -4785,13 +4843,13 @@ class ReviewSphere {
                 <p class="text-xs sm:text-sm opacity-75">
                   <i class="fas fa-info-circle mr-1"></i>포인트는 캠페인 완료 시 지급됩니다
                 </p>
-                ${pointsBalance >= 50000 ? `
+                ${pointsBalance >= 10000 ? `
                   <button onclick="app.showWithdrawalRequest()" class="bg-white text-purple-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition">
                     <i class="fas fa-money-bill-wave mr-1"></i>출금 신청
                   </button>
                 ` : `
                   <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-bold cursor-not-allowed">
-                    <i class="fas fa-lock mr-1"></i>50,000P 이상
+                    <i class="fas fa-lock mr-1"></i>10,000P 이상
                   </button>
                 `}
               </div>
@@ -4905,6 +4963,17 @@ class ReviewSphere {
                   </div>
                 </div>
               </div>
+
+              <!-- 1:1 문의 -->
+              <button onclick="app.showContactInquiry()" class="w-full bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-blue-200">
+                <div class="flex items-center space-x-3">
+                  <i class="fas fa-envelope text-blue-600 text-xl sm:text-2xl"></i>
+                  <div class="text-left">
+                    <h3 class="font-semibold text-base sm:text-lg text-blue-600">1:1 문의</h3>
+                    <p class="text-xs sm:text-sm text-gray-600">궁금한 사항을 문의해주세요</p>
+                  </div>
+                </div>
+              </button>
 
               <!-- 로그아웃 -->
               <button onclick="app.logout()" class="w-full bg-white p-5 sm:p-6 rounded-lg shadow hover:shadow-lg transition active:scale-95 border-2 border-red-200">
@@ -8187,10 +8256,10 @@ class ReviewSphere {
     try {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
       const profile = response.data;
-      const pointsBalance = profile.points_balance || 0;
+      const pointsBalance = Number(profile.sphere_points) || 0;
 
-      if (pointsBalance < 50000) {
-        alert('출금 가능한 포인트가 부족합니다. (최소 50,000P)');
+      if (pointsBalance < 10000) {
+        alert('출금 가능한 포인트가 부족합니다. (최소 10,000P)');
         return;
       }
 
@@ -8199,10 +8268,13 @@ class ReviewSphere {
         return;
       }
 
+      // 전화번호 가져오기 (contact_phone)
+      const contactPhone = profile.contact_phone || '';
+
       const modal = document.createElement('div');
       modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
       modal.innerHTML = `
-        <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
           <h2 class="text-2xl font-bold mb-4">포인트 출금 신청</h2>
           
           <div class="space-y-4">
@@ -8213,9 +8285,10 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium mb-2">출금 금액 (포인트)</label>
-              <input type="number" id="withdrawalAmount" class="w-full px-4 py-2 border rounded-lg" 
-                min="50000" max="${pointsBalance}" step="10000" placeholder="최소 50,000P">
-              <p class="text-xs text-gray-600 mt-1">* 최소 출금 금액: 50,000P</p>
+              <input type="text" id="withdrawalAmountDisplay" class="w-full px-4 py-2 border rounded-lg" 
+                placeholder="10,000P 단위로 입력 (예: 10,000)">
+              <input type="hidden" id="withdrawalAmount" value="">
+              <p class="text-xs text-gray-600 mt-1">* 최소 출금 금액: 10,000P (10,000P 단위)</p>
             </div>
 
             <div id="taxInfo" class="bg-yellow-50 p-4 rounded-lg hidden">
@@ -8246,6 +8319,13 @@ class ReviewSphere {
               <p class="text-xs text-gray-600 mt-2">* 계좌 정보가 틀린 경우 프로필에서 수정해주세요</p>
             </div>
 
+            <div>
+              <label class="block text-sm font-medium mb-2">연락처</label>
+              <input type="tel" id="withdrawalPhone" class="w-full px-4 py-2 border rounded-lg" 
+                value="${contactPhone}" placeholder="010-0000-0000">
+              <p class="text-xs text-gray-600 mt-1">* 출금 관련 연락을 위해 필요합니다</p>
+            </div>
+
             <div class="flex gap-2">
               <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                 취소
@@ -8260,16 +8340,35 @@ class ReviewSphere {
 
       document.body.appendChild(modal);
 
-      // 금액 입력 시 세금 계산
-      document.getElementById('withdrawalAmount').addEventListener('input', (e) => {
-        const amount = parseInt(e.target.value) || 0;
+      // 금액 입력 시 천단위 콤마 자동 추가 및 세금 계산
+      const displayInput = document.getElementById('withdrawalAmountDisplay');
+      const hiddenInput = document.getElementById('withdrawalAmount');
+      
+      displayInput.addEventListener('input', (e) => {
+        // 숫자만 추출
+        let value = e.target.value.replace(/[^\d]/g, '');
+        
+        // 숫자를 정수로 변환
+        const numValue = parseInt(value) || 0;
+        
+        // hidden input에 실제 값 저장
+        hiddenInput.value = numValue;
+        
+        // 천단위 콤마 추가하여 표시
+        if (value) {
+          e.target.value = numValue.toLocaleString();
+        } else {
+          e.target.value = '';
+        }
+        
+        // 세금 계산 표시
         const taxInfo = document.getElementById('taxInfo');
+        
+        if (numValue >= 10000) {
+          const tax = Math.floor(numValue * 0.22);
+          const net = numValue - tax;
 
-        if (amount >= 50000) {
-          const tax = Math.floor(amount * 0.22);
-          const net = amount - tax;
-
-          document.getElementById('requestAmount').textContent = amount.toLocaleString() + '원';
+          document.getElementById('requestAmount').textContent = numValue.toLocaleString() + '원';
           document.getElementById('taxAmount').textContent = '-' + tax.toLocaleString() + '원';
           document.getElementById('netAmount').textContent = net.toLocaleString() + '원';
           taxInfo.classList.remove('hidden');
@@ -8287,9 +8386,21 @@ class ReviewSphere {
   // 출금 신청 제출
   async submitWithdrawal() {
     const amount = parseInt(document.getElementById('withdrawalAmount').value);
+    const phone = document.getElementById('withdrawalPhone').value.trim();
 
-    if (!amount || amount < 50000) {
-      alert('최소 출금 금액은 50,000P입니다');
+    if (!amount || amount < 10000) {
+      alert('최소 출금 금액은 10,000P입니다');
+      return;
+    }
+
+    // 10,000 단위 체크
+    if (amount % 10000 !== 0) {
+      alert('출금 금액은 10,000P 단위로 입력해주세요');
+      return;
+    }
+
+    if (!phone) {
+      alert('연락처를 입력해주세요');
       return;
     }
 
@@ -8301,7 +8412,8 @@ class ReviewSphere {
         amount,
         bank_name: profileData.bank_name,
         account_number: profileData.account_number,
-        account_holder: profileData.account_holder_name
+        account_holder: profileData.account_holder_name,
+        contact_phone: phone
       }, this.getAuthHeaders());
 
       alert(`출금 신청이 완료되었습니다!\n실지급액: ${response.data.net_amount.toLocaleString()}원\n영업일 기준 7일 이내에 입금됩니다.`);
@@ -8314,6 +8426,120 @@ class ReviewSphere {
     } catch (error) {
       console.error('Submit withdrawal error:', error);
       alert(error.response?.data?.error || '출금 신청에 실패했습니다');
+    }
+  }
+
+  // 1:1 문의 모달
+  async showContactInquiry() {
+    // 사용자 이메일 가져오기
+    let userEmail = this.user.email || '';
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-4">
+          <i class="fas fa-envelope text-blue-600 mr-2"></i>1:1 문의
+        </h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">회신받을 이메일 주소 *</label>
+            <input type="email" id="inquiryReplyEmail" class="w-full px-4 py-2 border rounded-lg" 
+              value="${userEmail}" placeholder="답변을 받을 이메일 주소">
+            <p class="text-xs text-gray-600 mt-1">* 답변은 이 이메일로 전송됩니다</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">제목 *</label>
+            <input type="text" id="inquirySubject" class="w-full px-4 py-2 border rounded-lg" 
+              placeholder="문의 제목을 입력하세요">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">문의 내용 *</label>
+            <textarea id="inquiryMessage" class="w-full px-4 py-2 border rounded-lg" 
+              rows="8" placeholder="문의 내용을 상세히 입력해주세요"></textarea>
+          </div>
+
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700">
+              <i class="fas fa-info-circle text-blue-600 mr-1"></i>
+              문의하신 내용은 영업일 기준 1~2일 이내에 이메일로 답변드립니다.
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              취소
+            </button>
+            <button onclick="app.submitContactInquiry()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <i class="fas fa-paper-plane mr-1"></i>문의하기
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  // 1:1 문의 제출
+  async submitContactInquiry() {
+    const replyEmail = document.getElementById('inquiryReplyEmail').value.trim();
+    const subject = document.getElementById('inquirySubject').value.trim();
+    const message = document.getElementById('inquiryMessage').value.trim();
+
+    if (!replyEmail) {
+      alert('회신받을 이메일 주소를 입력해주세요');
+      return;
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(replyEmail)) {
+      alert('올바른 이메일 주소를 입력해주세요');
+      return;
+    }
+
+    if (!subject) {
+      alert('제목을 입력해주세요');
+      return;
+    }
+
+    if (!message) {
+      alert('문의 내용을 입력해주세요');
+      return;
+    }
+
+    if (message.length < 10) {
+      alert('문의 내용을 10자 이상 입력해주세요');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/contact/inquiry', {
+        reply_email: replyEmail,
+        subject,
+        message
+      }, this.getAuthHeaders());
+
+      alert(response.data.message);
+      
+      // 모달 닫기
+      document.querySelector('.fixed.inset-0').remove();
+    } catch (error) {
+      console.error('Submit inquiry error:', error);
+      console.error('Error details:', error.response?.data);
+      
+      const errorMsg = error.response?.data?.error || '문의 접수에 실패했습니다';
+      const errorDetails = error.response?.data?.details;
+      
+      if (errorDetails) {
+        alert(`${errorMsg}\n\n상세 정보:\n${errorDetails}`);
+      } else {
+        alert(errorMsg);
+      }
     }
   }
 }

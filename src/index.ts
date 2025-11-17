@@ -16,6 +16,7 @@ import { verifyJWT } from './utils';
 
 type Bindings = {
   DB: D1Database;
+  RESEND_API_KEY: string;
 };
 
 type Variables = {
@@ -152,11 +153,16 @@ app.post('/api/withdrawal/request', async (c) => {
       return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
     }
 
-    const { amount, bank_name, account_number, account_holder } = await c.req.json();
+    const { amount, bank_name, account_number, account_holder, contact_phone } = await c.req.json();
 
     // 최소 출금 금액 확인
-    if (amount < 50000) {
-      return c.json({ error: '최소 출금 금액은 50,000 포인트입니다' }, 400);
+    if (amount < 10000) {
+      return c.json({ error: '최소 출금 금액은 10,000 포인트입니다' }, 400);
+    }
+
+    // 10,000 단위 확인
+    if (amount % 10000 !== 0) {
+      return c.json({ error: '출금 금액은 10,000 포인트 단위로 입력해주세요' }, 400);
     }
 
     // 사용자 포인트 확인
@@ -171,12 +177,12 @@ app.post('/api/withdrawal/request', async (c) => {
     const tax_amount = Math.floor(amount * 0.22);
     const net_amount = amount - tax_amount;
 
-    // 출금 신청 생성
+    // 출금 신청 생성 (contact_phone 추가)
     const result = await c.env.DB.prepare(`
       INSERT INTO withdrawal_requests 
-      (user_id, amount, tax_amount, net_amount, bank_name, account_number, account_holder, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
-    `).bind(decoded.userId, amount, tax_amount, net_amount, bank_name, account_number, account_holder).run();
+      (user_id, amount, tax_amount, net_amount, bank_name, account_number, account_holder, contact_phone, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    `).bind(decoded.userId, amount, tax_amount, net_amount, bank_name, account_number, account_holder, contact_phone || null).run();
 
     // 포인트 차감 (pending 상태로 예약)
     await c.env.DB.prepare('UPDATE users SET sphere_points = sphere_points - ? WHERE id = ?')
@@ -616,6 +622,130 @@ app.put('/api/reviews/:id/cancel-approval', async (c) => {
   } catch (error) {
     console.error('Cancel approval error:', error);
     return c.json({ error: '승인 취소 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 1:1 문의 이메일 전송
+app.post('/api/contact/inquiry', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+
+    const { subject, message, reply_email } = await c.req.json();
+
+    if (!subject || !message) {
+      return c.json({ error: '제목과 내용을 입력해주세요' }, 400);
+    }
+
+    if (!reply_email) {
+      return c.json({ error: '회신받을 이메일 주소를 입력해주세요' }, 400);
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(reply_email)) {
+      return c.json({ error: '올바른 이메일 주소를 입력해주세요' }, 400);
+    }
+
+    // 사용자 정보 조회
+    const user = await c.env.DB.prepare(
+      'SELECT email, nickname, role FROM users WHERE id = ?'
+    ).bind(decoded.userId).first() as { email: string; nickname: string; role: string } | null;
+
+    if (!user) {
+      return c.json({ error: '사용자 정보를 찾을 수 없습니다' }, 404);
+    }
+
+    // Resend API로 이메일 전송
+    const resendApiKey = c.env.RESEND_API_KEY;
+    console.log('[Contact Inquiry] RESEND_API_KEY exists:', !!resendApiKey);
+    
+    if (!resendApiKey) {
+      console.error('[Contact Inquiry] RESEND_API_KEY not configured');
+      return c.json({ error: '이메일 서비스가 설정되지 않았습니다. 관리자에게 문의해주세요.' }, 500);
+    }
+
+    const roleText = user.role === 'advertiser' ? '광고주' : 
+                     user.role === 'agency' ? '대행사' :
+                     user.role === 'rep' ? '렙사' :
+                     user.role === 'influencer' ? '인플루언서' : '관리자';
+
+    console.log('[Contact Inquiry] Sending email from:', user.email, 'subject:', subject);
+    
+    // Gmail 주소 사용 (이미 Resend에서 작동 확인됨)
+    const fromEmail = 'bensmee96@gmail.com';
+    const toEmail = 'kyuhan.lee@mobin-inc.com';
+    
+    const emailPayload = {
+      from: `ReviewSphere <${fromEmail}>`,
+      to: [toEmail],
+      reply_to: reply_email,
+      subject: `[1:1 문의] ${subject}`,
+      html: `
+        <h2>리뷰스피어 1:1 문의</h2>
+        <hr/>
+        <p><strong>문의자:</strong> ${user.nickname} (${user.email})</p>
+        <p><strong>회신 이메일:</strong> ${reply_email}</p>
+        <p><strong>구분:</strong> ${roleText}</p>
+        <p><strong>제목:</strong> ${subject}</p>
+        <hr/>
+        <h3>문의 내용:</h3>
+        <p style="white-space: pre-wrap;">${message}</p>
+        <hr/>
+        <p style="color: #666; font-size: 12px;">이 이메일은 리뷰스피어 1:1 문의 시스템에서 자동 발송되었습니다.</p>
+        <p style="color: #666; font-size: 12px;">답장은 <strong>${reply_email}</strong>로 보내주세요.</p>
+      `
+    };
+    
+    console.log('[Contact Inquiry] Email payload:', JSON.stringify(emailPayload));
+    
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(emailPayload)
+    });
+
+    console.log('[Contact Inquiry] Resend API response status:', emailResponse.status);
+
+    if (!emailResponse.ok) {
+      const errorText = await emailResponse.text();
+      console.error('[Contact Inquiry] Resend API error status:', emailResponse.status);
+      console.error('[Contact Inquiry] Resend API error body:', errorText);
+      
+      let errorDetails = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = errorJson.message || errorJson.error || errorText;
+      } catch (e) {
+        // JSON 파싱 실패시 원본 텍스트 사용
+      }
+      
+      return c.json({ 
+        error: '이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        details: `Resend API Error (${emailResponse.status}): ${errorDetails}`
+      }, 500);
+    }
+
+    const responseData = await emailResponse.json();
+    console.log('[Contact Inquiry] Email sent successfully:', responseData);
+
+    return c.json({ 
+      success: true, 
+      message: '문의가 접수되었습니다. 빠른 시일 내에 답변드리겠습니다.' 
+    });
+  } catch (error) {
+    console.error('Contact inquiry error:', error);
+    return c.json({ error: '문의 접수 중 오류가 발생했습니다' }, 500);
   }
 });
 

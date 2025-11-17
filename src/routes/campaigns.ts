@@ -601,14 +601,7 @@ campaigns.get('/:id/applications', authMiddleware, async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 모집 기간 체크: 광고주는 모집 기간이 끝난 후에만 지원자 조회 가능 (관리자는 언제든 가능)
-    if (user.role !== 'admin') {
-      const now = new Date();
-      const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0]; // YYYY-MM-DD (한국 시간)
-      if (campaign.application_end_date && koreaDate <= campaign.application_end_date) {
-        return c.json({ error: '모집 기간이 종료된 후 지원자를 확인할 수 있습니다' }, 403);
-      }
-    }
+    // 모집 기간과 관계없이 언제든 지원자 조회 가능
     
     // Get applications with influencer info (채널 정보만 공개, 개인정보는 마스킹)
     const applications = await env.DB.prepare(
