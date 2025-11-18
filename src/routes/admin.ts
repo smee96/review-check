@@ -23,7 +23,10 @@ admin.get('/campaigns', async (c) => {
     const { env } = c;
     
     const campaigns = await env.DB.prepare(
-      `SELECT c.*, u.email as advertiser_email, u.nickname as advertiser_nickname
+      `SELECT c.*, 
+       COALESCE(c.is_best, 0) as is_best,
+       u.email as advertiser_email, 
+       u.nickname as advertiser_nickname
        FROM campaigns c
        JOIN users u ON c.advertiser_id = u.id
        ORDER BY c.created_at DESC`
@@ -188,6 +191,35 @@ admin.get('/users', async (c) => {
   } catch (error) {
     console.error('Get users error:', error);
     return c.json({ error: '사용자 목록 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 모든 리뷰 조회 (관리자용)
+admin.get('/reviews', async (c) => {
+  try {
+    const { env } = c;
+    
+    const reviews = await env.DB.prepare(
+      `SELECT r.id, r.application_id, r.post_url, r.image_url as review_image, 
+       r.submitted_at, r.updated_at, r.approval_status, r.rejection_reason, 
+       r.is_best, r.reviewed_by, r.reviewed_at,
+       '' as review_text,
+       c.title as campaign_title,
+       c.id as campaign_id,
+       u.nickname as influencer_nickname,
+       u.email as influencer_email,
+       a.created_at
+       FROM reviews r
+       JOIN applications a ON r.application_id = a.id
+       JOIN campaigns c ON a.campaign_id = c.id
+       JOIN users u ON a.influencer_id = u.id
+       ORDER BY r.submitted_at DESC`
+    ).all();
+    
+    return c.json(reviews.results);
+  } catch (error) {
+    console.error('Get all reviews error:', error);
+    return c.json({ error: '리뷰 목록 조회 중 오류가 발생했습니다' }, 500);
   }
 });
 

@@ -176,12 +176,12 @@ const UIUtils = {
               </button>
               
               <button 
-                onclick="app.showAdminSettlements()" 
+                onclick="app.showAdminReviews()" 
                 class="flex flex-col items-center justify-center space-y-1 transition ${
-                  currentPage === 'settlements' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
+                  currentPage === 'reviews' ? 'text-purple-600' : 'text-gray-600 hover:text-purple-600'
                 }">
-                <i class="fas fa-money-bill-wave text-xl"></i>
-                <span class="text-xs">정산관리</span>
+                <i class="fas fa-star text-xl"></i>
+                <span class="text-xs">리뷰관리</span>
               </button>
               
               <button 

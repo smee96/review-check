@@ -1176,29 +1176,102 @@ class ReviewSphere {
   // 베스트 리뷰
   async showBestReviews() {
     const app = document.getElementById('app');
-    app.innerHTML = `
-      <div class="min-h-screen flex flex-col bg-gray-50">
-        ${this.renderNav()}
-        
-        <div class="flex-grow pt-6 pb-20">
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-            <h2 class="text-2xl font-bold mb-2">
-              <i class="fas fa-star text-yellow-500 mr-2"></i>베스트 리뷰
-            </h2>
-            <p class="text-gray-600 mb-6">우수한 컨텐츠를 확인하세요</p>
-            
-            <div class="text-center py-12">
-              <i class="fas fa-star text-6xl text-gray-300 mb-4"></i>
-              <p class="text-gray-600 mb-2">베스트 리뷰 기능 준비 중입니다</p>
-              <p class="text-sm text-gray-500">곧 만나보실 수 있습니다</p>
+    
+    try {
+      // 베스트 리뷰 목록 가져오기
+      const response = await axios.get('/api/applications/reviews/best', this.getAuthHeaders());
+      const reviews = response.data;
+      
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow pt-6 pb-20">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+              <h2 class="text-2xl font-bold mb-2">
+                <i class="fas fa-star text-yellow-500 mr-2"></i>베스트 리뷰
+              </h2>
+              <p class="text-gray-600 mb-6">관리자가 선정한 우수한 리뷰를 확인하세요</p>
+              
+              ${reviews.length === 0 ? `
+                <div class="text-center py-12">
+                  <i class="fas fa-star text-6xl text-gray-300 mb-4"></i>
+                  <p class="text-gray-600 mb-2">아직 선정된 베스트 리뷰가 없습니다</p>
+                  <p class="text-sm text-gray-500">곧 멋진 리뷰들을 만나보실 수 있습니다</p>
+                </div>
+              ` : `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  ${reviews.map(review => `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+                      ${review.review_image ? `
+                        <div class="relative h-48 bg-gray-100">
+                          <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" 
+                            alt="리뷰 이미지" 
+                            class="w-full h-full object-cover"
+                            onerror="this.parentElement.style.display='none'">
+                          <div class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                            <i class="fas fa-star mr-1"></i>BEST
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                          ${review.campaign_thumbnail ? `
+                            <img src="${review.campaign_thumbnail}" alt="캠페인" class="w-8 h-8 rounded-full object-cover">
+                          ` : ''}
+                          <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-sm text-gray-800 truncate">${review.campaign_title}</h3>
+                            <p class="text-xs text-gray-500">${review.influencer_nickname}</p>
+                          </div>
+                        </div>
+                        
+                        <p class="text-sm text-gray-700 mb-3 line-clamp-3">${review.review_text || ''}</p>
+                        
+                        ${review.post_url ? `
+                          <a href="${review.post_url}" target="_blank" 
+                            class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-external-link-alt mr-1"></i>게시물 보기
+                          </a>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
             </div>
           </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'reviews')}
+          ${this.renderFooter()}
         </div>
-        
-        ${UIUtils.renderBottomNav(this.user, 'reviews')}
-        ${this.renderFooter()}
-      </div>
-    `;
+      `;
+    } catch (error) {
+      console.error('Load best reviews error:', error);
+      app.innerHTML = `
+        <div class="min-h-screen flex flex-col bg-gray-50">
+          ${this.renderNav()}
+          
+          <div class="flex-grow pt-6 pb-20">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+              <h2 class="text-2xl font-bold mb-2">
+                <i class="fas fa-star text-yellow-500 mr-2"></i>베스트 리뷰
+              </h2>
+              <div class="text-center py-12">
+                <i class="fas fa-exclamation-circle text-6xl text-red-300 mb-4"></i>
+                <p class="text-red-600 mb-2">베스트 리뷰를 불러오는데 실패했습니다</p>
+                <button onclick="app.showBestReviews()" class="text-blue-600 hover:underline text-sm">
+                  다시 시도
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          ${UIUtils.renderBottomNav(this.user, 'reviews')}
+          ${this.renderFooter()}
+        </div>
+      `;
+    }
   }
 
   showLogin(pushHistory = true) {
@@ -2135,6 +2208,14 @@ class ReviewSphere {
       const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
       const campaigns = response.data;
       const container = document.getElementById('adminCampaignsContent');
+      
+      console.log('=== 관리자 캠페인 관리 디버깅 ===');
+      console.log('총 캠페인 수:', campaigns.length);
+      if (campaigns.length > 0) {
+        console.log('첫 번째 캠페인 데이터:', campaigns[0]);
+        console.log('is_best 필드:', campaigns[0].is_best);
+        console.log('is_best 타입:', typeof campaigns[0].is_best);
+      }
 
       container.innerHTML = `
         <div class="space-y-3 sm:space-y-4">
@@ -2183,8 +2264,8 @@ class ReviewSphere {
                   ` : ''}
                   ${c.sphere_points > 0 || c.point_reward > 0 ? `
                     <div>
-                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
-                      <p class="font-semibold text-base sm:text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.2).toLocaleString()}P</p>
+                      <p class="text-gray-600">포인트 수수료 (30%)</p>
+                      <p class="font-semibold text-base sm:text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.3).toLocaleString()}원</p>
                     </div>
                   ` : ''}
                   <div>
@@ -2263,6 +2344,12 @@ class ReviewSphere {
                   
                   return buttons;
                 })()}
+                <!-- 베스트 설정 버튼 (항상 표시) -->
+                <button onclick="app.toggleBestCampaign(${c.id}, ${c.is_best ? 'false' : 'true'})" 
+                  class="${c.is_best ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white px-3 py-1 rounded text-xs sm:text-sm"
+                  data-campaign-id="${c.id}" data-is-best="${c.is_best}">
+                  <i class="fas fa-star mr-1"></i>${c.is_best ? '베스트 해제' : '베스트 설정'}
+                </button>
               </div>
             </div>
             `;
@@ -2273,6 +2360,178 @@ class ReviewSphere {
       console.error('Failed to load admin campaigns:', error);
       const container = document.getElementById('adminCampaignsContent');
       container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async showAdminReviews() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex flex-col bg-gray-50">
+        ${this.renderNav()}
+        
+        <div class="flex-grow pb-20">
+          <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+            <div class="mb-4 sm:mb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                <i class="fas fa-star text-purple-600 mr-2"></i>리뷰 관리
+              </h1>
+              <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">전체 리뷰 승인 및 베스트 리뷰 선정</p>
+            </div>
+
+            <div id="adminReviewsContent">
+              <p class="text-gray-600">로딩 중...</p>
+            </div>
+          </div>
+        </div>
+        
+        ${UIUtils.renderBottomNav(this.user, 'reviews')}
+        ${this.renderFooter()}
+      </div>
+    `;
+
+    // 리뷰 목록 로드
+    await this.loadAdminReviewsContent();
+  }
+
+  async loadAdminReviewsContent() {
+    try {
+      // 모든 캠페인의 리뷰 가져오기
+      const response = await axios.get('/api/admin/reviews', this.getAuthHeaders());
+      const reviews = response.data;
+      const container = document.getElementById('adminReviewsContent');
+
+      if (reviews.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 sm:py-12">
+            <i class="fas fa-inbox text-4xl sm:text-6xl text-gray-300 mb-4"></i>
+            <p class="text-sm sm:text-base text-gray-600 mb-2">제출된 리뷰가 없습니다</p>
+            <p class="text-xs sm:text-sm text-gray-500">인플루언서가 리뷰를 제출하면 여기에 표시됩니다</p>
+          </div>
+        `;
+        return;
+      }
+
+      // 캠페인별로 그룹화
+      const reviewsByCampaign = {};
+      reviews.forEach(review => {
+        if (!reviewsByCampaign[review.campaign_id]) {
+          reviewsByCampaign[review.campaign_id] = {
+            campaign_title: review.campaign_title,
+            reviews: []
+          };
+        }
+        reviewsByCampaign[review.campaign_id].reviews.push(review);
+      });
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          ${Object.entries(reviewsByCampaign).map(([campaignId, data]) => `
+            <div class="bg-white rounded-lg shadow-md p-4">
+              <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${data.campaign_title}
+              </h2>
+              <div class="space-y-4">
+                ${data.reviews.map(review => {
+                  const statusBadge = review.approval_status === 'approved' 
+                    ? '<span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>승인완료</span>'
+                    : review.approval_status === 'rejected'
+                    ? '<span class="inline-block px-2 py-1 text-xs rounded bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i>거절됨</span>'
+                    : '<span class="inline-block px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800"><i class="fas fa-clock mr-1"></i>검토대기</span>';
+                  
+                  return `
+                  <div class="border rounded-lg p-4 hover:shadow-md transition ${review.approval_status === 'rejected' ? 'bg-red-50' : ''}">
+                    <div class="flex justify-between items-start mb-3">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <p class="font-semibold text-gray-800">${review.influencer_nickname}</p>
+                          ${statusBadge}
+                          ${review.is_best ? '<span class="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800"><i class="fas fa-star mr-1"></i>BEST</span>' : ''}
+                        </div>
+                        <p class="text-sm text-gray-500">${review.influencer_email}</p>
+                      </div>
+                      <span class="text-xs text-gray-500">${new Date(review.submitted_at || review.created_at).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                    
+                    ${review.review_image ? `
+                      <div class="mb-3">
+                        <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="w-48 h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src, '_blank')" onerror="this.style.display='none'">
+                      </div>
+                    ` : ''}
+                    
+                    <div class="mb-3">
+                      <p class="text-sm text-gray-700 whitespace-pre-wrap">${review.review_text || '리뷰 내용 없음'}</p>
+                    </div>
+                    
+                    ${review.post_url ? `
+                      <div class="mb-3">
+                        <a href="${review.post_url}" target="_blank" class="text-blue-600 hover:underline text-sm">
+                          <i class="fas fa-external-link-alt mr-1"></i>게시물 보기
+                        </a>
+                      </div>
+                    ` : ''}
+                    
+                    ${review.approval_status === 'rejected' && review.rejection_reason ? `
+                      <div class="mb-3 p-3 bg-red-100 rounded-lg">
+                        <p class="text-sm font-semibold text-red-800 mb-1">거절 사유:</p>
+                        <p class="text-sm text-red-700">${review.rejection_reason}</p>
+                      </div>
+                    ` : ''}
+                    
+                    <div class="flex gap-2 mt-4">
+                      ${review.approval_status === 'pending' ? `
+                        <button onclick="app.approveReview(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                          <i class="fas fa-check mr-1"></i>승인
+                        </button>
+                        <button onclick="app.rejectReviewWithReason(${review.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
+                          <i class="fas fa-times mr-1"></i>거절
+                        </button>
+                      ` : review.approval_status === 'approved' ? `
+                        <button onclick="app.cancelReviewApprovalFromAdmin(${review.id})" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 text-sm">
+                          <i class="fas fa-undo mr-1"></i>승인취소
+                        </button>
+                        <button onclick="app.toggleBestReviewFromAdmin(${review.id}, ${review.is_best ? 'false' : 'true'})" 
+                          class="${review.is_best ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white px-4 py-2 rounded text-sm">
+                          <i class="fas fa-star mr-1"></i>${review.is_best ? '베스트 해제' : '베스트 설정'}
+                        </button>
+                      ` : `
+                        <button onclick="app.cancelReviewApprovalFromAdmin(${review.id})" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                          <i class="fas fa-undo mr-1"></i>거절취소
+                        </button>
+                      `}
+                    </div>
+                  </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Failed to load admin reviews:', error);
+      const container = document.getElementById('adminReviewsContent');
+      container.innerHTML = '<p class="text-red-600 p-4">리뷰 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  async cancelReviewApprovalFromAdmin(reviewId) {
+    if (!confirm('이 리뷰의 승인을 취소하시겠습니까?')) return;
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/cancel`, {}, this.getAuthHeaders());
+      alert('승인이 취소되었습니다');
+      await this.loadAdminReviewsContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '승인 취소에 실패했습니다');
+    }
+  }
+
+  async toggleBestReviewFromAdmin(reviewId, isBest) {
+    try {
+      await axios.put(`/api/admin/reviews/${reviewId}/best`, { is_best: isBest }, this.getAuthHeaders());
+      await this.loadAdminReviewsContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '베스트 리뷰 설정에 실패했습니다');
     }
   }
 
@@ -2307,7 +2566,8 @@ class ReviewSphere {
   }
 
   async loadAdminSettlementsPageContent() {
-    const container = document.getElementById('adminSettlementsContent');
+    // adminSettlementsContent (정산 관리 페이지) 또는 settlements-content (마이페이지 아코디언) 찾기
+    const container = document.getElementById('adminSettlementsContent') || document.getElementById('settlements-content');
     
     try {
       // 출금 요청 목록 가져오기
@@ -2674,7 +2934,7 @@ class ReviewSphere {
                     
                     ${review.review_image ? `
                       <div class="mb-3">
-                        <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="max-w-full h-auto rounded-lg" onerror="this.style.display='none'">
+                        <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="w-48 h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src, '_blank')" onerror="this.style.display='none'">
                       </div>
                     ` : ''}
                     
@@ -2709,6 +2969,12 @@ class ReviewSphere {
                         <button onclick="app.cancelReviewApproval(${review.id})" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 text-sm">
                           <i class="fas fa-undo mr-1"></i>승인취소
                         </button>
+                        ${this.user.role === 'admin' ? `
+                          <button onclick="app.toggleBestReview(${review.id}, ${review.is_best ? 'false' : 'true'})" 
+                            class="${review.is_best ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white px-4 py-2 rounded text-sm">
+                            <i class="fas fa-star mr-1"></i>${review.is_best ? '베스트 해제' : '베스트 설정'}
+                          </button>
+                        ` : ''}
                       ` : `
                         <button onclick="app.cancelReviewApproval(${review.id})" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
                           <i class="fas fa-undo mr-1"></i>거절취소
@@ -5088,7 +5354,15 @@ class ReviewSphere {
             <div class="space-y-4">
               ${applications.map(app => `
                 <div class="border rounded-lg p-4 hover:shadow-md transition">
-                  <h4 class="font-bold text-lg mb-2">${app.campaign_title}</h4>
+                  <div class="flex items-start justify-between mb-2">
+                    <h4 class="font-bold text-lg flex-1">${app.campaign_title}</h4>
+                    ${(app.sphere_points || app.point_reward) > 0 ? `
+                      <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-lg px-3 py-1 ml-2">
+                        <p class="text-xs text-purple-600 font-semibold">획득 예정</p>
+                        <p class="text-lg font-bold text-purple-700">${(app.sphere_points || app.point_reward).toLocaleString()}<span class="text-sm">P</span></p>
+                      </div>
+                    ` : ''}
+                  </div>
                   <div class="flex items-center flex-wrap gap-2 mb-2">
                     <span class="px-3 py-1 rounded-full text-sm font-semibold ${
                       app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -5254,7 +5528,15 @@ class ReviewSphere {
             <div class="space-y-4">
               ${applications.map(app => `
                 <div class="border rounded-lg p-4">
-                  <h4 class="font-bold text-lg mb-2">${app.campaign_title}</h4>
+                  <div class="flex items-start justify-between mb-2">
+                    <h4 class="font-bold text-lg flex-1">${app.campaign_title}</h4>
+                    ${(app.sphere_points || app.point_reward) > 0 ? `
+                      <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 rounded-lg px-2 py-1 ml-2">
+                        <p class="text-xs text-green-600">획득 포인트</p>
+                        <p class="text-base font-bold text-green-700">${(app.sphere_points || app.point_reward).toLocaleString()}<span class="text-xs">P</span></p>
+                      </div>
+                    ` : ''}
+                  </div>
                   <div class="mt-2">
                     ${app.review_url ? `
                       <a href="${app.review_url}" target="_blank" class="inline-block bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm">
@@ -6641,6 +6923,27 @@ class ReviewSphere {
                 </div>
               </div>
               
+              <!-- 정산 관리 -->
+              <div class="bg-white rounded-lg shadow border-2 border-orange-200">
+                <button onclick="app.toggleAdminAccordion('settlements')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <i class="fas fa-money-bill-wave text-orange-600 text-xl sm:text-2xl"></i>
+                      <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-orange-600">정산 관리</h3>
+                        <p class="text-xs sm:text-sm text-gray-600">출금 승인 및 정산 내역 관리</p>
+                      </div>
+                    </div>
+                    <i id="settlements-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                  </div>
+                </button>
+                <div id="settlements-content" class="hidden border-t">
+                  <div class="p-4 sm:p-6">
+                    <p class="text-gray-600">로딩 중...</p>
+                  </div>
+                </div>
+              </div>
+              
               <!-- 시스템 설정 -->
               <div class="bg-white rounded-lg shadow border-2 border-blue-200">
                 <button onclick="app.toggleAdminAccordion('systemSettings')" class="w-full p-5 sm:p-6 text-left hover:bg-gray-50 transition">
@@ -6687,7 +6990,7 @@ class ReviewSphere {
   async toggleAdminAccordion(sectionId) {
     const content = document.getElementById(`${sectionId}-content`);
     const icon = document.getElementById(`${sectionId}-icon`);
-    const allSections = ['userList', 'systemSettings'];
+    const allSections = ['userList', 'settlements', 'systemSettings'];
     
     const isOpen = !content.classList.contains('hidden');
     
@@ -6715,6 +7018,9 @@ class ReviewSphere {
       switch (sectionId) {
         case 'userList':
           await this.loadUserListContent(content);
+          break;
+        case 'settlements':
+          await this.loadAdminSettlementsPageContent();
           break;
         case 'systemSettings':
           await this.loadSystemSettingsContent(content);
@@ -6804,116 +7110,6 @@ class ReviewSphere {
     }
   }
 
-  async loadCampaignManagementContent(container) {
-    try {
-      const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
-      const campaigns = response.data;
-
-      container.innerHTML = `
-        <div class="p-4 sm:p-6">
-          <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">전체 캠페인 관리</h2>
-          <div class="space-y-3 sm:space-y-4">
-            ${campaigns.map(c => {
-              const channelIcon = UIUtils.getChannelIcon(c.channel_type);
-              
-              return `
-              <div class="border rounded-lg p-3 sm:p-4">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                      <h3 class="font-bold text-base sm:text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
-                        <i class="fas fa-edit mr-1"></i>${c.title}
-                      </h3>
-                      <span>${channelIcon}</span>
-                    </div>
-                    <p class="text-xs sm:text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
-                  </div>
-                  <span class="px-3 py-1 rounded-full text-xs sm:text-sm ${this.getStatusBadge(c.status)} whitespace-nowrap self-start">
-                    ${this.getStatusText(c.status)}
-                  </span>
-                </div>
-
-                <p class="text-sm sm:text-base text-gray-600 mb-2">${c.description || ''}</p>
-                
-                <div class="bg-blue-50 border border-blue-200 rounded p-2 sm:p-3 mb-2 text-xs sm:text-sm">
-                  <div class="grid grid-cols-2 gap-2">
-                    ${c.product_value > 0 ? `
-                      <div>
-                        <p class="text-gray-600">상품/이용권 가치</p>
-                        <p class="font-semibold text-base sm:text-lg">${c.product_value.toLocaleString()}원</p>
-                      </div>
-                    ` : ''}
-                    ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                      <div>
-                        <p class="text-gray-600">인당 포인트</p>
-                        <p class="font-semibold text-base sm:text-lg">${(c.sphere_points || c.point_reward).toLocaleString()}P</p>
-                      </div>
-                    ` : ''}
-                    ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                      <div>
-                        <p class="text-gray-600">총 포인트</p>
-                        <p class="font-semibold text-base sm:text-lg">${((c.sphere_points || c.point_reward) * c.slots).toLocaleString()}P</p>
-                      </div>
-                    ` : ''}
-                    ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                      <div>
-                        <p class="text-gray-600">플랫폼 수익 (20%)</p>
-                        <p class="font-semibold text-base sm:text-lg text-green-600">${Math.floor((c.sphere_points || c.point_reward) * c.slots * 0.20).toLocaleString()}원</p>
-                      </div>
-                    ` : ''}
-                    <div>
-                      <p class="text-gray-600">과금 방식</p>
-                      <p class="font-semibold">${c.pricing_type === 'points_only' ? '포인트만' : c.pricing_type === 'purchase_with_points' ? '구매+포인트' : c.pricing_type === 'product_only' ? '상품만' : c.pricing_type === 'product_with_points' ? '상품+포인트' : c.pricing_type === 'voucher_only' ? '이용권만' : c.pricing_type === 'voucher_with_points' ? '이용권+포인트' : '상품만'}</p>
-                    </div>
-                    <div>
-                      <p class="text-gray-600">결제 상태</p>
-                      <p>
-                        <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                          ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 mt-3">
-                  ${c.status === 'pending' ? `
-                    <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
-                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
-                      <i class="fas fa-check mr-1"></i>승인
-                    </button>
-                  ` : ''}
-                  ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
-                    <button onclick="app.markAsPaid(${c.id})" 
-                      class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs sm:text-sm">
-                      <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
-                    </button>
-                  ` : ''}
-                  ${(c.status === 'recruiting' || c.status === 'in_progress') ? `
-                    <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
-                      class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-xs sm:text-sm">
-                      <i class="fas fa-pause mr-1"></i>일시중지
-                    </button>
-                  ` : ''}
-                  ${c.status === 'suspended' ? `
-                    <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
-                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs sm:text-sm">
-                      <i class="fas fa-play mr-1"></i>재개
-                    </button>
-                  ` : ''}
-                </div>
-              </div>
-            `;
-            }).join('')}
-          </div>
-        </div>
-      `;
-    } catch (error) {
-      console.error('Failed to load campaign management:', error);
-      container.innerHTML = '<p class="text-red-600 p-4">캠페인 목록을 불러오는데 실패했습니다</p>';
-    }
-  }
-
   async loadSettlementsContent(container) {
     container.innerHTML = `
       <div class="p-4 sm:p-6">
@@ -6925,137 +7121,6 @@ class ReviewSphere {
         </div>
       </div>
     `;
-  }
-
-  async showAllCampaigns() {
-    try {
-      const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
-      const campaigns = response.data;
-
-      const content = document.getElementById('adminContent');
-      if (!content) {
-        console.error('adminContent element not found');
-        return;
-      }
-      
-      content.innerHTML = `
-        <h2 class="text-2xl font-bold mb-6">전체 캠페인 관리</h2>
-        <div class="space-y-4">
-          ${campaigns.map(c => {
-            const channelIcon = UIUtils.getChannelIcon(c.channel_type);
-            
-            return `
-            <div class="border rounded-lg p-4">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <h3 class="font-bold text-lg text-blue-600 hover:text-blue-800 cursor-pointer" onclick="app.editCampaignAsAdmin(${c.id})">
-                      <i class="fas fa-edit mr-1"></i>${c.title}
-                    </h3>
-                    <span>${channelIcon}</span>
-                  </div>
-                  <p class="text-sm text-gray-600">광고주: ${c.advertiser_nickname} (${c.advertiser_email})</p>
-                </div>
-                <span class="px-3 py-1 rounded-full text-sm ${this.getStatusBadge(c.status, c)}">
-                  ${this.getStatusText(c.status, c)}
-                </span>
-              </div>
-
-              <p class="text-gray-600 mb-2">${c.description || ''}</p>
-              
-              <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-2 text-sm">
-                <div class="grid grid-cols-2 gap-2">
-                  ${c.product_value > 0 ? `
-                    <div>
-                      <p class="text-gray-600">상품/이용권 가치</p>
-                      <p class="font-semibold text-lg">${c.product_value.toLocaleString()}원</p>
-                    </div>
-                  ` : ''}
-                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                    <div>
-                      <p class="text-gray-600">인당 포인트</p>
-                      <p class="font-semibold text-lg">${(c.sphere_points || c.point_reward).toLocaleString()}P</p>
-                    </div>
-                  ` : ''}
-                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                    <div>
-                      <p class="text-gray-600">총 포인트</p>
-                      <p class="font-semibold text-lg">${((c.sphere_points || c.point_reward) * c.slots).toLocaleString()}P</p>
-                    </div>
-                  ` : ''}
-                  ${c.sphere_points > 0 || c.point_reward > 0 ? `
-                    <div>
-                      <p class="text-gray-600">플랫폼 수익 (20%)</p>
-                      <p class="font-semibold text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.2).toLocaleString()}P</p>
-                    </div>
-                  ` : ''}
-                  <div>
-                    <p class="text-gray-600">과금 방식</p>
-                    <p class="font-semibold">${c.pricing_type === 'points_only' ? '포인트만' : c.pricing_type === 'purchase_with_points' ? '구매+포인트' : c.pricing_type === 'product_only' ? '상품만' : c.pricing_type === 'product_with_points' ? '상품+포인트' : c.pricing_type === 'voucher_only' ? '이용권만' : c.pricing_type === 'voucher_with_points' ? '이용권+포인트' : '상품만'}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-600">결제 상태</p>
-                    <p>
-                      <span class="px-2 py-1 rounded text-xs font-semibold ${c.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                        ${c.payment_status === 'paid' ? '✓ 결제 완료' : '⏳ 결제 대기'}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="flex space-x-2 mt-3">
-                ${c.status === 'pending' ? `
-                  <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
-                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                    <i class="fas fa-check mr-1"></i>승인
-                  </button>
-                ` : ''}
-                ${(c.status === 'recruiting' || c.status === 'in_progress') && c.payment_status === 'unpaid' ? `
-                  <button onclick="app.markAsPaid(${c.id})" 
-                    class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
-                    <i class="fas fa-credit-card mr-1"></i>결제 완료 처리
-                  </button>
-                ` : ''}
-                ${(c.status === 'recruiting' || c.status === 'in_progress') ? `
-                  <button onclick="app.updateCampaignStatus(${c.id}, 'suspended')" 
-                    class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 text-sm">
-                    <i class="fas fa-pause mr-1"></i>일시중지
-                  </button>
-                ` : ''}
-                ${c.status === 'suspended' ? `
-                  <button onclick="app.updateCampaignStatus(${c.id}, 'recruiting')" 
-                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                    <i class="fas fa-play mr-1"></i>재개
-                  </button>
-                ` : ''}
-                <button onclick="app.updateCampaignStatus(${c.id}, 'cancelled')" 
-                  class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">
-                  <i class="fas fa-ban mr-1"></i>취소
-                </button>
-              </div>
-            </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    } catch (error) {
-      console.error('showAllCampaigns error:', error);
-      alert('캠페인 목록을 불러오는데 실패했습니다: ' + (error.message || error));
-      const content = document.getElementById('adminContent');
-      if (content) {
-        content.innerHTML = `
-          <div class="p-4 bg-red-50 border border-red-200 rounded">
-            <h3 class="font-bold text-red-800 mb-2">오류 발생</h3>
-            <p class="text-red-600">캠페인 목록을 불러오는데 실패했습니다.</p>
-            <p class="text-sm text-gray-600 mt-2">에러: ${error.message || error}</p>
-            <button onclick="app.showAllCampaigns()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              다시 시도
-            </button>
-          </div>
-        `;
-      }
-    }
   }
 
   async updateCampaignStatus(campaignId, status) {
@@ -7105,6 +7170,31 @@ class ReviewSphere {
       }
     } catch (error) {
       alert(error.response?.data?.error || '결제 처리에 실패했습니다');
+    }
+  }
+
+  async toggleBestCampaign(campaignId, isBest) {
+    try {
+      await axios.put(`/api/admin/campaigns/${campaignId}/best`, { is_best: isBest }, this.getAuthHeaders());
+      
+      // 캠페인관리 페이지 새로고침
+      const adminCampaignsContent = document.getElementById('adminCampaignsContent');
+      if (adminCampaignsContent) {
+        await this.loadAdminCampaignsPageContent();
+      }
+    } catch (error) {
+      alert(error.response?.data?.error || '베스트 캠페인 설정에 실패했습니다');
+    }
+  }
+
+  async toggleBestReview(reviewId, isBest) {
+    try {
+      await axios.put(`/api/admin/reviews/${reviewId}/best`, { is_best: isBest }, this.getAuthHeaders());
+      
+      // 리뷰관리 페이지 새로고침
+      await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '베스트 리뷰 설정에 실패했습니다');
     }
   }
 
