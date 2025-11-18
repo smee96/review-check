@@ -95,6 +95,7 @@ class PricingUtils {
   // 전체 비용 계산
   async calculateFullPricing(pricingType, productValue, spherePoints = 0) {
     const { fixedFee, pointsFee, totalFee } = await this.calculatePlatformFee(pricingType, productValue, spherePoints);
+    const pointsFeeRate = await this.getPointsFeeRate();
     
     // 광고주 총 지출 계산
     // - 구매+포인트: 제품 가액 포함 (리뷰어 구매 대행 비용)
@@ -115,6 +116,7 @@ class PricingUtils {
       spherePoints,
       fixedFee,
       pointsFee,
+      pointsFeeRate,
       totalPlatformFee: totalFee,
       totalCost,
       influencerGets: {

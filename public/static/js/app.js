@@ -3096,7 +3096,21 @@ class ReviewSphere {
     }
   }
 
-  showCreateCampaign() {
+  async showCreateCampaign() {
+    // Load system settings first
+    let pointsFeeRate = 30;
+    try {
+      const settingsResponse = await axios.get('/api/settings');
+      const settingsArray = settingsResponse.data;
+      const settings = {};
+      settingsArray.forEach(s => {
+        settings[s.setting_key] = Number(s.setting_value);
+      });
+      pointsFeeRate = settings.points_fee_rate || 30;
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+    
     // 컨테이너 찾기: adminContent, advertiserContent, 또는 전체 페이지
     let content = document.getElementById('adminContent') || document.getElementById('advertiserContent');
     let isFullPage = false;
@@ -3419,7 +3433,7 @@ class ReviewSphere {
                   </div>
                 </div>
                 <p class="text-xs text-gray-600">스피어포인트만 지급</p>
-                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-orange-600 font-semibold mt-1">✨ 가장 높은 리뷰 퀄리티</p>
               </div>
             </label>
@@ -3434,7 +3448,7 @@ class ReviewSphere {
                   <i class="fas fa-shopping-cart text-indigo-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">리뷰어가 직접 구매 + 포인트</p>
-                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-indigo-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
@@ -3463,7 +3477,7 @@ class ReviewSphere {
                   <i class="fas fa-gift text-blue-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">상품 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-blue-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
@@ -3492,7 +3506,7 @@ class ReviewSphere {
                   <i class="fas fa-spa text-teal-600"></i>
                 </div>
                 <p class="text-xs text-gray-600">이용권 + 스피어포인트</p>
-                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 30% 수수료</p>
+                <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-teal-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
             </label>
@@ -8176,7 +8190,7 @@ class ReviewSphere {
             
             ${pricing.pointsFee > 0 ? `
               <div class="flex justify-between">
-                <span class="text-gray-700">포인트 수수료 (30%):</span>
+                <span class="text-gray-700">포인트 수수료 (${pricing.pointsFeeRate}%):</span>
                 <span class="font-semibold text-red-600">${pricing.pointsFee.toLocaleString()}원</span>
               </div>
             ` : ''}
