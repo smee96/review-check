@@ -152,6 +152,137 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 - **Cloudflare R2**: 리뷰 이미지 저장 (10GB 무료)
 - **로컬 개발**: `--local` 플래그로 로컬 SQLite 자동 사용
 
+## 💾 백업 및 복구 전략
+
+### D1 데이터베이스 백업
+
+Cloudflare D1은 **무료로 SQL 덤프 백업이 가능**합니다. 크레딧을 소모하지 않으며, 표준 SQL 형식으로 내보내기/복원이 가능합니다.
+
+#### 백업 방법 1: SQL 덤프 (권장)
+
+**프로덕션 데이터베이스 백업:**
+```bash
+# SQL 덤프 생성 (무료, 크레딧 소모 없음)
+npx wrangler d1 export review-spheres-v1-production --remote \
+  --output=backups/db_backup_$(date +%Y%m%d).sql
+
+# 생성된 백업 압축 (옵션)
+tar -czf db_backup_$(date +%Y%m%d).tar.gz backups/db_backup_*.sql
+```
+
+**로컬 개발 데이터베이스 백업:**
+```bash
+npx wrangler d1 export review-spheres-v1-production --local \
+  --output=backups/db_backup_local_$(date +%Y%m%d).sql
+```
+
+**백업 파일 크기:** 약 2.4MB (압축 시 1.7MB)
+
+#### 백업 방법 2: Time-Travel 복구
+
+Cloudflare D1은 **자동으로 Point-in-Time 백업**을 제공합니다:
+- 무료 플랜: 7일간 Time-Travel 가능
+- 유료 플랜: 30일간 Time-Travel 가능
+
+```bash
+# 특정 시점으로 복구
+npx wrangler d1 time-travel restore review-spheres-v1-production \
+  --timestamp=2025-01-17T10:30:00Z
+```
+
+#### 데이터베이스 복원
+
+**SQL 덤프에서 복원:**
+```bash
+# 프로덕션 복원 (주의: 기존 데이터 덮어쓰기)
+npx wrangler d1 execute review-spheres-v1-production --remote \
+  --file=backups/db_backup_20251118.sql
+
+# 로컬 개발 환경 복원
+npx wrangler d1 execute review-spheres-v1-production --local \
+  --file=backups/db_backup_20251118.sql
+```
+
+### R2 스토리지 백업
+
+리뷰 이미지는 Cloudflare R2에 저장되며, 자동 이중화가 적용됩니다:
+- Cloudflare의 글로벌 네트워크에 자동 복제
+- 내구성: 99.999999999% (11 nines)
+- 별도 백업 불필요 (인프라 수준에서 관리)
+
+필요 시 R2 버킷 전체를 다른 R2 버킷이나 S3로 동기화 가능:
+```bash
+# R2 객체 목록 조회
+npx wrangler r2 object list review-spheres-images
+
+# rclone 등의 도구로 백업 가능
+```
+
+### 소스 코드 백업
+
+**Git 저장소 (GitHub):**
+- 모든 코드는 GitHub에 버전 관리
+- Repository: https://github.com/mobin-inc/review-spheres-v1
+- 자동 백업 및 히스토리 관리
+
+**프로젝트 전체 백업 (Tar 아카이브):**
+```bash
+# 프로젝트 디렉토리 전체를 압축
+cd /home/user
+tar -czf webapp_backup_$(date +%Y%m%d).tar.gz webapp/
+
+# 또는 ProjectBackup 도구 사용
+# 자동으로 압축 및 CDN 업로드
+```
+
+### 백업 스케줄 권장사항
+
+**프로덕션 서비스 운영 시:**
+1. **일일 자동 백업**: 매일 새벽 2시 SQL 덤프 생성
+2. **주간 백업**: 매주 일요일 전체 백업 압축 및 별도 저장소 보관
+3. **월간 백업**: 매월 말일 장기 보관용 백업 생성
+4. **복원 테스트**: 분기별 1회 백업 파일로 테스트 환경 복원 시도
+
+**자동화 스크립트 예시:**
+```bash
+#!/bin/bash
+# backup.sh - 자동 백업 스크립트
+
+BACKUP_DIR="/home/user/webapp/backups"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+# D1 데이터베이스 백업
+npx wrangler d1 export review-spheres-v1-production --remote \
+  --output="$BACKUP_DIR/db_backup_$DATE.sql"
+
+# 압축
+tar -czf "$BACKUP_DIR/db_backup_$DATE.tar.gz" "$BACKUP_DIR/db_backup_$DATE.sql"
+
+# 30일 이상 된 백업 삭제
+find "$BACKUP_DIR" -name "db_backup_*.tar.gz" -mtime +30 -delete
+
+echo "✅ Backup completed: db_backup_$DATE.tar.gz"
+```
+
+### 비용 정보
+
+| 백업 방법 | 비용 | 주기 권장 | 장점 |
+|----------|------|----------|------|
+| **wrangler d1 export** | 무료 | 매일 | 표준 SQL, 복원 용이 |
+| **Time-Travel** | 무료 (7일) | 자동 | 즉시 복구, 관리 불필요 |
+| **R2 자동 이중화** | 무료 | 자동 | 인프라 수준 보장 |
+| **GitHub 백업** | 무료 | 실시간 | 버전 관리, 협업 |
+
+**결론:** D1 백업은 **완전히 무료**이며, 크레딧을 소모하지 않습니다. SQL 덤프는 표준 형식이므로 다른 SQLite 호환 데이터베이스로도 이전 가능합니다.
+
+### 현재 백업 상태
+
+- ✅ **최근 백업**: 2025-11-18 07:33:54
+- ✅ **백업 파일**: `db_backup_20251118_073354.sql` (2.4MB)
+- ✅ **압축 백업**: `reviewsphere_complete_backup_20251118.tar.gz` (1.7MB)
+- ✅ **백업 위치**: `/home/user/webapp/backups/`
+- ✅ **다운로드 가능**: ProjectBackup CDN을 통해 언제든지 다운로드 가능
+
 ## 🎨 사용자 가이드
 
 ### 광고주/대행사/렙사 가이드

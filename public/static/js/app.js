@@ -4134,15 +4134,15 @@ class ReviewSphere {
 
       // 비용 정보 계산 및 확인
       try {
-        const pricing = await PricingUtils.calculateFullPricing(pricingType, productValue, spherePoints);
+        const pricing = await window.pricingUtils.calculateFullPricing(pricingType, productValue, spherePoints);
         const totalCost = pricing.total_cost * slots;
         
-        const pricingTypeName = PricingUtils.getPricingTypeName(pricingType);
+        const pricingTypeName = window.pricingUtils.getPricingTypeName(pricingType);
         let confirmMessage = `캠페인 등록 신청을 하시겠습니까?\n\n`;
         confirmMessage += `과금 방식: ${pricingTypeName}\n`;
         confirmMessage += `모집인원: ${slots}명\n`;
-        confirmMessage += `1명당 비용: ${PricingUtils.formatNumber(pricing.total_cost)}원\n`;
-        confirmMessage += `전체 광고주 지출: ${PricingUtils.formatNumber(totalCost)}원\n\n`;
+        confirmMessage += `1명당 비용: ${pricing.total_cost.toLocaleString()}원\n`;
+        confirmMessage += `전체 광고주 지출: ${totalCost.toLocaleString()}원\n\n`;
         confirmMessage += `관리자 승인 후 인플루언서들이 참여 신청을 할 수 있습니다.`;
         
         if (!confirm(confirmMessage)) {
@@ -7313,37 +7313,39 @@ class ReviewSphere {
             <h3 class="text-lg font-bold mb-2">전체 가입자 목록</h3>
           </div>
           
-          <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200 text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-3 text-left font-semibold">이메일</th>
-                  <th class="px-4 py-3 text-left font-semibold">닉네임</th>
-                  <th class="px-4 py-3 text-left font-semibold">역할</th>
-                  <th class="px-4 py-3 text-right font-semibold">포인트</th>
-                  <th class="px-4 py-3 text-left font-semibold">가입일</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-                ${users.map(user => {
-                  const roleBadge = user.role === 'advertiser' || user.role === 'agency' || user.role === 'rep' ? 
-                    '<span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">광고주</span>' :
-                    user.role === 'influencer' ? 
-                    '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">인플루언서</span>' :
-                    '<span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">관리자</span>';
-                  
-                  return `
-                    <tr class="hover:bg-gray-50">
-                      <td class="px-4 py-3">${user.email}</td>
-                      <td class="px-4 py-3 font-semibold">${user.nickname}</td>
-                      <td class="px-4 py-3">${roleBadge}</td>
-                      <td class="px-4 py-3 text-right font-semibold ${user.sphere_points > 0 ? 'text-orange-600' : 'text-gray-400'}">${(user.sphere_points || 0).toLocaleString()} P</td>
-                      <td class="px-4 py-3 text-gray-600">${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
+          <div class="overflow-x-auto -mx-4 sm:mx-0">
+            <div class="inline-block min-w-full align-middle">
+              <table class="min-w-full bg-white border border-gray-200 text-xs sm:text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold whitespace-nowrap">이메일</th>
+                    <th class="px-2 sm:px-4 py-2 sm:py-3 text-left font-semibold whitespace-nowrap">닉네임</th>
+                    <th class="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold whitespace-nowrap">역할</th>
+                    <th class="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold whitespace-nowrap">포인트</th>
+                    <th class="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold whitespace-nowrap">가입일</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  ${users.map(user => {
+                    const roleBadge = user.role === 'advertiser' || user.role === 'agency' || user.role === 'rep' ? 
+                      '<span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full whitespace-nowrap">광고주</span>' :
+                      user.role === 'influencer' ? 
+                      '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full whitespace-nowrap">인플루언서</span>' :
+                      '<span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full whitespace-nowrap">관리자</span>';
+                    
+                    return `
+                      <tr class="hover:bg-gray-50">
+                        <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">${user.email}</td>
+                        <td class="px-2 sm:px-4 py-2 sm:py-3 font-semibold whitespace-nowrap">${user.nickname}</td>
+                        <td class="px-2 sm:px-4 py-2 sm:py-3 text-center">${roleBadge}</td>
+                        <td class="px-2 sm:px-4 py-2 sm:py-3 text-right font-semibold whitespace-nowrap ${user.sphere_points > 0 ? 'text-orange-600' : 'text-gray-400'}">${(user.sphere_points || 0).toLocaleString()} P</td>
+                        <td class="px-2 sm:px-4 py-2 sm:py-3 text-center text-gray-600 whitespace-nowrap">${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       `;
@@ -8106,8 +8108,10 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">포인트 수수료율 (%)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="points_fee_rate" 
+                  <input type="text" id="points_fee_rate" 
                     value="${settingsObj.points_fee_rate?.setting_value || 30}"
+                    oninput="app.formatNumberInput(this)"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
                   <button onclick="app.updateSystemSetting('points_fee_rate')" 
                     class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
@@ -8126,8 +8130,10 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_points_only" 
-                    value="${settingsObj.fixed_fee_points_only?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_points_only" 
+                    value="${(settingsObj.fixed_fee_points_only?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_points_only')" 
                     class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition">
@@ -8146,8 +8152,9 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_purchase_with_points" 
-                    value="${settingsObj.fixed_fee_purchase_with_points?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_purchase_with_points" 
+                    value="${(settingsObj.fixed_fee_purchase_with_points?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_purchase_with_points')" 
                     class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
@@ -8166,8 +8173,9 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_product_only" 
-                    value="${settingsObj.fixed_fee_product_only?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_product_only" 
+                    value="${(settingsObj.fixed_fee_product_only?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_product_only')" 
                     class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
@@ -8186,8 +8194,9 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_product_with_points" 
-                    value="${settingsObj.fixed_fee_product_with_points?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_product_with_points" 
+                    value="${(settingsObj.fixed_fee_product_with_points?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_product_with_points')" 
                     class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
@@ -8206,8 +8215,9 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_voucher_only" 
-                    value="${settingsObj.fixed_fee_voucher_only?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_voucher_only" 
+                    value="${(settingsObj.fixed_fee_voucher_only?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_voucher_only')" 
                     class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
@@ -8226,8 +8236,9 @@ class ReviewSphere {
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">건당 고정 수수료 (원)</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="fixed_fee_voucher_with_points" 
-                    value="${settingsObj.fixed_fee_voucher_with_points?.setting_value || 10000}"
+                  <input type="text" id="fixed_fee_voucher_with_points" 
+                    value="${(settingsObj.fixed_fee_voucher_with_points?.setting_value || 10000).toLocaleString()}"
+                    oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_voucher_with_points')" 
                     class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition">
@@ -8259,6 +8270,21 @@ class ReviewSphere {
     }
   }
 
+  // 천 단위 콤마 자동 입력
+  formatNumberInput(input) {
+    // 숫자만 추출
+    let value = input.value.replace(/[^\d]/g, '');
+    
+    // 빈 값이면 그대로 반환
+    if (!value) {
+      input.value = '';
+      return;
+    }
+    
+    // 천 단위 콤마 추가
+    input.value = Number(value).toLocaleString();
+  }
+
   async updateSystemSetting(settingKey) {
     try {
       const inputElement = document.getElementById(settingKey);
@@ -8267,7 +8293,8 @@ class ReviewSphere {
         return;
       }
 
-      const value = inputElement.value;
+      // 콤마 제거하고 숫자로 변환
+      const value = inputElement.value.replace(/[^\d]/g, '');
       if (!value || isNaN(value) || Number(value) < 0) {
         alert('유효한 값을 입력해주세요');
         return;
