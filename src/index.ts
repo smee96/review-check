@@ -130,7 +130,8 @@ app.get('/', (c) => {
         <script src="/static/js/api.js?v=46"></script>
         <script src="/static/js/ui-utils.js?v=46"></script>
         <script src="/static/js/pricing-utils.js?v=46"></script>
-        <script src="/static/js/app.js?v=60"></script>
+        <script src="/static/js/withdrawal-ui.js?v=1"></script>
+        <script src="/static/js/app.js?v=61"></script>
     </body>
     </html>
   `);
@@ -153,7 +154,22 @@ app.post('/api/withdrawal/request', async (c) => {
       return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
     }
 
-    const { amount, bank_name, account_number, account_holder, contact_phone } = await c.req.json();
+    const { 
+      amount, 
+      bank_name, 
+      account_number, 
+      account_holder, 
+      contact_phone,
+      real_name,
+      resident_number_partial,
+      id_card_image,
+      bankbook_image
+    } = await c.req.json();
+
+    // 필수 필드 검증
+    if (!real_name || !resident_number_partial || !id_card_image || !bankbook_image) {
+      return c.json({ error: '필수 서류 정보가 누락되었습니다' }, 400);
+    }
 
     // 최소 출금 금액 확인
     if (amount < 10000) {
@@ -177,12 +193,26 @@ app.post('/api/withdrawal/request', async (c) => {
     const tax_amount = Math.floor(amount * 0.22);
     const net_amount = amount - tax_amount;
 
-    // 출금 신청 생성 (contact_phone 추가)
+    // 출금 신청 생성 (서류 정보 포함)
     const result = await c.env.DB.prepare(`
       INSERT INTO withdrawal_requests 
-      (user_id, amount, tax_amount, net_amount, bank_name, account_number, account_holder, contact_phone, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `).bind(decoded.userId, amount, tax_amount, net_amount, bank_name, account_number, account_holder, contact_phone || null).run();
+      (user_id, amount, tax_amount, net_amount, bank_name, account_number, account_holder, 
+       contact_phone, real_name, resident_number_partial, id_card_image_url, bankbook_image_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    `).bind(
+      decoded.userId, 
+      amount, 
+      tax_amount, 
+      net_amount, 
+      bank_name, 
+      account_number, 
+      account_holder, 
+      contact_phone || null,
+      real_name,
+      resident_number_partial,
+      id_card_image, // Base64 데이터 저장
+      bankbook_image, // Base64 데이터 저장
+    ).run();
 
     // 포인트 차감 (pending 상태로 예약)
     await c.env.DB.prepare('UPDATE users SET sphere_points = sphere_points - ? WHERE id = ?')

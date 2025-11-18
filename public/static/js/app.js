@@ -2658,6 +2658,20 @@ class ReviewSphere {
                   ${w.processed_at ? `<span>처리: ${new Date(w.processed_at).toLocaleDateString('ko-KR')}</span>` : ''}
                 </div>
               </div>
+
+              <!-- 세금 신고 정보 -->
+              ${w.real_name || w.resident_number_partial ? `
+                <div class="flex items-center gap-6 text-sm text-gray-600 border-t pt-3 mt-3">
+                  ${w.real_name ? `<span><i class="fas fa-id-card mr-1"></i>실명: ${w.real_name}</span>` : ''}
+                  ${w.resident_number_partial ? `<span><i class="fas fa-birthday-cake mr-1"></i>생년월일: ${w.resident_number_partial}</span>` : ''}
+                  ${w.id_card_image_url || w.bankbook_image_url ? `
+                    <button onclick="app.showWithdrawalDocuments(${w.id})" 
+                      class="ml-auto px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
+                      <i class="fas fa-file-image mr-1"></i>서류 확인
+                    </button>
+                  ` : ''}
+                </div>
+              ` : ''}
               
               ${w.admin_memo ? `
                 <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
@@ -2708,6 +2722,107 @@ class ReviewSphere {
       await this.loadAdminSettlementsPageContent();
     } catch (error) {
       alert(error.response?.data?.error || '거절에 실패했습니다');
+    }
+  }
+
+  // 출금 신청 서류 확인 모달
+  async showWithdrawalDocuments(withdrawalId) {
+    try {
+      const response = await axios.get(`/api/admin/withdrawals/${withdrawalId}`, this.getAuthHeaders());
+      const w = response.data;
+
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">출금 신청 서류 확인</h2>
+            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+              <i class="fas fa-times text-2xl"></i>
+            </button>
+          </div>
+
+          <!-- 기본 정보 -->
+          <div class="bg-gray-50 p-4 rounded-lg mb-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div><span class="text-gray-600">신청자:</span> <span class="font-semibold">${w.user_nickname}</span></div>
+              <div><span class="text-gray-600">이메일:</span> ${w.user_email}</div>
+              <div><span class="text-gray-600">실명:</span> <span class="font-semibold">${w.real_name || '-'}</span></div>
+              <div><span class="text-gray-600">생년월일:</span> ${w.resident_number_partial || '-'}</div>
+              <div><span class="text-gray-600">연락처:</span> ${w.contact_phone || '-'}</div>
+              <div><span class="text-gray-600">신청일:</span> ${new Date(w.created_at).toLocaleString('ko-KR')}</div>
+            </div>
+          </div>
+
+          <!-- 금액 정보 -->
+          <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p class="text-sm text-gray-600 mb-1">출금 금액</p>
+                <p class="text-lg font-bold">${w.amount.toLocaleString()}P</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 mb-1">세금 (22%)</p>
+                <p class="text-lg font-bold text-red-600">-${w.tax_amount.toLocaleString()}원</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 mb-1">실지급액</p>
+                <p class="text-xl font-bold text-green-600">${w.net_amount.toLocaleString()}원</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 계좌 정보 -->
+          <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+            <h3 class="font-semibold mb-2">계좌 정보</h3>
+            <div class="grid grid-cols-3 gap-4 text-sm">
+              <div><span class="text-gray-600">은행:</span> ${w.bank_name}</div>
+              <div><span class="text-gray-600">계좌번호:</span> ${w.account_number}</div>
+              <div><span class="text-gray-600">예금주:</span> ${w.account_holder}</div>
+            </div>
+          </div>
+
+          <!-- 서류 이미지 -->
+          <div class="space-y-4">
+            ${w.id_card_image_url ? `
+              <div>
+                <h3 class="font-semibold mb-2 flex items-center">
+                  <i class="fas fa-id-card mr-2 text-blue-600"></i>
+                  신분증 사본
+                </h3>
+                <div class="border rounded-lg p-2 bg-gray-50">
+                  <img src="${w.id_card_image_url}" alt="신분증" class="max-w-full h-auto rounded">
+                </div>
+              </div>
+            ` : '<p class="text-gray-500 text-sm">신분증 사본이 없습니다</p>'}
+
+            ${w.bankbook_image_url ? `
+              <div>
+                <h3 class="font-semibold mb-2 flex items-center">
+                  <i class="fas fa-book mr-2 text-green-600"></i>
+                  통장 사본
+                </h3>
+                <div class="border rounded-lg p-2 bg-gray-50">
+                  <img src="${w.bankbook_image_url}" alt="통장" class="max-w-full h-auto rounded">
+                </div>
+              </div>
+            ` : '<p class="text-gray-500 text-sm">통장 사본이 없습니다</p>'}
+          </div>
+
+          <!-- 닫기 버튼 -->
+          <div class="mt-6 flex justify-end">
+            <button onclick="this.closest('.fixed').remove()" 
+              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+              닫기
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+    } catch (error) {
+      console.error('Failed to load withdrawal documents:', error);
+      alert('서류를 불러오는데 실패했습니다');
     }
   }
 
@@ -7411,7 +7526,7 @@ class ReviewSphere {
                 </section>
 
                 <section>
-                  <h2 class="text-xl font-bold mb-3">제3조 (포인트 제도)</h2>
+                  <h2 class="text-xl font-bold mb-3">제3조 (포인트 제도 및 출금)</h2>
                   <ol class="list-decimal pl-5 space-y-2">
                     <li>인플루언서는 캠페인 참여를 통해 포인트를 적립할 수 있습니다.</li>
                     <li>포인트는 다음의 경우에 적립됩니다:
@@ -7422,10 +7537,18 @@ class ReviewSphere {
                         <li>기타 회사가 정하는 보너스 포인트</li>
                       </ul>
                     </li>
-                    <li>적립된 포인트는 50,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
+                    <li>적립된 포인트는 10,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
                     <li>출금 신청 시 등록된 계좌로 영업일 기준 7일 이내에 지급됩니다.</li>
                     <li>포인트 출금 시 소득세법에 따라 기타소득세(22%, 지방소득세 포함)가 원천징수됩니다.</li>
                     <li>회원은 출금 신청 시 본인 명의의 은행 계좌를 등록해야 하며, 타인 명의 계좌로는 출금이 불가능합니다.</li>
+                    <li>출금 신청 시 세금 신고 및 본인 확인을 위해 다음 서류 제출이 필요합니다:
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>신분증 사본 (주민등록증, 운전면허증, 여권 중 택1)</li>
+                        <li>통장 사본 (계좌번호, 예금주 확인 가능한 페이지)</li>
+                        <li>연락처 정보 (출금 처리 관련 연락용)</li>
+                      </ul>
+                    </li>
+                    <li>회사는 제출된 개인정보를 세금 신고 및 출금 처리 목적으로만 사용하며, 관련 법령에 따라 5년간 보관 후 파기합니다.</li>
                     <li>부정한 방법으로 포인트를 적립한 경우, 회사는 해당 포인트를 회수하고 회원 자격을 제한할 수 있습니다.</li>
                     <li>포인트의 유효기간은 적립일로부터 2년입니다.</li>
                     <li>연간 출금 금액이 500만원을 초과하는 경우, 회원은 다음 연도에 종합소득세 신고 의무가 있습니다.</li>
@@ -7433,22 +7556,62 @@ class ReviewSphere {
                 </section>
 
                 <section>
-                  <h2 class="text-xl font-bold mb-3">제4조 (캠페인 참여)</h2>
+                  <h2 class="text-xl font-bold mb-3">제4조 (캠페인 참여 및 광고 표시 의무)</h2>
                   <ol class="list-decimal pl-5 space-y-2">
                     <li>인플루언서는 승인된 캠페인에 자유롭게 지원할 수 있습니다.</li>
                     <li>광고주는 지원자 중 적합한 인플루언서를 선정할 권한이 있습니다.</li>
                     <li>선정된 인플루언서는 캠페인 요구사항에 따라 성실히 활동해야 합니다.</li>
                     <li>캠페인 완료 후 포스트 URL 등 증빙자료를 제출해야 포인트가 지급됩니다.</li>
+                    <li><strong>광고 표시 의무 (표시광고법 준수):</strong>
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>인플루언서는 금전적 대가(포인트, 현금 등) 또는 경제적 이익(제품, 서비스 제공 등)을 받고 작성하는 모든 리뷰 및 게시물에 <strong>반드시 광고성 표시</strong>를 해야 합니다.</li>
+                        <li>광고성 표시 방법:
+                          <ul class="list-circle pl-5 mt-1 space-y-1">
+                            <li>블로그: "[체험단]", "[협찬]", "[제공받은 상품]" 등을 제목 또는 본문 앞부분에 명시</li>
+                            <li>인스타그램: "#광고", "#협찬", "#체험단", "#AD" 해시태그 포함</li>
+                            <li>네이버 스마트스토어 리뷰: 리뷰 내용에 "[체험단]" 또는 "[협찬]" 명시</li>
+                            <li>유튜브: 영상 설명란에 "본 영상은 ○○으로부터 제품(또는 대가)을 제공받아 제작되었습니다" 명시</li>
+                          </ul>
+                        </li>
+                        <li>광고성 표시를 하지 않을 경우:
+                          <ul class="list-circle pl-5 mt-1 space-y-1">
+                            <li>표시광고법 위반으로 2년 이하의 징역 또는 1억 5천만 원 이하의 벌금 부과 가능</li>
+                            <li>회사는 광고성 표시 누락에 대한 법적 책임을 지지 않으며, 모든 책임은 해당 인플루언서에게 있습니다</li>
+                            <li>회사는 광고성 표시 누락이 확인된 회원의 계정을 즉시 정지하고, 적립된 포인트를 회수할 수 있습니다</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><strong>허위·과장 리뷰 금지:</strong>
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>실제 사용하지 않거나 경험하지 않은 내용을 작성해서는 안 됩니다</li>
+                        <li>과장되거나 사실과 다른 내용을 포함해서는 안 됩니다</li>
+                        <li>허위·과장 리뷰 작성 시 공정거래위원회 제재 및 법적 처벌 대상이 될 수 있습니다</li>
+                      </ul>
+                    </li>
                   </ol>
                 </section>
 
                 <section>
-                  <h2 class="text-xl font-bold mb-3">제5조 (회원의 의무)</h2>
+                  <h2 class="text-xl font-bold mb-3">제5조 (회원의 의무 및 법적 책임)</h2>
                   <ol class="list-decimal pl-5 space-y-2">
                     <li>회원은 관계 법령, 본 약관, 이용안내 및 서비스상 공지사항 등을 준수해야 합니다.</li>
                     <li>회원은 본인의 계정 정보를 제3자에게 제공하거나 이용하게 해서는 안 됩니다.</li>
                     <li>인플루언서는 진실하고 성실한 리뷰를 작성해야 하며, 허위 또는 과장된 내용을 포함해서는 안 됩니다.</li>
                     <li>광고주는 적법한 제품 및 서비스에 대한 캠페인만 등록해야 합니다.</li>
+                    <li><strong>광고주의 법적 책임:</strong>
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>광고주는 인플루언서에게 표시광고법 준수 및 광고성 표시 의무를 안내해야 합니다</li>
+                        <li>허위·과장 광고로 인한 법적 책임은 광고주에게 있습니다</li>
+                        <li>네이버 스마트스토어 등 플랫폼 정책 위반으로 인한 불이익은 광고주가 부담합니다</li>
+                      </ul>
+                    </li>
+                    <li><strong>인플루언서의 법적 책임:</strong>
+                      <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>광고성 표시 누락, 허위·과장 리뷰 작성 등으로 인한 법적 책임은 인플루언서 본인에게 있습니다</li>
+                        <li>회사는 회원의 법령 위반 행위에 대해 어떠한 책임도 지지 않습니다</li>
+                      </ul>
+                    </li>
                   </ol>
                 </section>
 
@@ -8388,6 +8551,15 @@ class ReviewSphere {
 
   // 출금 신청 모달
   async showWithdrawalRequest() {
+    // WithdrawalUI 클래스 사용
+    if (!this.withdrawalUI) {
+      this.withdrawalUI = new window.WithdrawalUI(this);
+    }
+    this.withdrawalUI.showWithdrawalRequest();
+  }
+
+  // 이전 버전 (백업용 - 삭제 예정)
+  async showWithdrawalRequestOld() {
     // 프로필 정보 확인
     try {
       const response = await axios.get('/api/profile/influencer', this.getAuthHeaders());
