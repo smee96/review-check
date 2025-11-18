@@ -2786,10 +2786,16 @@ class ReviewSphere {
           <div class="space-y-4">
             ${w.id_card_image_url ? `
               <div>
-                <h3 class="font-semibold mb-2 flex items-center">
-                  <i class="fas fa-id-card mr-2 text-blue-600"></i>
-                  신분증 사본
-                </h3>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="font-semibold flex items-center">
+                    <i class="fas fa-id-card mr-2 text-blue-600"></i>
+                    신분증 사본
+                  </h3>
+                  <a href="${w.id_card_image_url}" download="신분증_${w.user_nickname}_${w.id}.jpg" 
+                     class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                    <i class="fas fa-download mr-1"></i>다운로드
+                  </a>
+                </div>
                 <div class="border rounded-lg p-2 bg-gray-50">
                   <img src="${w.id_card_image_url}" alt="신분증" class="max-w-full h-auto rounded">
                 </div>
@@ -2798,10 +2804,16 @@ class ReviewSphere {
 
             ${w.bankbook_image_url ? `
               <div>
-                <h3 class="font-semibold mb-2 flex items-center">
-                  <i class="fas fa-book mr-2 text-green-600"></i>
-                  통장 사본
-                </h3>
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="font-semibold flex items-center">
+                    <i class="fas fa-book mr-2 text-green-600"></i>
+                    통장 사본
+                  </h3>
+                  <a href="${w.bankbook_image_url}" download="통장사본_${w.user_nickname}_${w.id}.jpg" 
+                     class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                    <i class="fas fa-download mr-1"></i>다운로드
+                  </a>
+                </div>
                 <div class="border rounded-lg p-2 bg-gray-50">
                   <img src="${w.bankbook_image_url}" alt="통장" class="max-w-full h-auto rounded">
                 </div>
