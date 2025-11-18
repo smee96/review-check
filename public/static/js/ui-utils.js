@@ -317,7 +317,7 @@ const UIUtils = {
             </div>
             
             <div>
-              <h4 class="text-white text-sm font-semibold mb-2">운영사 정보</h4>
+              <h4 class="text-white text-sm font-semibold mb-2">회사소개</h4>
               <p class="text-xs mb-1"><strong>(주)모빈</strong> | 대표이사 이규한 | 개인정보 관리책임자 안중경</p>
               <p class="text-xs">서울시 구로구 디지털로31길 12, 본관 2층 넥스트데이 2호 (구로동, 티피타워)</p>
             </div>
