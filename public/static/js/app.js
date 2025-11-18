@@ -385,20 +385,25 @@ class ReviewSphere {
     // 홈은 항상 메인 페이지(캠페인 목록)로 이동
     const app = document.getElementById('app');
     
-    // Load campaigns for display
+    // Load campaigns and reviews for display
     let ongoingCampaigns = [];
     let bestCampaigns = [];
+    let bestReviews = [];
     
     try {
       // 진행중인 캠페인 (모든 승인된 캠페인)
       const ongoingResponse = await axios.get('/api/campaigns');
       ongoingCampaigns = ongoingResponse.data || [];
       
-      // 베스트 캠페인 (지원자 수 많은 순)
+      // 베스트 캠페인 (관리자 선정)
       const bestResponse = await axios.get('/api/campaigns?type=best');
       bestCampaigns = bestResponse.data || [];
+      
+      // 베스트 리뷰 (관리자 선정)
+      const bestReviewsResponse = await axios.get('/api/campaigns/reviews/best');
+      bestReviews = bestReviewsResponse.data || [];
     } catch (error) {
-      console.log('Failed to load campaigns:', error);
+      console.log('Failed to load data:', error);
     }
     
     app.innerHTML = `
@@ -855,14 +860,53 @@ class ReviewSphere {
               <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-heart text-red-500 mr-2"></i>베스트 리뷰
               </h3>
+              ${bestReviews.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
             </div>
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
-                <div class="w-full text-center py-16">
-                  <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
-                  <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
-                  <p class="text-sm text-gray-400">인플루언서들의 멋진 콘텐츠가 곧 이곳에 표시됩니다!</p>
-                </div>
+                ${bestReviews.length > 0 ? bestReviews.map((r, idx) => `
+                  <div class="bg-white border-2 border-red-200 rounded-xl overflow-hidden hover:shadow-xl transition flex-shrink-0" style="width: 280px;">
+                    ${r.image_url ? `
+                      <div class="w-full h-64 overflow-hidden bg-gray-100 relative">
+                        <img src="${r.image_url}" alt="리뷰" class="w-full h-full object-cover">
+                        <div class="absolute top-2 left-2">
+                          <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold shadow-md">
+                            <i class="fas fa-heart mr-1"></i>BEST
+                          </span>
+                        </div>
+                      </div>
+                    ` : `
+                      <div class="w-full h-64 bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center relative">
+                        <i class="fas fa-heart text-white text-5xl opacity-50"></i>
+                        <div class="absolute top-2 left-2">
+                          <span class="px-3 py-1 bg-white text-red-800 rounded-full text-xs font-semibold shadow-md">
+                            <i class="fas fa-heart mr-1"></i>BEST
+                          </span>
+                        </div>
+                      </div>
+                    `}
+                    <div class="p-4">
+                      <h4 class="font-bold text-base mb-2 line-clamp-2">${r.campaign_title}</h4>
+                      <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                        <span><i class="fas fa-user-circle mr-1"></i>${r.influencer_nickname}</span>
+                        <span class="text-xs">${new Date(r.submitted_at).toLocaleDateString('ko-KR')}</span>
+                      </div>
+                      ${r.post_url ? `
+                        <a href="${r.post_url}" target="_blank" rel="noopener noreferrer" 
+                           class="block w-full bg-red-600 text-white text-center py-2 rounded-lg hover:bg-red-700 transition text-sm"
+                           onclick="event.stopPropagation()">
+                          <i class="fas fa-external-link-alt mr-1"></i>리뷰 보기
+                        </a>
+                      ` : ''}
+                    </div>
+                  </div>
+                `).join('') : `
+                  <div class="w-full text-center py-16">
+                    <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
+                    <p class="text-sm text-gray-400">인플루언서들의 멋진 콘텐츠가 곧 이곳에 표시됩니다!</p>
+                  </div>
+                `}
               </div>
             </div>
           </div>
@@ -2436,11 +2480,20 @@ class ReviewSphere {
       container.innerHTML = `
         <div class="space-y-6">
           ${Object.entries(reviewsByCampaign).map(([campaignId, data]) => `
-            <div class="bg-white rounded-lg shadow-md p-4">
-              <h2 class="text-xl font-bold mb-4 text-gray-800">
-                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${data.campaign_title}
-              </h2>
-              <div class="space-y-4">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+              <button onclick="app.toggleCampaignReviews('campaign-${campaignId}')" 
+                class="w-full text-left p-4 hover:bg-gray-50 transition flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fas fa-bullhorn text-purple-600 text-lg"></i>
+                  <h2 class="text-xl font-bold text-gray-800">${data.campaign_title}</h2>
+                  <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                    ${data.reviews.length}개
+                  </span>
+                </div>
+                <i id="campaign-${campaignId}-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </button>
+              <div id="campaign-${campaignId}" class="hidden border-t">
+                <div class="p-4 space-y-4">
                 ${data.reviews.map(review => {
                   const statusBadge = review.approval_status === 'approved' 
                     ? '<span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>승인완료</span>'
@@ -2512,6 +2565,7 @@ class ReviewSphere {
                   </div>
                   `;
                 }).join('')}
+                </div>
               </div>
             </div>
           `).join('')}
@@ -2521,6 +2575,20 @@ class ReviewSphere {
       console.error('Failed to load admin reviews:', error);
       const container = document.getElementById('adminReviewsContent');
       container.innerHTML = '<p class="text-red-600 p-4">리뷰 목록을 불러오는데 실패했습니다</p>';
+    }
+  }
+
+  // 캠페인 리뷰 토글 함수 추가
+  toggleCampaignReviews(campaignId) {
+    const content = document.getElementById(campaignId);
+    const icon = document.getElementById(`${campaignId}-icon`);
+    
+    if (content.classList.contains('hidden')) {
+      content.classList.remove('hidden');
+      icon.classList.add('rotate-180');
+    } else {
+      content.classList.add('hidden');
+      icon.classList.remove('rotate-180');
     }
   }
 

@@ -734,4 +734,32 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
   }
 });
 
+// 베스트 리뷰 목록 조회 (공개 API)
+campaigns.get('/reviews/best', async (c) => {
+  try {
+    const { env } = c;
+    
+    const reviews = await env.DB.prepare(
+      `SELECT r.id, r.post_url, r.image_url,
+       r.submitted_at,
+       c.id as campaign_id,
+       c.title as campaign_title,
+       c.thumbnail_image as campaign_thumbnail,
+       u.nickname as influencer_nickname
+       FROM reviews r
+       JOIN applications a ON r.application_id = a.id
+       JOIN campaigns c ON a.campaign_id = c.id
+       JOIN users u ON a.influencer_id = u.id
+       WHERE COALESCE(r.is_best, 0) = 1 AND r.approval_status = 'approved'
+       ORDER BY r.submitted_at DESC
+       LIMIT 20`
+    ).all();
+    
+    return c.json(reviews.results || []);
+  } catch (error) {
+    console.error('Get best reviews error:', error);
+    return c.json({ error: '베스트 리뷰 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default campaigns;
