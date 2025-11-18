@@ -103,6 +103,18 @@ campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 
     const user = c.get('user');
     const { env } = c;
     
+    // Get system settings
+    const settingsData = await env.DB.prepare(
+      'SELECT setting_key, setting_value FROM system_settings'
+    ).all();
+    
+    const settings: Record<string, number> = {};
+    settingsData.results.forEach((s: any) => {
+      settings[s.setting_key] = Number(s.setting_value);
+    });
+    
+    const pointsFeeRate = (settings.points_fee_rate || 30) / 100;
+    
     const campaigns = await env.DB.prepare(
       `SELECT c.*, 
        (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
@@ -116,13 +128,15 @@ campaigns.get('/my', authMiddleware, requireRole('advertiser', 'agency', 'rep', 
       const slots = campaign.slots || 1;
       const spherePoints = campaign.sphere_points || 0;
       const productValue = campaign.product_value || 0;
+      const pricingType = campaign.pricing_type || 'product_only';
       
-      const fixedFee = 10000; // 건당 고정 수수료
-      const pointsFeeRate = 0.3; // 포인트 수수료 30%
+      // Get fixed fee based on pricing type
+      const fixedFeeKey = `fixed_fee_${pricingType}`;
+      const fixedFee = settings[fixedFeeKey] || 10000;
       
       let subtotal = 0;
       
-      switch (campaign.pricing_type) {
+      switch (pricingType) {
         case 'points_only':
           // 포인트만: 포인트 + 건당수수료 + 포인트수수료
           subtotal = (spherePoints + fixedFee + Math.floor(spherePoints * pointsFeeRate)) * slots;

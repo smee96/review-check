@@ -2205,6 +2205,15 @@ class ReviewSphere {
 
   async loadAdminCampaignsPageContent() {
     try {
+      // Load system settings
+      const settingsResponse = await axios.get('/api/settings');
+      const settingsArray = settingsResponse.data;
+      const settings = {};
+      settingsArray.forEach(s => {
+        settings[s.setting_key] = Number(s.setting_value);
+      });
+      const pointsFeeRate = (settings.points_fee_rate || 30) / 100;
+      
       const response = await axios.get('/api/admin/campaigns', this.getAuthHeaders());
       const campaigns = response.data;
       const container = document.getElementById('adminCampaignsContent');
@@ -2216,6 +2225,7 @@ class ReviewSphere {
         console.log('is_best 필드:', campaigns[0].is_best);
         console.log('is_best 타입:', typeof campaigns[0].is_best);
       }
+      console.log('포인트 수수료율:', pointsFeeRate * 100 + '%');
 
       container.innerHTML = `
         <div class="space-y-3 sm:space-y-4">
@@ -2264,8 +2274,8 @@ class ReviewSphere {
                   ` : ''}
                   ${c.sphere_points > 0 || c.point_reward > 0 ? `
                     <div>
-                      <p class="text-gray-600">포인트 수수료 (30%)</p>
-                      <p class="font-semibold text-base sm:text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * 0.3).toLocaleString()}원</p>
+                      <p class="text-gray-600">포인트 수수료 (${Math.round(pointsFeeRate * 100)}%)</p>
+                      <p class="font-semibold text-base sm:text-lg">${(((c.sphere_points || c.point_reward) * c.slots) * pointsFeeRate).toLocaleString()}원</p>
                     </div>
                   ` : ''}
                   <div>
