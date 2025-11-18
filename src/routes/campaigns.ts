@@ -188,15 +188,15 @@ campaigns.get('/', async (c) => {
     const type = c.req.query('type'); // 'best' or undefined
     
     if (type === 'best') {
-      // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1)
+      // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1, 모든 상태 포함)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.is_best = 1 AND c.status = ? AND c.payment_status = ?
+         WHERE c.is_best = 1
          ORDER BY c.updated_at DESC
          LIMIT 20`
-      ).bind('recruiting', 'paid').all();
+      ).all();
       
       return c.json(campaigns.results);
     } else {

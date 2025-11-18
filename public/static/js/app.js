@@ -864,18 +864,22 @@ class ReviewSphere {
             </div>
             <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
               <div class="flex space-x-4" style="width: max-content;">
-                ${bestReviews.length > 0 ? bestReviews.map((r, idx) => `
+                ${bestReviews.length > 0 ? bestReviews.map((r, idx) => {
+                  // R2 이미지 URL 생성
+                  const imageUrl = r.image_url ? (r.image_url.startsWith('http') ? r.image_url : \`https://pub-d466289a49b24107b8e1c002d70c8a0f.r2.dev/\${r.image_url}\`) : null;
+                  
+                  return \`
                   <div class="bg-white border-2 border-red-200 rounded-xl overflow-hidden hover:shadow-xl transition flex-shrink-0" style="width: 280px;">
-                    ${r.image_url ? `
+                    \${imageUrl ? \`
                       <div class="w-full h-64 overflow-hidden bg-gray-100 relative">
-                        <img src="${r.image_url}" alt="리뷰" class="w-full h-full object-cover">
+                        <img src="\${imageUrl}" alt="리뷰" class="w-full h-full object-cover">
                         <div class="absolute top-2 left-2">
                           <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold shadow-md">
                             <i class="fas fa-heart mr-1"></i>BEST
                           </span>
                         </div>
                       </div>
-                    ` : `
+                    \` : \`
                       <div class="w-full h-64 bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center relative">
                         <i class="fas fa-heart text-white text-5xl opacity-50"></i>
                         <div class="absolute top-2 left-2">
@@ -884,23 +888,24 @@ class ReviewSphere {
                           </span>
                         </div>
                       </div>
-                    `}
-                    <div class="p-4">
-                      <h4 class="font-bold text-base mb-2 line-clamp-2">${r.campaign_title}</h4>
+                    \`}
+                    <div class="p-4 flex flex-col" style="min-height: 160px;">
+                      <h4 class="font-bold text-base mb-2 line-clamp-2" style="height: 48px; overflow: hidden;">\${r.campaign_title}</h4>
                       <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
-                        <span><i class="fas fa-user-circle mr-1"></i>${r.influencer_nickname}</span>
-                        <span class="text-xs">${new Date(r.submitted_at).toLocaleDateString('ko-KR')}</span>
+                        <span class="truncate flex-1 mr-2"><i class="fas fa-user-circle mr-1"></i>\${r.influencer_nickname}</span>
+                        <span class="text-xs whitespace-nowrap">\${new Date(r.submitted_at).toLocaleDateString('ko-KR')}</span>
                       </div>
-                      ${r.post_url ? `
-                        <a href="${r.post_url}" target="_blank" rel="noopener noreferrer" 
-                           class="block w-full bg-red-600 text-white text-center py-2 rounded-lg hover:bg-red-700 transition text-sm"
+                      \${r.post_url ? \`
+                        <a href="\${r.post_url}" target="_blank" rel="noopener noreferrer" 
+                           class="block w-full bg-red-600 text-white text-center py-2 rounded-lg hover:bg-red-700 transition text-sm mt-auto"
                            onclick="event.stopPropagation()">
                           <i class="fas fa-external-link-alt mr-1"></i>리뷰 보기
                         </a>
-                      ` : ''}
+                      \` : ''}
                     </div>
                   </div>
-                `).join('') : `
+                  \`;
+                }).join('') : \`
                   <div class="w-full text-center py-16">
                     <i class="fas fa-comment-dots text-6xl text-gray-300 mb-4"></i>
                     <p class="text-xl text-gray-500 mb-2">베스트 리뷰를 기다리고 있어요</p>
