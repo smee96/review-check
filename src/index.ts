@@ -428,6 +428,51 @@ app.put('/api/admin/withdrawals/:id/approve', async (c) => {
   }
 });
 
+// 출금 신청 상세 조회 (관리자)
+app.get('/api/admin/withdrawals/:id', async (c) => {
+  try {
+    const token = c.req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return c.json({ error: '인증이 필요합니다' }, 401);
+    }
+
+    const decoded = await verifyJWT(token);
+    if (!decoded) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 401);
+    }
+    
+    // 관리자 권한 확인
+    const user = await c.env.DB.prepare('SELECT role FROM users WHERE id = ?')
+      .bind(decoded.userId).first();
+    
+    if (user?.role !== 'admin') {
+      return c.json({ error: '관리자 권한이 필요합니다' }, 403);
+    }
+
+    const withdrawalId = c.req.param('id');
+
+    // 출금 신청 정보 조회 (사용자 정보 포함)
+    const withdrawal = await c.env.DB.prepare(`
+      SELECT 
+        w.*,
+        u.email as user_email,
+        u.nickname as user_nickname
+      FROM withdrawal_requests w
+      JOIN users u ON w.user_id = u.id
+      WHERE w.id = ?
+    `).bind(withdrawalId).first();
+
+    if (!withdrawal) {
+      return c.json({ error: '출금 신청을 찾을 수 없습니다' }, 404);
+    }
+
+    return c.json(withdrawal);
+  } catch (error) {
+    console.error('Get withdrawal error:', error);
+    return c.json({ error: '출금 신청 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 // 출금 거절 (RESTful)
 app.put('/api/admin/withdrawals/:id/reject', async (c) => {
   try {

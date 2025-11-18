@@ -2664,12 +2664,20 @@ class ReviewSphere {
                 <div class="flex items-center gap-6 text-sm text-gray-600 border-t pt-3 mt-3">
                   ${w.real_name ? `<span><i class="fas fa-id-card mr-1"></i>실명: ${w.real_name}</span>` : ''}
                   ${w.resident_number_partial ? `<span><i class="fas fa-birthday-cake mr-1"></i>생년월일: ${w.resident_number_partial}</span>` : ''}
-                  ${w.id_card_image_url || w.bankbook_image_url ? `
-                    <button onclick="app.showWithdrawalDocuments(${w.id})" 
-                      class="ml-auto px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
-                      <i class="fas fa-file-image mr-1"></i>서류 확인
-                    </button>
-                  ` : ''}
+                  <div class="ml-auto flex items-center gap-2">
+                    ${w.id_card_image_url ? `
+                      <a href="${w.id_card_image_url}" download="신분증_${w.user_nickname}_${w.id}.jpg" 
+                         class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
+                        <i class="fas fa-id-card mr-1"></i>신분증
+                      </a>
+                    ` : ''}
+                    ${w.bankbook_image_url ? `
+                      <a href="${w.bankbook_image_url}" download="통장사본_${w.user_nickname}_${w.id}.jpg" 
+                         class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs">
+                        <i class="fas fa-book mr-1"></i>통장
+                      </a>
+                    ` : ''}
+                  </div>
                 </div>
               ` : ''}
               
