@@ -2668,88 +2668,110 @@ class ReviewSphere {
           ` : ''}
           
           ${withdrawals.map(w => `
-            <div class="border rounded-lg p-4 bg-white">
-              <!-- PC 최적화: 정보를 가로로 배치 -->
-              <div class="flex items-start justify-between mb-3 gap-4">
-                <!-- 사용자 정보 -->
-                <div class="flex-shrink-0" style="min-width: 180px;">
-                  <h3 class="font-bold text-base">${w.user_nickname || '사용자'}</h3>
-                  <p class="text-sm text-gray-600">${w.user_email || ''}</p>
+            <div class="border rounded-lg p-3 sm:p-4 bg-white">
+              <!-- 사용자 정보 및 상태 -->
+              <div class="flex items-start justify-between mb-3 gap-2">
+                <div class="flex-shrink-0 min-w-0">
+                  <h3 class="font-bold text-sm sm:text-base truncate">${w.user_nickname || '사용자'}</h3>
+                  <p class="text-xs sm:text-sm text-gray-600 truncate">${w.user_email || ''}</p>
                 </div>
-
-                <!-- 금액 정보 (가로 배치) -->
-                <div class="flex-1 grid grid-cols-4 gap-4">
-                  <div class="text-center">
-                    <p class="text-xs text-gray-600 mb-1">출금 금액</p>
-                    <p class="font-semibold text-base">${w.amount.toLocaleString()}P</p>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-xs text-gray-600 mb-1">세금 (22%)</p>
-                    <p class="font-semibold text-base text-red-600">-${w.tax_amount.toLocaleString()}P</p>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-xs text-gray-600 mb-1">실지급액</p>
-                    <p class="font-bold text-lg text-green-600">${w.net_amount.toLocaleString()}원</p>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-xs text-gray-600 mb-1">상태</p>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs ${
-                      w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      w.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      w.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                    }">
-                      ${w.status === 'pending' ? '⏳ 대기' : w.status === 'approved' ? '✓ 승인' : w.status === 'rejected' ? '✗ 거절' : w.status}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- 액션 버튼 -->
-                <div class="flex-shrink-0 flex gap-2">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <span class="inline-block px-2 sm:px-3 py-1 rounded-full text-xs whitespace-nowrap ${
+                    w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    w.status === 'approved' ? 'bg-green-100 text-green-800' :
+                    w.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                  }">
+                    ${w.status === 'pending' ? '⏳ 대기' : w.status === 'approved' ? '✓ 승인' : w.status === 'rejected' ? '✗ 거절' : w.status}
+                  </span>
                   ${w.status === 'pending' ? `
                     <button onclick="app.approveWithdrawal(${w.id})" 
-                      class="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 text-sm">
+                      class="bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded hover:bg-green-700 text-xs sm:text-sm">
                       <i class="fas fa-check"></i>
                     </button>
                     <button onclick="app.rejectWithdrawal(${w.id})" 
-                      class="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm">
+                      class="bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded hover:bg-red-700 text-xs sm:text-sm">
                       <i class="fas fa-times"></i>
                     </button>
                   ` : ''}
                 </div>
               </div>
 
-              <!-- 계좌 정보 및 날짜 (가로 배치) -->
-              <div class="flex items-center justify-between text-sm border-t pt-3 gap-6">
-                <div class="flex items-center gap-6 text-gray-600">
-                  <span><i class="fas fa-university mr-1"></i>${w.bank_name}</span>
-                  <span><i class="fas fa-credit-card mr-1"></i>${w.account_number}</span>
-                  <span><i class="fas fa-user mr-1"></i>${w.account_holder}</span>
-                  ${w.contact_phone ? `<span><i class="fas fa-phone mr-1"></i>${w.contact_phone}</span>` : ''}
+              <!-- 금액 정보 (모바일: 2x2, PC: 1x4) -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-3">
+                <div class="text-center bg-gray-50 p-2 rounded">
+                  <p class="text-xs text-gray-600 mb-1">출금 금액</p>
+                  <p class="font-semibold text-sm sm:text-base">${w.amount.toLocaleString()}P</p>
                 </div>
-                <div class="flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
-                  <span>신청: ${new Date(w.created_at).toLocaleDateString('ko-KR')}</span>
-                  ${w.processed_at ? `<span>처리: ${new Date(w.processed_at).toLocaleDateString('ko-KR')}</span>` : ''}
+                <div class="text-center bg-red-50 p-2 rounded">
+                  <p class="text-xs text-gray-600 mb-1">세금 (22%)</p>
+                  <p class="font-semibold text-sm sm:text-base text-red-600">-${w.tax_amount.toLocaleString()}P</p>
+                </div>
+                <div class="text-center bg-green-50 p-2 rounded col-span-2 sm:col-span-1">
+                  <p class="text-xs text-gray-600 mb-1">실지급액</p>
+                  <p class="font-bold text-base sm:text-lg text-green-600">${w.net_amount.toLocaleString()}원</p>
+                </div>
+                <div class="text-center bg-blue-50 p-2 rounded col-span-2 sm:col-span-1">
+                  <p class="text-xs text-gray-600 mb-1">신청일</p>
+                  <p class="font-semibold text-xs sm:text-sm">${new Date(w.created_at).toLocaleDateString('ko-KR')}</p>
+                </div>
+              </div>
+
+              <!-- 계좌 정보 (가로 스크롤) -->
+              <div class="border-t pt-2 overflow-x-auto">
+                <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 whitespace-nowrap min-w-max">
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-university text-gray-400"></i>
+                    <span class="font-medium">${w.bank_name}</span>
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-credit-card text-gray-400"></i>
+                    <span class="font-mono">${w.account_number}</span>
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <i class="fas fa-user text-gray-400"></i>
+                    <span>${w.account_holder}</span>
+                  </span>
+                  ${w.contact_phone ? `
+                    <span class="flex items-center gap-1">
+                      <i class="fas fa-phone text-gray-400"></i>
+                      <span>${w.contact_phone}</span>
+                    </span>
+                  ` : ''}
                 </div>
               </div>
 
               <!-- 세금 신고 정보 -->
               ${w.real_name || w.resident_number_partial ? `
-                <div class="flex items-center gap-6 text-sm text-gray-600 border-t pt-3 mt-3">
-                  ${w.real_name ? `<span><i class="fas fa-id-card mr-1"></i>실명: ${w.real_name}</span>` : ''}
-                  ${w.resident_number_partial ? `<span><i class="fas fa-birthday-cake mr-1"></i>생년월일: ${w.resident_number_partial}</span>` : ''}
-                  <div class="ml-auto flex items-center gap-2">
-                    ${w.id_card_image_url ? `
-                      <a href="${w.id_card_image_url}" download="신분증_${w.user_nickname}_${w.id}.jpg" 
-                         class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
-                        <i class="fas fa-id-card mr-1"></i>신분증
-                      </a>
-                    ` : ''}
-                    ${w.bankbook_image_url ? `
-                      <a href="${w.bankbook_image_url}" download="통장사본_${w.user_nickname}_${w.id}.jpg" 
-                         class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs">
-                        <i class="fas fa-book mr-1"></i>통장
-                      </a>
-                    ` : ''}
+                <div class="border-t pt-2 mt-2 overflow-x-auto">
+                  <div class="flex items-center justify-between gap-2 min-w-max">
+                    <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 whitespace-nowrap">
+                      ${w.real_name ? `
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-id-card text-gray-400"></i>
+                          <span>실명: ${w.real_name}</span>
+                        </span>
+                      ` : ''}
+                      ${w.resident_number_partial ? `
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-birthday-cake text-gray-400"></i>
+                          <span>생년월일: ${w.resident_number_partial}</span>
+                        </span>
+                      ` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                      ${w.id_card_image_url ? `
+                        <a href="${w.id_card_image_url}" download="신분증_${w.user_nickname}_${w.id}.jpg" 
+                           class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs whitespace-nowrap">
+                          <i class="fas fa-id-card mr-1"></i>신분증
+                        </a>
+                      ` : ''}
+                      ${w.bankbook_image_url ? `
+                        <a href="${w.bankbook_image_url}" download="통장사본_${w.user_nickname}_${w.id}.jpg" 
+                           class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs whitespace-nowrap">
+                          <i class="fas fa-book mr-1"></i>통장
+                        </a>
+                      ` : ''}
+                    </div>
                   </div>
                 </div>
               ` : ''}
