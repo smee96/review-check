@@ -642,6 +642,24 @@ webapp/
   - 모든 "돌아가기" 버튼을 "홈으로 돌아가기"로 변경
   - 에러 로깅 강화로 디버깅 용이성 향상
 
+### 2025-11-18
+- ✅ **관리자 페이지 모바일 최적화**
+  - 가입자 목록: 가로 스크롤, whitespace-nowrap으로 줄바꿈 방지
+  - 정산 관리: 모바일 2x2 그리드, PC 1x4 그리드 반응형 레이아웃
+  - 계좌 정보: 가로 스크롤로 모든 정보 한 줄에 표시
+  - 아이콘과 폰트 크기 반응형 조정 (text-xs sm:text-sm)
+- ✅ **시스템 설정 개선**
+  - 모든 수수료 입력 필드에 천 단위 자동 콤마 추가
+  - formatNumberInput 함수로 입력 시 실시간 포맷팅
+  - 기존 값도 천 단위 콤마로 표시
+- ✅ **버그 수정**
+  - 캠페인 복사 시 PricingUtils 오류 해결 (window.pricingUtils로 변경)
+  - formatNumber 메서드 → toLocaleString()으로 대체
+- ✅ **프로덕션 배포**
+  - Deployment ID: 5b4a70b0-67ae-4a45-a7a3-058b6968fa2d
+  - URL: https://review-spheres-v1.pages.dev
+  - Commit: 8e840ba
+
 ### 2025-11-10
 - ✅ 프로젝트 초기 설정 완료
 - ✅ 데이터베이스 스키마 설계
