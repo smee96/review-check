@@ -3125,11 +3125,20 @@ class ReviewSphere {
       container.innerHTML = `
         <div class="space-y-6">
           ${Object.entries(reviewsByCampaign).map(([campaignId, data]) => `
-            <div class="bg-white rounded-lg shadow-md p-4">
-              <h2 class="text-xl font-bold mb-4 text-gray-800">
-                <i class="fas fa-bullhorn text-purple-600 mr-2"></i>${data.campaign_title}
-              </h2>
-              <div class="space-y-4">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+              <button onclick="app.toggleCampaignReviews('adv-campaign-${campaignId}')" 
+                class="w-full text-left p-4 hover:bg-gray-50 transition flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fas fa-bullhorn text-purple-600 text-lg"></i>
+                  <h2 class="text-xl font-bold text-gray-800">${data.campaign_title}</h2>
+                  <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                    ${data.reviews.length}개
+                  </span>
+                </div>
+                <i id="adv-campaign-${campaignId}-icon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </button>
+              <div id="adv-campaign-${campaignId}" class="hidden border-t">
+                <div class="p-4 space-y-4">
                 ${data.reviews.map(review => {
                   const statusBadge = review.approval_status === 'approved' 
                     ? '<span class="inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>승인완료</span>'
@@ -3150,23 +3159,24 @@ class ReviewSphere {
                       <span class="text-xs text-gray-500">${new Date(review.submitted_at || review.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
                     
-                    ${review.review_image ? `
-                      <div class="mb-3">
-                        <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="w-48 h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src, '_blank')" onerror="this.style.display='none'">
-                      </div>
-                    ` : ''}
+                    <div class="flex gap-3 mb-3">
+                      ${review.review_image ? `
+                        <div>
+                          <img src="/api/applications/review-image/${encodeURIComponent(review.review_image)}" alt="리뷰 이미지" class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-90 hover:scale-110 transition-all shadow-md border-2 border-gray-200" onclick="window.open(this.src, '_blank')" onerror="this.style.display='none'" title="클릭하여 크게 보기">
+                        </div>
+                      ` : ''}
+                      ${review.post_url ? `
+                        <div class="flex-1">
+                          <a href="${review.post_url}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium">
+                            <i class="fas fa-external-link-alt mr-1"></i>게시물 보기
+                          </a>
+                        </div>
+                      ` : ''}
+                    </div>
                     
                     <div class="mb-3">
                       <p class="text-sm text-gray-700 whitespace-pre-wrap">${review.review_text || '리뷰 내용 없음'}</p>
                     </div>
-                    
-                    ${review.post_url ? `
-                      <div class="mb-3">
-                        <a href="${review.post_url}" target="_blank" class="text-blue-600 hover:underline text-sm">
-                          <i class="fas fa-external-link-alt mr-1"></i>게시물 보기
-                        </a>
-                      </div>
-                    ` : ''}
                     
                     ${review.approval_status === 'rejected' && review.rejection_reason ? `
                       <div class="mb-3 p-3 bg-red-100 rounded-lg">
@@ -3202,6 +3212,7 @@ class ReviewSphere {
                   </div>
                   `;
                 }).join('')}
+                </div>
               </div>
             </div>
           `).join('')}
