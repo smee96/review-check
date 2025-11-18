@@ -202,13 +202,13 @@ admin.get('/reviews', async (c) => {
     const reviews = await env.DB.prepare(
       `SELECT r.id, r.application_id, r.post_url, r.image_url as review_image, 
        r.submitted_at, r.updated_at, r.approval_status, r.rejection_reason, 
-       r.is_best, r.reviewed_by, r.reviewed_at,
+       COALESCE(r.is_best, 0) as is_best, r.reviewed_by, r.reviewed_at,
        '' as review_text,
        c.title as campaign_title,
        c.id as campaign_id,
        u.nickname as influencer_nickname,
        u.email as influencer_email,
-       a.created_at
+       a.applied_at as created_at
        FROM reviews r
        JOIN applications a ON r.application_id = a.id
        JOIN campaigns c ON a.campaign_id = c.id
