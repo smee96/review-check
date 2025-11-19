@@ -7120,6 +7120,49 @@ class ReviewSphere {
               <p class="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">${this.user.nickname}님 (관리자)</p>
             </div>
 
+            <!-- 통계 카드 -->
+            <div id="admin-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600">오늘 방문자</p>
+                    <p class="text-2xl font-bold text-blue-600" id="stat-visitors">-</p>
+                  </div>
+                  <i class="fas fa-users text-blue-500 text-3xl opacity-20"></i>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600">전체 회원</p>
+                    <p class="text-2xl font-bold text-green-600" id="stat-users">-</p>
+                  </div>
+                  <i class="fas fa-user-check text-green-500 text-3xl opacity-20"></i>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600">전체 캠페인</p>
+                    <p class="text-2xl font-bold text-purple-600" id="stat-campaigns">-</p>
+                  </div>
+                  <i class="fas fa-bullhorn text-purple-500 text-3xl opacity-20"></i>
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-lg shadow p-4 border-l-4 border-orange-500">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600">모집 중</p>
+                    <p class="text-2xl font-bold text-orange-600" id="stat-active">-</p>
+                  </div>
+                  <i class="fas fa-fire text-orange-500 text-3xl opacity-20"></i>
+                </div>
+              </div>
+            </div>
+
             <!-- 아코디언 메뉴 -->
             <div class="space-y-3 mb-4 sm:mb-8">
               <!-- 가입자 목록 -->
@@ -7205,6 +7248,23 @@ class ReviewSphere {
         ${this.renderFooter()}
       </div>
     `;
+    
+    // 통계 데이터 로드
+    this.loadAdminStats();
+  }
+
+  async loadAdminStats() {
+    try {
+      const response = await axios.get('/api/admin/stats', this.getAuthHeaders());
+      const stats = response.data;
+      
+      document.getElementById('stat-visitors').textContent = stats.todayVisitors.toLocaleString();
+      document.getElementById('stat-users').textContent = stats.totalUsers.toLocaleString();
+      document.getElementById('stat-campaigns').textContent = stats.totalCampaigns.toLocaleString();
+      document.getElementById('stat-active').textContent = stats.activeCampaigns.toLocaleString();
+    } catch (error) {
+      console.error('Load admin stats error:', error);
+    }
   }
 
   async toggleAdminAccordion(sectionId) {

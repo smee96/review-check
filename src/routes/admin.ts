@@ -265,4 +265,46 @@ admin.put('/reviews/:id/best', async (c) => {
   }
 });
 
+// 통계 조회
+admin.get('/stats', async (c) => {
+  try {
+    const { env } = c;
+    
+    // 오늘 날짜 (한국 시간 기준)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString();
+    
+    // 오늘 방문자 수 (visitor_logs 테이블이 없으면 0 반환)
+    let todayVisitors = 0;
+    try {
+      const visitorsResult = await env.DB.prepare(
+        `SELECT COUNT(DISTINCT ip_address) as count 
+         FROM visitor_logs 
+         WHERE visited_at >= ?`
+      ).bind(todayStr).first();
+      todayVisitors = visitorsResult?.count || 0;
+    } catch (e) {
+      console.log('Visitor logs table not found, returning 0');
+    }
+    
+    // 전체 통계
+    const totalUsers = await env.DB.prepare('SELECT COUNT(*) as count FROM users').first();
+    const totalCampaigns = await env.DB.prepare('SELECT COUNT(*) as count FROM campaigns').first();
+    const activeCampaigns = await env.DB.prepare(
+      `SELECT COUNT(*) as count FROM campaigns WHERE status = 'recruiting'`
+    ).first();
+    
+    return c.json({
+      todayVisitors,
+      totalUsers: totalUsers?.count || 0,
+      totalCampaigns: totalCampaigns?.count || 0,
+      activeCampaigns: activeCampaigns?.count || 0
+    });
+  } catch (error) {
+    console.error('Get stats error:', error);
+    return c.json({ error: '통계 조회 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default admin;
