@@ -8131,8 +8131,7 @@ class ReviewSphere {
                 <label class="block text-sm font-medium text-gray-700 mb-1">포인트 수수료율 (%)</label>
                 <div class="flex items-center gap-2">
                   <input type="text" id="points_fee_rate" 
-                    value="${settingsObj.points_fee_rate?.setting_value || 30}"
-                    oninput="app.formatNumberInput(this)"
+                    value="${(settingsObj.points_fee_rate?.setting_value || 30).toLocaleString()}"
                     oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
                   <button onclick="app.updateSystemSetting('points_fee_rate')" 
@@ -8154,7 +8153,6 @@ class ReviewSphere {
                 <div class="flex items-center gap-2">
                   <input type="text" id="fixed_fee_points_only" 
                     value="${(settingsObj.fixed_fee_points_only?.setting_value || 10000).toLocaleString()}"
-                    oninput="app.formatNumberInput(this)"
                     oninput="app.formatNumberInput(this)"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
                   <button onclick="app.updateSystemSetting('fixed_fee_points_only')" 
