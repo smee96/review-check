@@ -123,7 +123,7 @@ passwordReset.post('/request', async (c) => {
 
     return c.json({ 
       success: true, 
-      message: '비밀번호 재설정 요청이 접수되었습니다. 이메일로 인증번호를 받으실 수 있습니다.' 
+      message: '인증번호가 이메일로 전송되었습니다. 받으신 6자리 인증번호를 입력해주세요.' 
     });
   } catch (error) {
     console.error('Password reset request error:', error);
