@@ -1895,42 +1895,7 @@ class ReviewSphere {
     }
   }
 
-  showForgotPassword() {
-    const app = document.getElementById('app');
-    app.innerHTML = `
-      <div class="min-h-screen flex flex-col">
-        <div class="flex-grow bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center px-4 py-12">
-          <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-            <div class="text-center mb-8">
-              <h2 class="text-3xl font-bold text-gray-800">비밀번호 찾기</h2>
-              <p class="text-gray-600 mt-2">이메일로 재설정 링크를 보내드립니다</p>
-            </div>
 
-            <form id="forgotPasswordForm" onsubmit="event.preventDefault(); app.handleForgotPassword();">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-                  <input type="email" id="forgotEmail" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-                </div>
-
-                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
-                  재설정 링크 보내기
-                </button>
-              </div>
-            </form>
-
-            <div class="mt-6 text-center">
-              <button onclick="app.showLogin()" class="text-gray-500 hover:text-gray-700 text-sm">
-                <i class="fas fa-arrow-left mr-1"></i>로그인으로 돌아가기
-              </button>
-            </div>
-          </div>
-        </div>
-        ${this.renderFooter()}
-      </div>
-    `;
-  }
 
   // 마이페이지
   showMyPage(pushHistory = true) {
@@ -7596,10 +7561,7 @@ class ReviewSphere {
     this.register(email, nickname, password, role);
   }
 
-  handleForgotPassword() {
-    const email = document.getElementById('forgotEmail').value;
-    this.forgotPassword(email);
-  }
+
 
   showTerms() {
     const app = document.getElementById('app');
