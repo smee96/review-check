@@ -59,8 +59,8 @@ auth.post('/register', async (c) => {
     // Hash password
     const passwordHash = await hashPassword(password);
     
-    // Create user with initial points (10,000 points for new users)
-    const initialPoints = 10000;
+    // Create user with initial points (1,000 points for new users)
+    const initialPoints = 1000;
     const result = await env.DB.prepare(
       'INSERT INTO users (email, nickname, password_hash, role, sphere_points, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
     ).bind(email, nickname, passwordHash, role, initialPoints, getCurrentDateTime(), getCurrentDateTime()).run();
