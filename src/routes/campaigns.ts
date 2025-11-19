@@ -200,23 +200,25 @@ campaigns.get('/', async (c) => {
       
       return c.json(campaigns.results);
     } else {
-      // 진행중인 캠페인: 모집중(결제 무관) + 승인대기(결제 무관) 캠페인
+      // 진행중인 캠페인: 모집중(결제 무관) + 승인대기(결제 무관) + 승인완료 캠페인
       // - 모집중(결제완료): 지원 가능
       // - 모집중(미결제): 결제 대기 안내 표시
       // - 승인대기: 관리자 승인 대기 안내 표시
+      // - 승인완료: 지원 가능 (approved 상태도 표시)
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.status = ? OR c.status = ?
+         WHERE c.status IN ('recruiting', 'pending', 'approved')
          ORDER BY 
            CASE 
              WHEN c.status = 'recruiting' AND c.payment_status = 'paid' THEN 0
+             WHEN c.status = 'approved' THEN 0
              WHEN c.status = 'recruiting' AND c.payment_status = 'unpaid' THEN 1
              WHEN c.status = 'pending' THEN 2
            END,
            c.created_at DESC`
-      ).bind('recruiting', 'pending').all();
+      ).all();
       
       return c.json(campaigns.results);
     }

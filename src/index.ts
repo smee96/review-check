@@ -10,6 +10,7 @@ import profiles from './routes/profiles';
 import admin from './routes/admin';
 import notifications from './routes/notifications';
 import settings from './routes/settings';
+import passwordReset from './routes/password-reset';
 
 // Import utilities
 import { verifyJWT } from './utils';
@@ -39,6 +40,7 @@ app.route('/api/profile', profiles);
 app.route('/api/admin', admin);
 app.route('/api/notifications', notifications);
 app.route('/api/settings', settings);
+app.route('/api/password-reset', passwordReset);
 
 // Frontend route
 app.get('/', (c) => {
@@ -131,6 +133,7 @@ app.get('/', (c) => {
         <script src="/static/js/ui-utils.js?v=46"></script>
         <script src="/static/js/pricing-utils.js?v=46"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
+        <script src="/static/js/password-reset.js?v=1"></script>
         <script src="/static/js/app.js?v=61"></script>
     </body>
     </html>

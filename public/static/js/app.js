@@ -1323,6 +1323,10 @@ class ReviewSphere {
     }
   }
 
+  showForgotPassword() {
+    passwordResetManager.showPasswordResetModal();
+  }
+
   showLogin(pushHistory = true) {
     if (pushHistory) {
       this.pushHistory('login');
