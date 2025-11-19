@@ -336,35 +336,7 @@ class ReviewSphere {
     this.showHome();
   }
 
-  async forgotPassword(email) {
-    try {
-      const response = await axios.post('/api/auth/forgot-password', { email });
-      alert(response.data.message);
-      
-      // For development - show token
-      if (response.data.dev_token) {
-        const resetUrl = window.location.origin + '/reset-password?token=' + response.data.dev_token;
-        console.log('Reset URL:', resetUrl);
-        prompt('개발용 비밀번호 재설정 URL (실제로는 이메일로 발송됩니다):', resetUrl);
-      }
-    } catch (error) {
-      alert(error.response?.data?.error || '요청에 실패했습니다');
-    }
-  }
 
-  async resetPassword(token, newPassword) {
-    try {
-      const response = await axios.post('/api/auth/reset-password', {
-        token,
-        newPassword
-      });
-      
-      alert(response.data.message);
-      this.showLogin();
-    } catch (error) {
-      alert(error.response?.data?.error || '비밀번호 재설정에 실패했습니다');
-    }
-  }
 
   getAuthHeaders() {
     return {

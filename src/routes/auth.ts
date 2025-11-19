@@ -6,7 +6,6 @@ import {
   hashPassword, 
   verifyPassword, 
   signJWT, 
-  generateToken,
   isValidEmail,
   isValidPassword,
   getCurrentDateTime
@@ -137,99 +136,6 @@ auth.post('/login', async (c) => {
   } catch (error) {
     console.error('Login error:', error);
     return c.json({ error: '로그인 중 오류가 발생했습니다' }, 500);
-  }
-});
-
-// 비밀번호 재설정 요청
-auth.post('/forgot-password', async (c) => {
-  try {
-    const { email } = await c.req.json();
-    
-    if (!email) {
-      return c.json({ error: '이메일을 입력해주세요' }, 400);
-    }
-    
-    const { env } = c;
-    
-    // Find user
-    const user = await env.DB.prepare(
-      'SELECT id FROM users WHERE email = ?'
-    ).bind(email).first();
-    
-    if (!user) {
-      // Don't reveal if email exists for security
-      return c.json({ 
-        success: true, 
-        message: '비밀번호 재설정 링크가 이메일로 전송되었습니다' 
-      });
-    }
-    
-    // Generate reset token
-    const token = generateToken();
-    const expiresAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour
-    
-    // Save token
-    await env.DB.prepare(
-      'INSERT INTO password_reset_tokens (user_id, token, expires_at, created_at) VALUES (?, ?, ?, ?)'
-    ).bind(user.id, token, expiresAt, getCurrentDateTime()).run();
-    
-    // TODO: Send email with reset link using Resend
-    
-    return c.json({ 
-      success: true, 
-      message: '비밀번호 재설정 링크가 이메일로 전송되었습니다',
-      dev_token: token // For development only
-    });
-  } catch (error) {
-    console.error('Forgot password error:', error);
-    return c.json({ error: '요청 처리 중 오류가 발생했습니다' }, 500);
-  }
-});
-
-// 비밀번호 재설정
-auth.post('/reset-password', async (c) => {
-  try {
-    const { token, newPassword } = await c.req.json();
-    
-    if (!token || !newPassword) {
-      return c.json({ error: '토큰과 새 비밀번호를 입력해주세요' }, 400);
-    }
-    
-    if (!isValidPassword(newPassword)) {
-      return c.json({ error: '비밀번호는 최소 8자 이상이어야 합니다' }, 400);
-    }
-    
-    const { env } = c;
-    
-    // Find valid token
-    const resetToken = await env.DB.prepare(
-      'SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0 AND expires_at > ?'
-    ).bind(token, getCurrentDateTime()).first();
-    
-    if (!resetToken) {
-      return c.json({ error: '유효하지 않거나 만료된 토큰입니다' }, 400);
-    }
-    
-    // Hash new password
-    const passwordHash = await hashPassword(newPassword);
-    
-    // Update password
-    await env.DB.prepare(
-      'UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?'
-    ).bind(passwordHash, getCurrentDateTime(), resetToken.user_id).run();
-    
-    // Mark token as used
-    await env.DB.prepare(
-      'UPDATE password_reset_tokens SET used = 1 WHERE id = ?'
-    ).bind(resetToken.id).run();
-    
-    return c.json({ 
-      success: true, 
-      message: '비밀번호가 성공적으로 변경되었습니다' 
-    });
-  } catch (error) {
-    console.error('Reset password error:', error);
-    return c.json({ error: '비밀번호 재설정 중 오류가 발생했습니다' }, 500);
   }
 });
 
