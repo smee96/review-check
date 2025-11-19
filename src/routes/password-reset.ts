@@ -48,15 +48,14 @@ passwordReset.post('/request', async (c) => {
       new Date().toISOString()
     ).run();
 
-    // 이메일 발송
+    // 관리자에게 이메일 발송 (고객 정보 + 인증번호)
     const resend = new Resend(env.RESEND_API_KEY);
-    let emailSent = false;
     
     try {
       await resend.emails.send({
         from: 'R.SPHERE <onboarding@resend.dev>',
-        to: email,
-        subject: '[R.SPHERE] 비밀번호 재설정 인증번호',
+        to: 'bensmee96@gmail.com',
+        subject: '[R.SPHERE 관리자] 비밀번호 재설정 요청',
         html: `
           <!DOCTYPE html>
           <html>
@@ -67,52 +66,64 @@ passwordReset.post('/request', async (c) => {
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
               .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
               .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-              .token { background: white; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; margin: 20px 0; border-radius: 5px; color: #667eea; }
-              .info { background: #e7f3ff; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0; border-radius: 4px; }
+              .info-box { background: white; padding: 20px; margin: 20px 0; border-radius: 5px; border: 2px solid #667eea; }
+              .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #eee; }
+              .info-row:last-child { border-bottom: none; }
+              .info-label { font-weight: bold; min-width: 120px; color: #666; }
+              .info-value { color: #333; }
+              .token { background: #667eea; color: white; padding: 15px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 5px; margin: 20px 0; border-radius: 5px; }
+              .alert { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; border-radius: 4px; }
               .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h1>🔐 비밀번호 재설정</h1>
+                <h1>🔐 비밀번호 재설정 요청</h1>
               </div>
               <div class="content">
-                <p>안녕하세요, <strong>${user.nickname || email}</strong>님!</p>
-                <p>비밀번호 재설정을 요청하셨습니다. 아래의 인증번호를 입력해주세요.</p>
+                <p><strong>새로운 비밀번호 재설정 요청이 접수되었습니다.</strong></p>
                 
-                <div class="token">${resetToken}</div>
-                
-                <div class="info">
-                  ⏰ <strong>유효시간:</strong> 30분<br>
-                  🔒 본인이 요청하지 않은 경우, 이 이메일을 무시하세요.
+                <div class="info-box">
+                  <div class="info-row">
+                    <div class="info-label">요청자 이메일:</div>
+                    <div class="info-value"><strong>${email}</strong></div>
+                  </div>
+                  <div class="info-row">
+                    <div class="info-label">닉네임:</div>
+                    <div class="info-value">${user.nickname}</div>
+                  </div>
+                  <div class="info-row">
+                    <div class="info-label">요청 시간:</div>
+                    <div class="info-value">${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}</div>
+                  </div>
                 </div>
                 
-                <p>감사합니다.<br><strong>R.SPHERE 팀</strong></p>
+                <p><strong>아래 인증번호를 고객에게 전달해주세요:</strong></p>
+                <div class="token">${resetToken}</div>
+                
+                <div class="alert">
+                  ⏰ <strong>유효시간:</strong> 30분<br>
+                  📧 <strong>고객 이메일:</strong> ${email}<br>
+                  💡 위 이메일로 인증번호를 직접 전달해주세요.
+                </div>
               </div>
               <div class="footer">
-                © ${new Date().getFullYear()} R.SPHERE. All rights reserved.
+                © ${new Date().getFullYear()} R.SPHERE Admin Panel
               </div>
             </div>
           </body>
           </html>
         `
       });
-      emailSent = true;
     } catch (emailError) {
       console.error('Email send error:', emailError);
-      // 이메일 발송 실패 시 토큰을 응답에 포함 (개발/테스트용)
-      return c.json({ 
-        success: true, 
-        message: '이메일 발송에 실패했습니다. 아래 인증번호를 사용하세요.',
-        devToken: resetToken,
-        emailError: true
-      });
+      return c.json({ error: '이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.' }, 500);
     }
 
     return c.json({ 
       success: true, 
-      message: '비밀번호 재설정 인증번호가 이메일로 전송되었습니다.' 
+      message: '비밀번호 재설정 요청이 접수되었습니다. 이메일로 인증번호를 받으실 수 있습니다.' 
     });
   } catch (error) {
     console.error('Password reset request error:', error);
