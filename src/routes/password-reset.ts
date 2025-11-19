@@ -53,7 +53,7 @@ passwordReset.post('/request', async (c) => {
     
     try {
       await resend.emails.send({
-        from: 'R.SPHERE <noreply@review-spheres.com>',
+        from: 'R.SPHERE <onboarding@resend.dev>',
         to: email,
         subject: '[R.SPHERE] 비밀번호 재설정 인증번호',
         html: `
