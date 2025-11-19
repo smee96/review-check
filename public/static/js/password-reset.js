@@ -145,7 +145,13 @@ class PasswordResetManager {
       
       if (response.data.success) {
         this.email = email;
-        this.showMessage(response.data.message, 'success');
+        
+        // 이메일 발송 실패 시 토큰을 화면에 표시
+        if (response.data.emailError && response.data.devToken) {
+          this.showMessage(`${response.data.message}\n\n인증번호: ${response.data.devToken}`, 'info');
+        } else {
+          this.showMessage(response.data.message, 'success');
+        }
         
         // 2초 후 다음 단계로
         setTimeout(() => {

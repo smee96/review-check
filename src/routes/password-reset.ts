@@ -50,6 +50,7 @@ passwordReset.post('/request', async (c) => {
 
     // 이메일 발송
     const resend = new Resend(env.RESEND_API_KEY);
+    let emailSent = false;
     
     try {
       await resend.emails.send({
@@ -97,14 +98,21 @@ passwordReset.post('/request', async (c) => {
           </html>
         `
       });
+      emailSent = true;
     } catch (emailError) {
       console.error('Email send error:', emailError);
-      return c.json({ error: '이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.' }, 500);
+      // 이메일 발송 실패 시 토큰을 응답에 포함 (개발/테스트용)
+      return c.json({ 
+        success: true, 
+        message: '이메일 발송에 실패했습니다. 아래 인증번호를 사용하세요.',
+        devToken: resetToken,
+        emailError: true
+      });
     }
 
     return c.json({ 
       success: true, 
-      message: '비밀번호 재설정 링크가 이메일로 전송되었습니다.' 
+      message: '비밀번호 재설정 인증번호가 이메일로 전송되었습니다.' 
     });
   } catch (error) {
     console.error('Password reset request error:', error);
