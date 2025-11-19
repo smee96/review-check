@@ -1735,7 +1735,12 @@ class ReviewSphere {
                         ${campaign.instagram_mention_account ? `
                           <div>
                             <span class="text-sm text-gray-500">인스타그램 멘션 계정</span>
-                            <p class="font-semibold text-pink-600">${campaign.instagram_mention_account.startsWith('@') ? campaign.instagram_mention_account : '@' + campaign.instagram_mention_account}</p>
+                            <p class="font-semibold">
+                              <a href="https://www.instagram.com/${campaign.instagram_mention_account.replace('@', '')}" target="_blank" class="text-pink-600 hover:text-pink-800">
+                                ${campaign.instagram_mention_account.startsWith('@') ? campaign.instagram_mention_account : '@' + campaign.instagram_mention_account}
+                                <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                              </a>
+                            </p>
                           </div>
                         ` : ''}
                         ${campaign.blog_product_url ? `
