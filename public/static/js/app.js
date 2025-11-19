@@ -6582,7 +6582,7 @@ class ReviewSphere {
           </div>
         </div>
 
-        <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+        <button type="submit" id="applySubmitBtn" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
           지원하기
         </button>
       </form>
@@ -6616,7 +6616,13 @@ class ReviewSphere {
   }
 
   async handleApplyCampaign(campaignId) {
+    const submitBtn = document.getElementById('applySubmitBtn');
+    
     try {
+      // 버튼 비활성화 및 로딩 상태
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>처리중...';
+      
       // 개인 정보 수집
       const realName = document.getElementById('realName').value.trim();
       const birthDate = document.getElementById('birthDate').value;
@@ -6631,12 +6637,16 @@ class ReviewSphere {
       // 필수 정보 확인
       if (!realName || !birthDate || !gender || !contactPhone) {
         alert('개인 정보를 모두 입력해주세요');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '지원하기';
         return;
       }
 
       // 필수 동의 확인
       if (!portraitRightsConsent || !personalInfoConsent || !contentUsageConsent) {
         alert('모든 필수 동의 항목에 동의해주세요');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '지원하기';
         return;
       }
 
@@ -6660,10 +6670,14 @@ class ReviewSphere {
       };
 
       await axios.post(`/api/campaigns/${campaignId}/apply`, data, this.getAuthHeaders());
+      
+      // 성공 메시지 표시 후 바로 홈으로 이동
       alert('캠페인 지원이 완료되었습니다!');
-      // 저장 후 홈으로 자연스럽게 이동
       this.showHome();
     } catch (error) {
+      // 에러 발생 시 버튼 복구
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '지원하기';
       alert(error.response?.data?.error || '지원에 실패했습니다');
     }
   }
