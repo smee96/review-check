@@ -15,6 +15,9 @@ import passwordReset from './routes/password-reset';
 // Import utilities
 import { verifyJWT } from './utils';
 
+// Import middleware
+import { visitorLogger } from './middleware/visitor';
+
 type Bindings = {
   DB: D1Database;
   RESEND_API_KEY: string;
@@ -25,6 +28,9 @@ type Variables = {
 };
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+// Visitor logging middleware (모든 요청 추적)
+app.use('*', visitorLogger);
 
 // CORS middleware
 app.use('/api/*', cors());
