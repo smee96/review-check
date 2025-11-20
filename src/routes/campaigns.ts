@@ -244,13 +244,8 @@ campaigns.get('/:id', authMiddleware, async (c) => {
     }
     
     // 권한 체크
-    // 광고주/대행사/렙사는 자신의 캠페인만 조회 가능
-    if (['advertiser', 'agency', 'rep'].includes(user.role) && campaign.advertiser_id !== user.userId) {
-      return c.json({ error: '권한이 없습니다' }, 403);
-    }
-    
-    // 인플루언서는 모든 캠페인 조회 가능 (pending 포함)
-    // 단, 지원은 recruiting + paid 캠페인만 가능 (아래 can_apply에서 제어)
+    // 모든 사용자(광고주/대행사/렙사/인플루언서)는 모든 캠페인 조회 가능
+    // 단, 지원은 인플루언서만 가능하고 recruiting + paid 캠페인만 가능 (아래 can_apply에서 제어)
     
     // 인플루언서인 경우 지원 여부 및 신청 가능 여부 확인
     let has_applied = false;
