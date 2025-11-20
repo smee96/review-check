@@ -1725,6 +1725,81 @@ class ReviewSphere {
                     ` : ''}
                   </div>
                   
+                  <!-- 구매+포인트 캠페인 안내사항 -->
+                  ${campaign.pricing_type === 'purchase_with_points' ? `
+                    <div class="mb-8">
+                      <h2 class="text-xl font-bold text-gray-800 mb-3">
+                        <i class="fas fa-exclamation-circle mr-2 text-orange-600"></i>구매평 캠페인 안내사항
+                      </h2>
+                      
+                      <!-- 중요 안내 -->
+                      <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-4">
+                        <div class="flex items-start">
+                          <i class="fas fa-info-circle text-orange-600 mr-3 mt-1"></i>
+                          <div class="text-sm text-orange-900">
+                            <p class="font-semibold mb-2">본 캠페인은 <strong>구매평 체험단</strong>입니다</p>
+                            <ul class="space-y-1 list-disc pl-5">
+                              <li>선정 이후 <strong>개인 경비로 직접 상품을 구매</strong>해야 하며, <strong>페이백 형태</strong>로 진행됩니다</li>
+                              <li>선정 후 1-2일 내 제품을 <strong>정가로 구매</strong>해주셔야 합니다</li>
+                              <li>쿠폰, 할인, 적립금 사용 불가 (할인 적용 확인 시 추가금 부담 발생)</li>
+                              <li><strong>별도 쇼핑 지원금은 지급되지 않습니다</strong></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- 페이백 정보 -->
+                      <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                        <h3 class="font-semibold text-blue-900 mb-2 flex items-center">
+                          <i class="fas fa-money-bill-wave mr-2"></i>페이백 금액
+                        </h3>
+                        <div class="text-sm text-blue-900 space-y-1">
+                          <p class="flex justify-between">
+                            <span>• 제품 비용:</span>
+                            <span class="font-semibold">${campaign.product_value ? campaign.product_value.toLocaleString() + '원' : '-'}</span>
+                          </p>
+                          <p class="flex justify-between">
+                            <span>• 추가 포인트:</span>
+                            <span class="font-semibold">${(campaign.sphere_points || 0).toLocaleString()}P</span>
+                          </p>
+                          <div class="border-t border-blue-300 pt-2 mt-2">
+                            <p class="flex justify-between font-bold">
+                              <span>총 페이백:</span>
+                              <span class="text-blue-600">${(campaign.product_value + (campaign.sphere_points || 0)).toLocaleString()}원</span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- 구매평 작성 안내 -->
+                      <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">
+                          <i class="fas fa-star mr-2 text-yellow-500"></i>구매평 작성 필수사항
+                        </h3>
+                        <ul class="text-sm text-gray-700 space-y-1 list-disc pl-5">
+                          <li>콘텐츠 작성과 함께 <strong>구매후기를 반드시 작성</strong>해야 합니다</li>
+                          <li>구매후기 작성 시 사진 또는 영상 필수 포함</li>
+                          <li>상단에 <strong>[협찬]</strong> 문구를 표기해주세요 (누락 시 수정 요청)</li>
+                          <li>기간 내 콘텐츠와 구매후기를 모두 작성해야 포인트 지급됩니다</li>
+                        </ul>
+                      </div>
+                      
+                      <!-- 주의사항 -->
+                      <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                        <h3 class="font-semibold text-red-900 mb-2 flex items-center">
+                          <i class="fas fa-exclamation-triangle mr-2"></i>필수 확인사항
+                        </h3>
+                        <ul class="text-sm text-red-800 space-y-1 list-disc pl-5">
+                          <li><strong>구매후기 유지기간: 6개월</strong> (콘텐츠와 동일)</li>
+                          <li>단순 변심에 의한 구매평 삭제 시 <strong>페널티 부과</strong> 및 지급 포인트 회수</li>
+                          <li>본인 구매 지연으로 인한 기간 연장 불가</li>
+                          <li>포인트 출금 시 세금 3.3% 발생 (금융 수수료 별도)</li>
+                          <li>신청 시 <strong>구매할 계정 아이디를 정확히 입력</strong>해주세요</li>
+                        </ul>
+                      </div>
+                    </div>
+                  ` : ''}
+                  
                   <!-- 채널별 링크 정보 -->
                   ${campaign.instagram_mention_account || campaign.blog_product_url || campaign.youtube_purchase_link ? `
                     <div class="mb-8">
@@ -2649,7 +2724,7 @@ class ReviewSphere {
                   <p class="font-semibold text-sm sm:text-base">${w.amount.toLocaleString()}P</p>
                 </div>
                 <div class="text-center bg-red-50 p-2 rounded">
-                  <p class="text-xs text-gray-600 mb-1">세금 (22%)</p>
+                  <p class="text-xs text-gray-600 mb-1">세금 (3.3%)</p>
                   <p class="font-semibold text-sm sm:text-base text-red-600">-${w.tax_amount.toLocaleString()}P</p>
                 </div>
                 <div class="text-center bg-green-50 p-2 rounded col-span-2 sm:col-span-1">
@@ -2811,7 +2886,7 @@ class ReviewSphere {
                 <p class="text-lg font-bold">${w.amount.toLocaleString()}P</p>
               </div>
               <div>
-                <p class="text-sm text-gray-600 mb-1">세금 (22%)</p>
+                <p class="text-sm text-gray-600 mb-1">세금 (3.3%)</p>
                 <p class="text-lg font-bold text-red-600">-${w.tax_amount.toLocaleString()}원</p>
               </div>
               <div>
@@ -7724,7 +7799,7 @@ class ReviewSphere {
                     </li>
                     <li>적립된 포인트는 10,000포인트 이상부터 현금으로 출금 신청이 가능합니다.</li>
                     <li>출금 신청 시 등록된 계좌로 영업일 기준 7일 이내에 지급됩니다.</li>
-                    <li>포인트 출금 시 소득세법에 따라 기타소득세(22%, 지방소득세 포함)가 원천징수됩니다.</li>
+                    <li>포인트 출금 시 소득세법에 따라 기타소득세(3.3%, 소득세 3% + 지방소득세 0.3%)가 원천징수됩니다.</li>
                     <li>회원은 출금 신청 시 본인 명의의 은행 계좌를 등록해야 하며, 타인 명의 계좌로는 출금이 불가능합니다.</li>
                     <li>출금 신청 시 세금 신고 및 본인 확인을 위해 다음 서류 제출이 필요합니다:
                       <ul class="list-disc pl-5 mt-2 space-y-1">
@@ -8815,7 +8890,7 @@ class ReviewSphere {
                   <span id="requestAmount" class="font-semibold"></span>
                 </div>
                 <div class="flex justify-between">
-                  <span>원천징수 (22%):</span>
+                  <span>원천징수 (3.3%):</span>
                   <span id="taxAmount" class="text-red-600"></span>
                 </div>
                 <div class="flex justify-between border-t pt-1 mt-1">
@@ -8881,7 +8956,7 @@ class ReviewSphere {
         const taxInfo = document.getElementById('taxInfo');
         
         if (numValue >= 10000) {
-          const tax = Math.floor(numValue * 0.22);
+          const tax = Math.floor(numValue * 0.033);
           const net = numValue - tax;
 
           document.getElementById('requestAmount').textContent = numValue.toLocaleString() + '원';

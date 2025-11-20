@@ -211,8 +211,8 @@ app.post('/api/withdrawal/request', async (c) => {
       return c.json({ error: '출금 가능한 포인트가 부족합니다' }, 400);
     }
 
-    // 세금 계산 (22% 원천징수)
-    const tax_amount = Math.floor(amount * 0.22);
+    // 세금 계산 (3.3% 원천징수: 소득세 3% + 지방소득세 0.3%)
+    const tax_amount = Math.floor(amount * 0.033);
     const net_amount = amount - tax_amount;
 
     // 출금 신청 생성 (서류 정보 포함)

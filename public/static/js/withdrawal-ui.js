@@ -90,7 +90,7 @@ class WithdrawalUI {
                   <span id="requestAmount" class="font-semibold"></span>
                 </div>
                 <div class="flex justify-between">
-                  <span>원천징수 (22%):</span>
+                  <span>원천징수 (3.3%):</span>
                   <span id="taxAmount" class="text-red-600"></span>
                 </div>
                 <div class="flex justify-between border-t pt-1 mt-1">
@@ -228,9 +228,10 @@ class WithdrawalUI {
               <p class="font-semibold text-red-800 mb-2">⚠️ 주의사항</p>
               <ul class="text-red-700 space-y-1 text-xs list-disc pl-5">
                 <li>연간 출금 금액이 500만원을 초과하는 경우, 다음 연도 5월에 종합소득세 신고 의무가 있습니다.</li>
-                <li>출금 시 22%의 세금(소득세 20% + 지방소득세 2%)이 원천징수됩니다.</li>
+                <li>출금 시 3.3%의 세금(소득세 3% + 지방소득세 0.3%)이 원천징수됩니다.</li>
                 <li>타인 명의 계좌로는 출금이 불가능하며, 반드시 본인 명의 계좌여야 합니다.</li>
                 <li>허위 정보 제공 시 출금이 거부되며, 법적 책임을 질 수 있습니다.</li>
+                <li>출금 시 발생하는 별도의 금융 수수료는 이용자 부담입니다.</li>
               </ul>
             </div>
 
@@ -281,7 +282,7 @@ class WithdrawalUI {
       const taxInfo = document.getElementById('taxInfo');
       
       if (numValue >= 10000) {
-        const tax = Math.floor(numValue * 0.22);
+        const tax = Math.floor(numValue * 0.033);
         const net = numValue - tax;
 
         document.getElementById('requestAmount').textContent = numValue.toLocaleString() + '원';
