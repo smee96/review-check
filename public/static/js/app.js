@@ -3347,7 +3347,7 @@ class ReviewSphere {
                 <option value="youtube">유튜브</option>
                 <option value="smartstore">스마트스토어</option>
               </select>
-              <p class="text-xs text-gray-500 mt-1">⚠️ 한 캠페인은 하나의 채널만 선택 가능합니다. 여러 채널을 진행하려면 캠페인을 따로 등록해주세요.</p>
+              <p class="text-xs text-gray-500 mt-1">💡 한 캠페인은 하나의 채널만 선택 가능합니다. 여러 채널을 진행하려면 '복사' 기능을 이용하면 편하게 캠페인을 생성할 수 있습니다.</p>
             </div>
 
             <div>
