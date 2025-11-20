@@ -3345,7 +3345,7 @@ class ReviewSphere {
                 <option value="instagram">인스타그램</option>
                 <option value="blog">네이버 블로그</option>
                 <option value="youtube">유튜브</option>
-                <option value="smartstore">스마트스토어</option>
+                <option value="smartstore">구매처 리뷰</option>
               </select>
               <p class="text-xs text-gray-500 mt-1">💡 한 캠페인은 하나의 채널만 선택 가능합니다. 여러 채널을 진행하려면 '복사' 기능을 이용하면 편하게 캠페인을 생성할 수 있습니다.</p>
             </div>
@@ -3803,13 +3803,13 @@ class ReviewSphere {
         `
       },
       smartstore: {
-        title: '스마트스토어 상세 정보',
+        title: '구매처 리뷰 상세 정보',
         fields: `
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">스마트스토어 상품 URL *</label>
-            <input type="url" id="smartstoreProductUrl" required placeholder="https://smartstore.naver.com/..."
+            <label class="block text-sm font-medium text-gray-700 mb-2">구매처 상품 URL *</label>
+            <input type="url" id="smartstoreProductUrl" required placeholder="https://smartstore.naver.com/... 또는 쿠팡, 마켓컬리 등"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-            <p class="text-xs text-gray-500 mt-1">리뷰를 남길 스마트스토어 상품 링크를 입력해주세요</p>
+            <p class="text-xs text-gray-500 mt-1">리뷰를 남길 구매처(스마트스토어, 쿠팡, 마켓컬리 등) 상품 링크를 입력해주세요</p>
           </div>
         `
       }
@@ -3819,7 +3819,47 @@ class ReviewSphere {
     if (config) {
       titleElement.textContent = config.title;
       fieldsContainer.innerHTML = config.fields;
+      
+      // 채널별 기본 미션 설정
+      this.setDefaultMissions(channelType);
     }
+  }
+
+  setDefaultMissions(channelType) {
+    const missionContainer = document.getElementById('missionContainer');
+    if (!missionContainer) return;
+    
+    // 기존 미션 초기화
+    missionContainer.innerHTML = '';
+    
+    // 채널별 기본 미션
+    const defaultMissions = {
+      instagram: [
+        '본인 인스타그램 피드에 게시',
+        '최소 3장 이상의 제품 사진 포함',
+        '제품 사용 후기 및 장점 상세 작성'
+      ],
+      blog: [
+        '네이버 블로그에 리뷰 포스팅',
+        '최소 5장 이상의 제품 사진 포함',
+        '제품 사용 후기 및 장점 상세 작성'
+      ],
+      youtube: [
+        '유튜브에 리뷰 영상 업로드',
+        '영상 내 제품 사용 장면 포함',
+        '영상 설명란에 구매 링크 포함'
+      ],
+      smartstore: [
+        '구매처 상품 URL에서 상품을 구매',
+        '상품 수령 후, 정성스러운 구매평 작성',
+        '최소 3장 이상의 제품 사진 포함'
+      ]
+    };
+    
+    const missions = defaultMissions[channelType] || [];
+    missions.forEach((mission, index) => {
+      this.addMissionField(mission);
+    });
   }
 
   initializeDatePickers() {
@@ -6714,11 +6754,11 @@ class ReviewSphere {
           <div>
             <label class="block text-sm font-semibold mb-2">
               리뷰 캡쳐 이미지
-              <span class="text-xs text-gray-500 font-normal">(선택사항 - 스마트스토어 리뷰 등)</span>
+              <span class="text-xs text-gray-500 font-normal">(선택사항 - 구매처 리뷰 등)</span>
             </label>
             <input type="file" id="reviewImage" accept="image/*"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <p class="text-xs text-gray-500 mt-1">스마트스토어 리뷰 캡쳐 이미지를 업로드하세요 (자동 압축)</p>
+            <p class="text-xs text-gray-500 mt-1">구매처 리뷰 캡쳐 이미지를 업로드하세요 (자동 압축)</p>
           </div>
           
           <div id="imagePreview" class="hidden mt-2">
@@ -6887,7 +6927,7 @@ class ReviewSphere {
           <div>
             <label class="block text-sm font-semibold mb-2">
               리뷰 캡쳐 이미지
-              <span class="text-xs text-gray-500 font-normal">(선택사항 - 스마트스토어 리뷰 등)</span>
+              <span class="text-xs text-gray-500 font-normal">(선택사항 - 구매처 리뷰 등)</span>
             </label>
             ${existingImageKey ? `
               <div class="mb-2 p-2 bg-blue-50 border border-blue-200 rounded">
@@ -7714,7 +7754,7 @@ class ReviewSphere {
                           <ul class="list-circle pl-5 mt-1 space-y-1">
                             <li>블로그: "[체험단]", "[협찬]", "[제공받은 상품]" 등을 제목 또는 본문 앞부분에 명시</li>
                             <li>인스타그램: "#광고", "#협찬", "#체험단", "#AD" 해시태그 포함</li>
-                            <li>네이버 스마트스토어 리뷰: 리뷰 내용에 "[체험단]" 또는 "[협찬]" 명시</li>
+                            <li>구매처 리뷰(스마트스토어, 쿠팡 등): 리뷰 내용에 "[체험단]" 또는 "[협찬]" 명시</li>
                             <li>유튜브: 영상 설명란에 "본 영상은 ○○으로부터 제품(또는 대가)을 제공받아 제작되었습니다" 명시</li>
                           </ul>
                         </li>
@@ -7748,7 +7788,7 @@ class ReviewSphere {
                       <ul class="list-disc pl-5 mt-2 space-y-1">
                         <li>광고주는 인플루언서에게 표시광고법 준수 및 광고성 표시 의무를 안내해야 합니다</li>
                         <li>허위·과장 광고로 인한 법적 책임은 광고주에게 있습니다</li>
-                        <li>네이버 스마트스토어 등 플랫폼 정책 위반으로 인한 불이익은 광고주가 부담합니다</li>
+                        <li>스마트스토어, 쿠팡 등 구매처 플랫폼 정책 위반으로 인한 불이익은 광고주가 부담합니다</li>
                       </ul>
                     </li>
                     <li><strong>인플루언서의 법적 책임:</strong>
@@ -7808,7 +7848,7 @@ class ReviewSphere {
     }
   }
 
-  addMissionField() {
+  addMissionField(defaultValue = '') {
     const container = document.getElementById('missionContainer');
     const currentCount = container.children.length;
     
@@ -7822,7 +7862,7 @@ class ReviewSphere {
     missionDiv.className = 'flex gap-2 items-start';
     missionDiv.innerHTML = `
       <span class="text-sm font-medium text-gray-600 mt-2 min-w-[50px]">No.${missionIndex}</span>
-      <input type="text" id="mission${missionIndex}" placeholder="미션 내용을 입력하세요"
+      <input type="text" id="mission${missionIndex}" placeholder="미션 내용을 입력하세요" value="${defaultValue}"
         class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
       <button type="button" onclick="app.removeMissionField(this)" 
         class="mt-2 text-red-600 hover:text-red-700">

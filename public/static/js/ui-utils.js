@@ -398,7 +398,7 @@ const UIUtils = {
       instagram: '<i class="fab fa-instagram text-pink-600"></i>',
       blog: '<i class="fas fa-blog text-green-600"></i>',
       youtube: '<i class="fab fa-youtube text-red-600"></i>',
-      smartstore: '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="스마트스토어" />'
+      smartstore: '<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block" alt="구매처 리뷰" />'
     };
     return icons[channelType] || '<i class="fas fa-mobile-alt text-gray-500"></i>';
   },
@@ -409,7 +409,7 @@ const UIUtils = {
       instagram: `<i class="fab fa-instagram text-pink-600 mr-1"></i>인스타그램`,
       blog: `<i class="fas fa-blog text-green-600 mr-1"></i>블로그`,
       youtube: `<i class="fab fa-youtube text-red-600 mr-1"></i>유튜브`,
-      smartstore: `<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="스마트스토어" />스마트스토어`
+      smartstore: `<img src="/static/icons/smartstore.png" class="w-4 h-4 inline-block mr-1" alt="구매처 리뷰" />구매처 리뷰`
     };
     return channels[channelType] || `<i class="fas fa-mobile-alt text-gray-500 mr-1"></i>기타`;
   }
