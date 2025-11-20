@@ -278,6 +278,14 @@ admin.get('/stats', async (c) => {
     // 오늘 방문자 수 (visitor_logs 테이블이 없으면 0 반환)
     let todayVisitors = 0;
     try {
+      // 30일 이상 된 로그 삭제 (DB 용량 관리)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      await env.DB.prepare(
+        `DELETE FROM visitor_logs WHERE visited_at < ?`
+      ).bind(thirtyDaysAgo.toISOString()).run();
+      
+      // 오늘 방문자 수 조회
       const visitorsResult = await env.DB.prepare(
         `SELECT COUNT(DISTINCT ip_address) as count 
          FROM visitor_logs 
