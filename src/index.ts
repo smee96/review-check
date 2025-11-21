@@ -150,10 +150,10 @@ app.get('/', (c) => {
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <script src="/static/js/api.js?v=46"></script>
         <script src="/static/js/ui-utils.js?v=46"></script>
-        <script src="/static/js/pricing-utils.js?v=46"></script>
+        <script src="/static/js/pricing-utils.js?v=47"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
         <script src="/static/js/password-reset.js?v=1"></script>
-        <script src="/static/js/app.js?v=61"></script>
+        <script src="/static/js/app.js?v=70"></script>
     </body>
     </html>
   `);

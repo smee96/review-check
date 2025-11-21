@@ -35,15 +35,15 @@ class PricingUtils {
       return settingsObj;
     } catch (error) {
       console.error('Failed to load system settings:', error);
-      // 에러 시 기본값 반환 (런칭 프로모션: 30,000원 → 10,000원)
+      // 에러 시 기본값 반환 (런칭 프로모션: 등록 수수료 무료, 포인트 수수료 15%)
       return {
-        fixed_fee_points_only: 10000,
-        fixed_fee_purchase_with_points: 10000,
-        fixed_fee_product_only: 10000,
-        fixed_fee_product_with_points: 10000,
-        fixed_fee_voucher_only: 10000,
-        fixed_fee_voucher_with_points: 10000,
-        points_fee_rate: 30,
+        fixed_fee_points_only: 0,
+        fixed_fee_purchase_with_points: 0,
+        fixed_fee_product_only: 0,
+        fixed_fee_product_with_points: 0,
+        fixed_fee_voucher_only: 0,
+        fixed_fee_voucher_with_points: 0,
+        points_fee_rate: 15,
         fixed_fee_original: 30000  // 원래 가격 (프로모션 전)
       };
     }
@@ -55,26 +55,26 @@ class PricingUtils {
     
     switch(pricingType) {
       case 'points_only':
-        return settings.fixed_fee_points_only || 10000;
+        return settings.fixed_fee_points_only || 0;
       case 'purchase_with_points':
-        return settings.fixed_fee_purchase_with_points || 10000;
+        return settings.fixed_fee_purchase_with_points || 0;
       case 'product_only':
-        return settings.fixed_fee_product_only || 10000;
+        return settings.fixed_fee_product_only || 0;
       case 'product_with_points':
-        return settings.fixed_fee_product_with_points || 10000;
+        return settings.fixed_fee_product_with_points || 0;
       case 'voucher_only':
-        return settings.fixed_fee_voucher_only || 10000;
+        return settings.fixed_fee_voucher_only || 0;
       case 'voucher_with_points':
-        return settings.fixed_fee_voucher_with_points || 10000;
+        return settings.fixed_fee_voucher_with_points || 0;
       default:
-        return 10000;
+        return 0;
     }
   }
 
   // 포인트 수수료율 조회
   async getPointsFeeRate() {
     const settings = await this.getSystemSettings();
-    return settings.points_fee_rate || 30;
+    return settings.points_fee_rate || 15;
   }
 
   // 플랫폼 수수료 계산 (고정 수수료 + 포인트 수수료)
