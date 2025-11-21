@@ -502,7 +502,7 @@ class ReviewSphere {
                 </p>
                 <div class="mb-4">
                   <p class="text-2xl sm:text-3xl font-extrabold">
-                    스피어 포인트 <span class="text-3xl sm:text-4xl">1,000P 지급!</span>
+                    스피어 포인트 <span class="text-3xl sm:text-4xl">5,000P 지급!</span>
                   </p>
                 </div>
                 ${this.user && this.user.role === 'influencer' ? `
@@ -581,7 +581,7 @@ class ReviewSphere {
                         <i class="fas fa-gift text-2xl text-yellow-300"></i>
                         <span class="font-semibold">회원가입 축하금</span>
                       </div>
-                      <span class="text-2xl font-extrabold text-yellow-300">1,000P</span>
+                      <span class="text-2xl font-extrabold text-yellow-300">5,000P</span>
                     </div>
                     <div class="h-px bg-white opacity-30"></div>
                     <div class="flex items-center justify-between text-left">
@@ -4280,8 +4280,8 @@ class ReviewSphere {
       
       // 포인트만 지급인 경우
       if (pricingType === 'points_only') {
-        if (spherePoints <= 0) {
-          alert('스피어포인트를 입력해주세요 (최소 1P 이상)');
+        if (spherePoints < 10000) {
+          alert('스피어포인트는 최소 10,000P 이상이어야 합니다');
           return;
         }
       }
@@ -4298,8 +4298,8 @@ class ReviewSphere {
           alert('상품/이용권 가치를 입력해주세요');
           return;
         }
-        if (spherePoints <= 0) {
-          alert('스피어포인트를 입력해주세요 (최소 1P 이상)');
+        if (spherePoints < 10000) {
+          alert('스피어포인트는 최소 10,000P 이상이어야 합니다');
           return;
         }
       }
