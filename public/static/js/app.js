@@ -601,14 +601,14 @@ class ReviewSphere {
                           </div>
                         ` : c.pricing_type === 'purchase_with_points' ? `
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                            <span class="text-purple-700 font-semibold">총 지급 포인트</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">구매금</span>
-                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                            <span class="text-gray-600">페이백</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + 'P' : '-'}</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">포인트</span>
+                            <span class="text-gray-600">리뷰댓가</span>
                             <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
                           </div>
                         ` : c.pricing_type === 'product_with_points' ? `
@@ -740,14 +740,14 @@ class ReviewSphere {
                           </div>
                         ` : c.pricing_type === 'purchase_with_points' ? `
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                            <span class="text-purple-700 font-semibold">총 지급 포인트</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">구매금</span>
-                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                            <span class="text-gray-600">페이백</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + 'P' : '-'}</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">포인트</span>
+                            <span class="text-gray-600">리뷰댓가</span>
                             <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
                           </div>
                         ` : c.pricing_type === 'product_with_points' ? `
@@ -1105,14 +1105,14 @@ class ReviewSphere {
                           </div>
                         ` : c.pricing_type === 'purchase_with_points' ? `
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-purple-700 font-semibold">구매 + 포인트</span>
+                            <span class="text-purple-700 font-semibold">총 지급 포인트</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">구매금</span>
-                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + '원' : '-'}</span>
+                            <span class="text-gray-600">페이백</span>
+                            <span class="font-bold text-orange-600">${c.product_value ? c.product_value.toLocaleString() + 'P' : '-'}</span>
                           </div>
                           <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-600">포인트</span>
+                            <span class="text-gray-600">리뷰댓가</span>
                             <span class="font-bold text-purple-600">${(c.sphere_points || c.point_reward).toLocaleString()} P</span>
                           </div>
                         ` : c.pricing_type === 'product_with_points' ? `
@@ -1748,26 +1748,29 @@ class ReviewSphere {
                         </div>
                       </div>
                       
-                      <!-- 페이백 정보 -->
-                      <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                        <h3 class="font-semibold text-blue-900 mb-2 flex items-center">
-                          <i class="fas fa-money-bill-wave mr-2"></i>페이백 금액
+                      <!-- 스피어 포인트 지급 정보 -->
+                      <div class="bg-purple-50 p-4 rounded-lg mb-4">
+                        <h3 class="font-semibold text-purple-900 mb-2 flex items-center">
+                          <i class="fas fa-coins mr-2"></i>스피어 포인트 지급
                         </h3>
-                        <div class="text-sm text-blue-900 space-y-1">
+                        <div class="text-sm text-purple-900 space-y-1">
                           <p class="flex justify-between">
-                            <span>• 제품 비용:</span>
-                            <span class="font-semibold">${campaign.product_value ? campaign.product_value.toLocaleString() + '원' : '-'}</span>
+                            <span>• 페이백 포인트:</span>
+                            <span class="font-semibold">${campaign.product_value ? campaign.product_value.toLocaleString() + 'P' : '-'}</span>
                           </p>
                           <p class="flex justify-between">
-                            <span>• 스피어 포인트:</span>
+                            <span>• 리뷰 댓가 포인트:</span>
                             <span class="font-semibold">${(campaign.sphere_points || 0).toLocaleString()}P</span>
                           </p>
-                          <div class="border-t border-blue-300 pt-2 mt-2">
+                          <div class="border-t border-purple-300 pt-2 mt-2">
                             <p class="flex justify-between font-bold">
-                              <span>총 페이백:</span>
-                              <span class="text-blue-600">${(campaign.product_value + (campaign.sphere_points || 0)).toLocaleString()}원</span>
+                              <span>총 지급 포인트:</span>
+                              <span class="text-purple-600 text-xl">${(campaign.product_value + (campaign.sphere_points || 0)).toLocaleString()}P</span>
                             </p>
                           </div>
+                        </div>
+                        <div class="text-xs text-purple-700 bg-white rounded p-2 mt-2">
+                          💡 구매후기 작성 완료 시 위 포인트가 모두 지급됩니다
                         </div>
                       </div>
                       
@@ -8495,8 +8498,8 @@ class ReviewSphere {
       // 상품/이용권 가치 입력 표시 (구매 대행 비용)
       if (productValueSection) productValueSection.classList.remove('hidden');
       productValueInput.required = true;
-      productValueLabel.textContent = '리뷰어 구매 금액';
-      productValueHint.textContent = '리뷰어가 구매할 상품/서비스의 금액을 입력하세요 (구매 대행)';
+      productValueLabel.textContent = '페이백 포인트';
+      productValueHint.textContent = '리뷰어에게 구매 비용으로 지급할 포인트를 입력하세요 (1P = 1원)';
       
       // 스피어포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
@@ -8645,32 +8648,32 @@ class ReviewSphere {
           
           ${pricingType === 'purchase_with_points' && pricing.productValue > 0 ? `
             <!-- 구매+포인트: 3단계 비용 분리 표시 -->
-            <!-- 1. 구매 금액 -->
+            <!-- 1. 페이백 포인트 -->
             <div class="bg-orange-50 border border-orange-200 rounded p-3 mt-3">
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="text-gray-800 font-bold">
-                    <i class="fas fa-shopping-cart mr-1 text-orange-600"></i>구매 금액 (${slots}명)
+                    <i class="fas fa-coins mr-1 text-orange-600"></i>페이백 포인트 (${slots}명)
                   </span>
-                  <span class="font-bold text-xl text-orange-600">${(pricing.productValue * slots).toLocaleString()}원</span>
+                  <span class="font-bold text-xl text-orange-600">${(pricing.productValue * slots).toLocaleString()}P</span>
                 </div>
                 <div class="text-xs text-gray-500 bg-white rounded p-2">
-                  💡 리뷰어 구매 대행 비용 (판매 수익으로 회수 예정)
+                  💡 리뷰어 구매 비용 페이백 (포인트로 지급)
                 </div>
               </div>
             </div>
             
-            <!-- 2. 리뷰 비용 -->
+            <!-- 2. 스피어 포인트 (리뷰 댓가) -->
             <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="text-gray-800 font-bold">
-                    <i class="fas fa-star mr-1 text-blue-600"></i>리뷰 비용 (${slots}명)
+                    <i class="fas fa-star mr-1 text-blue-600"></i>스피어 포인트 (${slots}명)
                   </span>
                   <span class="font-bold text-xl text-blue-600">${((pricing.spherePoints + pricing.fixedFee + pricing.pointsFee) * slots).toLocaleString()}원</span>
                 </div>
                 <div class="text-xs text-gray-500 bg-white rounded p-2">
-                  💡 포인트 + 플랫폼 수수료 (순수 리뷰 마케팅 비용)
+                  💡 리뷰 댓가 + 플랫폼 수수료 (리뷰 마케팅 비용)
                 </div>
               </div>
             </div>
@@ -8685,7 +8688,7 @@ class ReviewSphere {
                 </div>
                 <div class="bg-white rounded p-3 space-y-2">
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">구매 금액 + 리뷰 비용:</span>
+                    <span class="text-gray-600">페이백 포인트 + 스피어 포인트:</span>
                     <span class="font-semibold">${totalForAllInfluencers.toLocaleString()}원</span>
                   </div>
                   <div class="flex justify-between text-sm">
