@@ -3997,21 +3997,21 @@ class ReviewSphere {
         `
       },
       youtube: {
-        title: '유튜브 상세 정보',
+        title: '상품 구매 정보',
         fields: `
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">구매 링크 *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">상품 구매 URL *</label>
             <input type="url" id="youtubePurchaseLink" required placeholder="https://..."
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-            <p class="text-xs text-gray-500 mt-1">영상 설명란에 포함될 구매 링크를 입력해주세요</p>
+            <p class="text-xs text-gray-500 mt-1">영상 설명란에 포함될 상품 구매 링크를 입력해주세요</p>
           </div>
         `
       },
       smartstore: {
-        title: '구매처 리뷰 상세 정보',
+        title: '상품 구매 정보',
         fields: `
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">구매처 상품 URL *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">상품 구매 URL *</label>
             <input type="url" id="smartstoreProductUrl" required placeholder="https://smartstore.naver.com/... 또는 쿠팡, 마켓컬리 등"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             <p class="text-xs text-gray-500 mt-1">리뷰를 남길 구매처(스마트스토어, 쿠팡, 마켓컬리 등) 상품 링크를 입력해주세요</p>
