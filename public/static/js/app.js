@@ -1759,7 +1759,7 @@ class ReviewSphere {
                             <span class="font-semibold">${campaign.product_value ? campaign.product_value.toLocaleString() + '원' : '-'}</span>
                           </p>
                           <p class="flex justify-between">
-                            <span>• 추가 포인트:</span>
+                            <span>• 스피어 포인트:</span>
                             <span class="font-semibold">${(campaign.sphere_points || 0).toLocaleString()}P</span>
                           </p>
                           <div class="border-t border-blue-300 pt-2 mt-2">
@@ -1777,10 +1777,10 @@ class ReviewSphere {
                           <i class="fas fa-star mr-2 text-yellow-500"></i>구매평 작성 필수사항
                         </h3>
                         <ul class="text-sm text-gray-700 space-y-1 list-disc pl-5">
-                          <li>콘텐츠 작성과 함께 <strong>구매후기를 반드시 작성</strong>해야 합니다</li>
+                          <li><strong>구매후기를 반드시 작성</strong>해야 합니다</li>
                           <li>구매후기 작성 시 사진 또는 영상 필수 포함</li>
                           <li>상단에 <strong>[협찬]</strong> 문구를 표기해주세요 (누락 시 수정 요청)</li>
-                          <li>기간 내 콘텐츠와 구매후기를 모두 작성해야 포인트 지급됩니다</li>
+                          <li>기간 내 구매후기 작성 완료 시 스피어 포인트가 지급됩니다</li>
                         </ul>
                       </div>
                       
@@ -1790,7 +1790,7 @@ class ReviewSphere {
                           <i class="fas fa-exclamation-triangle mr-2"></i>필수 확인사항
                         </h3>
                         <ul class="text-sm text-red-800 space-y-1 list-disc pl-5">
-                          <li><strong>구매후기 유지기간: 6개월</strong> (콘텐츠와 동일)</li>
+                          <li><strong>구매후기 유지기간: 6개월</strong></li>
                           <li>단순 변심에 의한 구매평 삭제 시 <strong>페널티 부과</strong> 및 지급 포인트 회수</li>
                           <li>본인 구매 지연으로 인한 기간 연장 불가</li>
                           <li>포인트 출금 시 세금 3.3% 발생 (금융 수수료 별도)</li>
