@@ -483,6 +483,12 @@ class ReviewSphere {
                   <i class="fas fa-fire mr-1"></i>
                   지금이 가장 저렴한 가격입니다!
                 </p>
+                <div class="mt-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3 max-w-md mx-auto">
+                  <p class="text-sm text-pink-100">
+                    <i class="fas fa-smile-wink mr-1"></i>
+                    나중에 비싸게 받을 거예요~ 😉
+                  </p>
+                </div>
               </div>
             </div>
             
