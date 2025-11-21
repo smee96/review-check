@@ -415,11 +415,15 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="mt-4">
-                  <p class="text-sm text-purple-100">
-                    <i class="fas fa-star mr-1 text-yellow-300"></i>
-                    AI 매칭으로 빠르고 정확하게
-                  </p>
+                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-purple-100">빠른 매칭</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-purple-100">신뢰할 수 있는 리뷰</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -513,36 +517,7 @@ class ReviewSphere {
               </div>
             </div>
             
-            <!-- 슬라이드 4: 성장 메시지 -->
-            <div class="min-w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-10 sm:py-14">
-              <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
-                <div class="flex items-center justify-center mb-4">
-                  <i class="fas fa-rocket text-4xl sm:text-5xl text-white mr-3"></i>
-                  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
-                    리뷰스피어가 성장하고 있어요
-                  </h2>
-                </div>
-                <div class="space-y-3 mb-6">
-                  <div class="flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
-                    <p class="text-xl sm:text-2xl font-bold">더 많은 캠페인</p>
-                  </div>
-                  <div class="flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
-                    <p class="text-xl sm:text-2xl font-bold">더 많은 인플루언서</p>
-                  </div>
-                  <div class="flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
-                    <p class="text-xl sm:text-2xl font-bold">더 큰 기회</p>
-                  </div>
-                </div>
-                <p class="text-2xl sm:text-3xl font-extrabold text-pink-200">
-                  많관부 💜
-                </p>
-              </div>
-            </div>
-            
-            <!-- 슬라이드 5: 초보 인플루언서 환영 배너 -->
+            <!-- 슬라이드 4: 초보 인플루언서 환영 배너 -->
             <div class="min-w-full bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 text-white py-10 sm:py-14">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
                 <div class="mb-4">
@@ -590,10 +565,34 @@ class ReviewSphere {
                     <i class="fas fa-star mr-2"></i>지금 바로 시작하기
                   </button>
                 `}
-                
-                <p class="text-xs text-green-100 mt-3">
-                  <i class="fas fa-info-circle mr-1"></i>
-                  리뷰스피어 캠페인 선정 시 최소 10,000P 리뷰 댓가 지급!
+              </div>
+            </div>
+            
+            <!-- 슬라이드 5: 성장 메시지 -->
+            <div class="min-w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white py-10 sm:py-14">
+              <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                  <i class="fas fa-rocket text-4xl sm:text-5xl text-white mr-3"></i>
+                  <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
+                    리뷰스피어가 성장하고 있어요
+                  </h2>
+                </div>
+                <div class="space-y-3 mb-6">
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 많은 캠페인</p>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 많은 인플루언서</p>
+                  </div>
+                  <div class="flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle text-2xl text-green-300"></i>
+                    <p class="text-xl sm:text-2xl font-bold">더 큰 기회</p>
+                  </div>
+                </div>
+                <p class="text-2xl sm:text-3xl font-extrabold text-pink-200">
+                  많관부 💜
                 </p>
               </div>
             </div>
@@ -627,11 +626,15 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="mt-4">
-                  <p class="text-sm text-purple-100">
-                    <i class="fas fa-star mr-1 text-yellow-300"></i>
-                    AI 매칭으로 빠르고 정확하게
-                  </p>
+                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-purple-100">빠른 매칭</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-purple-100">신뢰할 수 있는 리뷰</span>
+                  </div>
                 </div>
               </div>
             </div>
