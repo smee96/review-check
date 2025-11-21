@@ -415,28 +415,11 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-6">
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-shield-alt text-2xl text-purple-200"></i>
-                    </div>
-                    <p class="text-sm font-semibold">신뢰할 수 있는</p>
-                    <p class="text-xs text-purple-100">AI 기반 매칭 시스템</p>
-                  </div>
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-bolt text-2xl text-yellow-300"></i>
-                    </div>
-                    <p class="text-sm font-semibold">빠른 시작</p>
-                    <p class="text-xs text-purple-100">5분 만에 캠페인 등록</p>
-                  </div>
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-chart-line text-2xl text-green-300"></i>
-                    </div>
-                    <p class="text-sm font-semibold">효과적인 마케팅</p>
-                    <p class="text-xs text-purple-100">실제 사용자의 진짜 리뷰</p>
-                  </div>
+                <div class="mt-4">
+                  <p class="text-sm text-purple-100">
+                    <i class="fas fa-star mr-1 text-yellow-300"></i>
+                    AI 매칭으로 빠르고 정확하게
+                  </p>
                 </div>
               </div>
             </div>
@@ -644,28 +627,11 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-6">
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-shield-alt text-2xl text-purple-200"></i>
-                    </div>
-                    <p class="text-sm font-semibold">신뢰할 수 있는</p>
-                    <p class="text-xs text-purple-100">AI 기반 매칭 시스템</p>
-                  </div>
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-bolt text-2xl text-yellow-300"></i>
-                    </div>
-                    <p class="text-sm font-semibold">빠른 시작</p>
-                    <p class="text-xs text-purple-100">5분 만에 캠페인 등록</p>
-                  </div>
-                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
-                    <div class="flex items-center justify-center mb-2">
-                      <i class="fas fa-chart-line text-2xl text-green-300"></i>
-                    </div>
-                    <p class="text-sm font-semibold">효과적인 마케팅</p>
-                    <p class="text-xs text-purple-100">실제 사용자의 진짜 리뷰</p>
-                  </div>
+                <div class="mt-4">
+                  <p class="text-sm text-purple-100">
+                    <i class="fas fa-star mr-1 text-yellow-300"></i>
+                    AI 매칭으로 빠르고 정확하게
+                  </p>
                 </div>
               </div>
             </div>
