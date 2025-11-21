@@ -270,10 +270,17 @@ admin.get('/stats', async (c) => {
   try {
     const { env } = c;
     
-    // 오늘 날짜 (한국 시간 기준)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString();
+    // 오늘 날짜 (한국 시간 기준 KST, UTC+9)
+    const now = new Date();
+    const kstOffset = 9 * 60 * 60 * 1000; // 9 hours in milliseconds
+    const kstNow = new Date(now.getTime() + kstOffset);
+    
+    // 한국 시간 기준 오늘 00:00:00
+    const kstToday = new Date(kstNow);
+    kstToday.setUTCHours(0, 0, 0, 0);
+    
+    // UTC로 변환 (한국 시간 00:00:00 = UTC 전날 15:00:00)
+    const todayStr = new Date(kstToday.getTime() - kstOffset).toISOString();
     
     // 오늘 방문자 수 (visitor_logs 테이블이 없으면 0 반환)
     let todayVisitors = 0;
