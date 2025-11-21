@@ -3986,7 +3986,7 @@ class ReviewSphere {
         `
       },
       blog: {
-        title: '네이버 블로그 상세 정보',
+        title: '상품 구매 정보',
         fields: `
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">상품 구매 URL *</label>
