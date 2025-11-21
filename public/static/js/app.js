@@ -589,7 +589,7 @@ class ReviewSphere {
                         <i class="fas fa-star text-2xl text-yellow-300"></i>
                         <span class="font-semibold">리뷰 선정 시</span>
                       </div>
-                      <span class="text-2xl font-extrabold text-yellow-300">5,000P+</span>
+                      <span class="text-2xl font-extrabold text-yellow-300">10,000P+</span>
                     </div>
                   </div>
                 </div>
@@ -610,7 +610,7 @@ class ReviewSphere {
                 
                 <p class="text-xs text-green-100 mt-3">
                   <i class="fas fa-info-circle mr-1"></i>
-                  리뷰스피어 캠페인 선정 시 최소 5,000P 리뷰 댓가 지급!
+                  리뷰스피어 캠페인 선정 시 최소 10,000P 리뷰 댓가 지급!
                 </p>
               </div>
             </div>
@@ -3930,7 +3930,7 @@ class ReviewSphere {
               onfocus="app.clearDefaultZero(this)"
               onblur="if(this.value==='') this.value='0'; app.calculateNewPricingCost()"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
-            <p class="text-xs text-gray-500 mt-1" id="spherePointsHint">최소 5,000P 이상 (1포인트 = 1원, 1만P 이상 현금 출금 가능)</p>
+            <p class="text-xs text-gray-500 mt-1" id="spherePointsHint">최소 10,000P 이상 (1포인트 = 1원, 1만P 이상 현금 출금 가능)</p>
           </div>
 
           <!-- 비용 계산 미리보기 -->
@@ -8748,19 +8748,19 @@ class ReviewSphere {
     
     // 포인트만 지급인 경우
     if (pricingType === 'points_only' && spherePoints <= 0) {
-      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">스피어포인트를 입력해주세요 (최소 5,000P)</p>';
+      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">스피어포인트를 입력해주세요 (최소 10,000P)</p>';
       return;
     }
     
     // 포인트만 지급인 경우 최소값 체크
-    if (pricingType === 'points_only' && spherePoints < 5000) {
-      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 5,000P 이상이어야 합니다</p>';
+    if (pricingType === 'points_only' && spherePoints < 10000) {
+      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 10,000P 이상이어야 합니다</p>';
       return;
     }
     
     // 포인트 포함 타입인 경우 최소값 체크
-    if ((pricingType === 'purchase_with_points' || pricingType === 'product_with_points' || pricingType === 'voucher_with_points') && spherePoints > 0 && spherePoints < 5000) {
-      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 5,000P 이상이어야 합니다</p>';
+    if ((pricingType === 'purchase_with_points' || pricingType === 'product_with_points' || pricingType === 'voucher_with_points') && spherePoints > 0 && spherePoints < 10000) {
+      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 10,000P 이상이어야 합니다</p>';
       return;
     }
     
