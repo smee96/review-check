@@ -415,7 +415,18 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                <div class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
+                  <p class="text-base font-semibold mb-2">
+                    저렴하다고 좋은 게 아니에요
+                  </p>
+                  <p class="text-base font-semibold mb-3">
+                    비싸다고 좋은 게 아니에요
+                  </p>
+                  <p class="text-xl font-extrabold text-yellow-300">
+                    진짜가 좋은 거예요 ✨
+                  </p>
+                </div>
+                <div class="mt-4 flex items-center justify-center gap-6 text-sm">
                   <div class="flex items-center gap-2">
                     <i class="fas fa-check-circle text-yellow-300"></i>
                     <span class="text-purple-100">빠른 매칭</span>
@@ -626,7 +637,18 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
-                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                <div class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
+                  <p class="text-base font-semibold mb-2">
+                    저렴하다고 좋은 게 아니에요
+                  </p>
+                  <p class="text-base font-semibold mb-3">
+                    비싸다고 좋은 게 아니에요
+                  </p>
+                  <p class="text-xl font-extrabold text-yellow-300">
+                    진짜가 좋은 거예요 ✨
+                  </p>
+                </div>
+                <div class="mt-4 flex items-center justify-center gap-6 text-sm">
                   <div class="flex items-center gap-2">
                     <i class="fas fa-check-circle text-yellow-300"></i>
                     <span class="text-purple-100">빠른 매칭</span>
