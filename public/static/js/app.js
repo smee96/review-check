@@ -7562,7 +7562,7 @@ class ReviewSphere {
     }
   }
 
-  async loadUserListContent(contentDiv) {
+  async loadUserListContent(contentDiv, page = 1) {
     try {
       const response = await axios.get('/api/admin/users', this.getAuthHeaders());
       const users = response.data;
@@ -7571,6 +7571,36 @@ class ReviewSphere {
       const advertisers = users.filter(u => u.role === 'advertiser' || u.role === 'agency' || u.role === 'rep');
       const influencers = users.filter(u => u.role === 'influencer');
       const admins = users.filter(u => u.role === 'admin');
+      
+      // 페이징 설정
+      const itemsPerPage = 20;
+      const totalPages = Math.ceil(users.length / itemsPerPage);
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedUsers = users.slice(startIndex, endIndex);
+      
+      // 페이지 번호 생성 (현재 페이지 기준 ±2 범위)
+      const getPageNumbers = () => {
+        const pages = [];
+        const start = Math.max(1, page - 2);
+        const end = Math.min(totalPages, page + 2);
+        
+        if (start > 1) {
+          pages.push(1);
+          if (start > 2) pages.push('...');
+        }
+        
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+        
+        if (end < totalPages) {
+          if (end < totalPages - 1) pages.push('...');
+          pages.push(totalPages);
+        }
+        
+        return pages;
+      };
       
       contentDiv.innerHTML = `
         <div class="p-4 sm:p-6">
@@ -7596,8 +7626,11 @@ class ReviewSphere {
             </div>
           </div>
           
-          <div class="mb-4">
-            <h3 class="text-lg font-bold mb-2">전체 가입자 목록</h3>
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-lg font-bold">전체 가입자 목록</h3>
+            <p class="text-sm text-gray-600">
+              ${startIndex + 1}-${Math.min(endIndex, users.length)} / ${users.length}명
+            </p>
           </div>
           
           <div class="overflow-x-auto -mx-4 sm:mx-0">
@@ -7613,7 +7646,7 @@ class ReviewSphere {
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                  ${users.map(user => {
+                  ${paginatedUsers.map(user => {
                     const roleBadge = user.role === 'advertiser' || user.role === 'agency' || user.role === 'rep' ? 
                       '<span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full whitespace-nowrap">광고주</span>' :
                       user.role === 'influencer' ? 
@@ -7634,6 +7667,38 @@ class ReviewSphere {
               </table>
             </div>
           </div>
+          
+          <!-- 페이징 -->
+          ${totalPages > 1 ? `
+            <div class="mt-6 flex items-center justify-center gap-2">
+              <button 
+                onclick="app.loadUserListContent(document.getElementById('userList-content'), ${page - 1})"
+                ${page === 1 ? 'disabled' : ''}
+                class="px-3 py-2 rounded-lg border ${page === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'} text-sm font-medium">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              
+              ${getPageNumbers().map(pageNum => {
+                if (pageNum === '...') {
+                  return '<span class="px-3 py-2 text-gray-400">...</span>';
+                }
+                return `
+                  <button 
+                    onclick="app.loadUserListContent(document.getElementById('userList-content'), ${pageNum})"
+                    class="px-3 py-2 rounded-lg border text-sm font-medium ${pageNum === page ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">
+                    ${pageNum}
+                  </button>
+                `;
+              }).join('')}
+              
+              <button 
+                onclick="app.loadUserListContent(document.getElementById('userList-content'), ${page + 1})"
+                ${page === totalPages ? 'disabled' : ''}
+                class="px-3 py-2 rounded-lg border ${page === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'} text-sm font-medium">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          ` : ''}
         </div>
       `;
     } catch (error) {
