@@ -395,7 +395,7 @@ class ReviewSphere {
                 <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
                   리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
-                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
                     this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
                       <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
@@ -415,6 +415,29 @@ class ReviewSphere {
                     </button>
                   `}
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-6">
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-shield-alt text-2xl text-purple-200"></i>
+                    </div>
+                    <p class="text-sm font-semibold">신뢰할 수 있는</p>
+                    <p class="text-xs text-purple-100">AI 기반 매칭 시스템</p>
+                  </div>
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-bolt text-2xl text-yellow-300"></i>
+                    </div>
+                    <p class="text-sm font-semibold">빠른 시작</p>
+                    <p class="text-xs text-purple-100">5분 만에 캠페인 등록</p>
+                  </div>
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-chart-line text-2xl text-green-300"></i>
+                    </div>
+                    <p class="text-sm font-semibold">효과적인 마케팅</p>
+                    <p class="text-xs text-purple-100">실제 사용자의 진짜 리뷰</p>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -432,7 +455,7 @@ class ReviewSphere {
                 </p>
                 <div class="mb-4">
                   <p class="text-2xl sm:text-3xl font-extrabold">
-                    <span class="line-through opacity-70">30,000원</span> → <span class="text-yellow-300">10,000원</span>
+                    <span class="line-through opacity-70">30,000원</span> → <span class="text-yellow-300">무료</span>
                   </p>
                 </div>
                 ${this.user && (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') ? `
@@ -448,6 +471,20 @@ class ReviewSphere {
                     <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                   </button>
                 `}
+                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-pink-100">포인트 수수료 15%</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-yellow-300"></i>
+                    <span class="text-pink-100">등록비 무료 (한정 기간)</span>
+                  </div>
+                </div>
+                <p class="text-xs text-pink-100 mt-3">
+                  <i class="fas fa-fire mr-1"></i>
+                  지금이 가장 저렴한 가격입니다!
+                </p>
               </div>
             </div>
             
@@ -481,6 +518,15 @@ class ReviewSphere {
                     <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                   </button>
                 `}
+                <div class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto">
+                  <div class="flex items-start gap-3 text-left text-sm">
+                    <i class="fas fa-info-circle text-xl text-yellow-300 mt-0.5"></i>
+                    <div>
+                      <p class="font-semibold mb-1">가입 후 즉시 캠페인 지원 가능!</p>
+                      <p class="text-xs text-yellow-100">리뷰 작성만 하면 포인트를 받을 수 있어요. 포인트는 현금으로 출금 가능합니다.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -578,7 +624,7 @@ class ReviewSphere {
                 <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
                   리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
-                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
                     this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
                       <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
@@ -597,6 +643,29 @@ class ReviewSphere {
                       <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                     </button>
                   `}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-6">
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-shield-alt text-2xl text-purple-200"></i>
+                    </div>
+                    <p class="text-sm font-semibold">신뢰할 수 있는</p>
+                    <p class="text-xs text-purple-100">AI 기반 매칭 시스템</p>
+                  </div>
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-bolt text-2xl text-yellow-300"></i>
+                    </div>
+                    <p class="text-sm font-semibold">빠른 시작</p>
+                    <p class="text-xs text-purple-100">5분 만에 캠페인 등록</p>
+                  </div>
+                  <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                    <div class="flex items-center justify-center mb-2">
+                      <i class="fas fa-chart-line text-2xl text-green-300"></i>
+                    </div>
+                    <p class="text-sm font-semibold">효과적인 마케팅</p>
+                    <p class="text-xs text-purple-100">실제 사용자의 진짜 리뷰</p>
+                  </div>
                 </div>
               </div>
             </div>

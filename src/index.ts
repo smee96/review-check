@@ -153,7 +153,7 @@ app.get('/', (c) => {
         <script src="/static/js/pricing-utils.js?v=47"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
         <script src="/static/js/password-reset.js?v=1"></script>
-        <script src="/static/js/app.js?v=70"></script>
+        <script src="/static/js/app.js?v=71"></script>
     </body>
     </html>
   `);
