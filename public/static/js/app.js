@@ -346,6 +346,19 @@ class ReviewSphere {
     };
   }
 
+  // GTM 이벤트 전송 함수
+  trackButtonClick(buttonName, linkUrl, buttonLocation) {
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: 'hero_button_click',
+        button_name: buttonName,
+        link_url: linkUrl,
+        button_location: buttonLocation
+      });
+      console.log('📊 GTM Event:', { buttonName, linkUrl, buttonLocation });
+    }
+  }
+
   // ============================================
   // Page Rendering Methods
   // ============================================
@@ -398,19 +411,19 @@ class ReviewSphere {
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
                     this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
-                      <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <button onclick="app.trackButtonClick('내 캠페인 관리', '/campaigns', 'Main_Slide1'); app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                         <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
                       </button>
                     ` : `
-                      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <button onclick="app.trackButtonClick('캠페인 둘러보기', '#campaigns-section', 'Main_Slide1'); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                         <i class="fas fa-search mr-2"></i>캠페인 둘러보기
                       </button>
                     `
                   ) : `
-                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <button onclick="app.trackButtonClick('광고주로 시작하기', '/login', 'Main_Slide1'); app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                       <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                     </button>
-                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <button onclick="app.trackButtonClick('인플루언서로 시작하기', '/login', 'Main_Slide1'); app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                       <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                     </button>
                   `}
@@ -457,7 +470,7 @@ class ReviewSphere {
                   </p>
                 </div>
                 ${this.user && (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') ? `
-                  <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('내 캠페인 관리', '/campaigns', 'Promo_Slide2'); app.showAdvertiserCampaigns()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
                     <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
                   </button>
                 ` : this.user ? `
@@ -465,7 +478,7 @@ class ReviewSphere {
                     <i class="fas fa-bullhorn mr-2"></i>광고주 전용
                   </button>
                 ` : `
-                  <button onclick="app.showLogin()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('광고주로 시작하기', '/login', 'Promo_Slide2'); app.showLogin()" class="bg-white text-pink-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-pink-50 transition shadow-lg w-56">
                     <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                   </button>
                 `}
@@ -510,7 +523,7 @@ class ReviewSphere {
                   </p>
                 </div>
                 ${this.user && this.user.role === 'influencer' ? `
-                  <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('캠페인 둘러보기', '#campaigns-section', 'Event_Slide3'); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
                     <i class="fas fa-search mr-2"></i>캠페인 둘러보기
                   </button>
                 ` : this.user ? `
@@ -518,7 +531,7 @@ class ReviewSphere {
                     <i class="fas fa-star mr-2"></i>인플루언서 전용
                   </button>
                 ` : `
-                  <button onclick="app.showLogin()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('인플루언서로 시작하기', '/login', 'Event_Slide3'); app.showLogin()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition shadow-lg w-56">
                     <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                   </button>
                 `}
@@ -570,7 +583,7 @@ class ReviewSphere {
                 </div>
                 
                 ${this.user && this.user.role === 'influencer' ? `
-                  <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-green-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('캠페인 둘러보기', '#campaigns-section', 'Beginner_Slide4'); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-green-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition shadow-lg w-56">
                     <i class="fas fa-search mr-2"></i>캠페인 둘러보기
                   </button>
                 ` : this.user ? `
@@ -578,7 +591,7 @@ class ReviewSphere {
                     <i class="fas fa-star mr-2"></i>인플루언서 전용
                   </button>
                 ` : `
-                  <button onclick="app.showLogin()" class="bg-white text-green-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition shadow-lg w-56">
+                  <button onclick="app.trackButtonClick('지금 바로 시작하기', '/login', 'Beginner_Slide4'); app.showLogin()" class="bg-white text-green-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition shadow-lg w-56">
                     <i class="fas fa-star mr-2"></i>지금 바로 시작하기
                   </button>
                 `}
@@ -626,19 +639,19 @@ class ReviewSphere {
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
                     this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep' ? `
-                      <button onclick="app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <button onclick="app.trackButtonClick('내 캠페인 관리', '/campaigns', 'Main_Slide1'); app.showAdvertiserCampaigns()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                         <i class="fas fa-tasks mr-2"></i>내 캠페인 관리
                       </button>
                     ` : `
-                      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                      <button onclick="app.trackButtonClick('캠페인 둘러보기', '#campaigns-section', 'Main_Slide1'); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                         <i class="fas fa-search mr-2"></i>캠페인 둘러보기
                       </button>
                     `
                   ) : `
-                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <button onclick="app.trackButtonClick('광고주로 시작하기', '/login', 'Main_Slide1'); app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                       <i class="fas fa-bullhorn mr-2"></i>광고주로 시작하기
                     </button>
-                    <button onclick="app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
+                    <button onclick="app.trackButtonClick('인플루언서로 시작하기', '/login', 'Main_Slide1'); app.showLogin()" class="bg-white text-purple-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-lg w-56">
                       <i class="fas fa-star mr-2"></i>인플루언서로 시작하기
                     </button>
                   `}
