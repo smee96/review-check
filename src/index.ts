@@ -66,6 +66,8 @@ app.get('/', (c) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>R.SPHERE - 인플루언서 마케팅 플랫폼</title>
         <link rel="icon" type="image/png" href="/static/favicon.png">
+        <!-- Google reCAPTCHA v3 -->
+        <script src="https://www.google.com/recaptcha/api.js?render=6LfYorkqAAAAAMlA1wsensitSC9vHr-hcMEBTwwUDT"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <!-- Flatpickr CSS -->
@@ -153,7 +155,7 @@ app.get('/', (c) => {
         <script src="/static/js/pricing-utils.js?v=47"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
         <script src="/static/js/password-reset.js?v=1"></script>
-        <script src="/static/js/app.js?v=81"></script>
+        <script src="/static/js/app.js?v=82"></script>
     </body>
     </html>
   `);

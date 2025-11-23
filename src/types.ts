@@ -134,6 +134,7 @@ export interface RegisterRequest {
   nickname: string;
   password: string;
   role: UserRole;
+  recaptchaToken?: string;
 }
 
 export interface LoginRequest {

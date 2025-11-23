@@ -25,7 +25,7 @@ const auth = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 // 회원가입
 auth.post('/register', async (c) => {
   try {
-    const { email, nickname, password, role } = await c.req.json<RegisterRequest>();
+    const { email, nickname, password, role, recaptchaToken } = await c.req.json<RegisterRequest>();
     
     // Validation
     if (!email || !nickname || !password || !role) {
@@ -44,7 +44,45 @@ auth.post('/register', async (c) => {
       return c.json({ error: '유효하지 않은 역할입니다' }, 400);
     }
     
+    // 1️⃣ reCAPTCHA 검증
+    if (recaptchaToken) {
+      try {
+        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `secret=6LfYorkqAAAAABhiFSLXzpgPPLxqn39rWVE1z1Lv&response=${recaptchaToken}`
+        });
+        const recaptchaResult = await recaptchaResponse.json();
+        
+        if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+          return c.json({ error: '보안 검증에 실패했습니다. 다시 시도해주세요.' }, 400);
+        }
+      } catch (error) {
+        console.error('reCAPTCHA verification error:', error);
+        // reCAPTCHA 오류 시 계속 진행 (서비스 중단 방지)
+      }
+    }
+    
+    // 2️⃣ 이메일 도메인 검증 (존재하지 않는 도메인 차단)
+    const emailDomain = email.split('@')[1];
+    const suspiciousDomains = ['hhhh.com', 'fydtr.com', 'test.com', 'example.com', 'temp-mail.org', 'guerrillamail.com'];
+    if (suspiciousDomains.includes(emailDomain)) {
+      return c.json({ error: '사용할 수 없는 이메일 도메인입니다' }, 400);
+    }
+    
     const { env } = c;
+    
+    // 3️⃣ IP 기반 가입 속도 제한 (1일 1회)
+    const clientIP = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    
+    const recentSignup = await env.DB.prepare(
+      'SELECT id FROM users WHERE created_at > ? AND id IN (SELECT user_id FROM user_ips WHERE ip_address = ?)'
+    ).bind(oneDayAgo, clientIP).first();
+    
+    if (recentSignup) {
+      return c.json({ error: '하루에 한 번만 가입할 수 있습니다. 24시간 후 다시 시도해주세요.' }, 429);
+    }
     
     // Check if email already exists
     const existingUser = await env.DB.prepare(
@@ -65,6 +103,21 @@ auth.post('/register', async (c) => {
     ).bind(email, nickname, passwordHash, role, initialPoints, getCurrentDateTime(), getCurrentDateTime()).run();
     
     const userId = result.meta.last_row_id;
+    
+    // Save IP address for rate limiting (create table if not exists)
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS user_ips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        ip_address TEXT NOT NULL,
+        created_at DATETIME NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `).run();
+    
+    await env.DB.prepare(
+      'INSERT INTO user_ips (user_id, ip_address, created_at) VALUES (?, ?, ?)'
+    ).bind(userId, clientIP, getCurrentDateTime()).run();
     
     // Create profile based on role
     if (role === 'advertiser' || role === 'agency' || role === 'rep') {

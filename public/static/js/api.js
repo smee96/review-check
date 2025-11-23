@@ -16,12 +16,13 @@ class API {
   }
 
   // Auth APIs
-  async register(email, nickname, password, role) {
+  async register(email, nickname, password, role, recaptchaToken) {
     return axios.post(`${this.baseURL}/auth/register`, {
       email,
       nickname,
       password,
-      role
+      role,
+      recaptchaToken
     });
   }
 

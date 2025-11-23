@@ -276,9 +276,9 @@ class ReviewSphere {
   // Auth Methods
   // ============================================
 
-  async register(email, nickname, password, role) {
+  async register(email, nickname, password, role, recaptchaToken) {
     try {
-      const response = await api.register(email, nickname, password, role);
+      const response = await api.register(email, nickname, password, role, recaptchaToken);
       alert(response.data.message || '회원가입이 완료되었습니다!');
       this.showLogin();
     } catch (error) {
@@ -7931,7 +7931,7 @@ class ReviewSphere {
     this.login(email, password);
   }
 
-  handleRegister() {
+  async handleRegister() {
     const email = document.getElementById('registerEmail').value;
     const nickname = document.getElementById('registerNickname').value;
     const password = document.getElementById('registerPassword').value;
@@ -7946,7 +7946,14 @@ class ReviewSphere {
     }
     errorElement.classList.add('hidden');
     
-    this.register(email, nickname, password, role);
+    // Get reCAPTCHA token
+    try {
+      const recaptchaToken = await grecaptcha.execute('6LfYorkqAAAAAMlA1wsensitSC9vHr-hcMEBTwwUDT', { action: 'register' });
+      this.register(email, nickname, password, role, recaptchaToken);
+    } catch (error) {
+      alert('보안 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
+      console.error('reCAPTCHA error:', error);
+    }
   }
 
 
