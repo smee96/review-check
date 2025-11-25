@@ -39,8 +39,50 @@ app.use('/api/*', cors());
 app.use('/static/*', serveStatic({ root: './public' }));
 
 // SEO files
-app.get('/robots.txt', serveStatic({ path: './public/robots.txt' }));
-app.get('/sitemap.xml', serveStatic({ path: './public/sitemap.xml' }));
+app.get('/robots.txt', (c) => {
+  return c.text(`# robots.txt for 리뷰스피어 (ReviewSphere)
+
+User-agent: *
+Allow: /
+Allow: /static/
+
+# Disallow private pages
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://review-spheres-v1.pages.dev/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 1`, 200, {
+    'Content-Type': 'text/plain',
+  });
+});
+
+app.get('/sitemap.xml', (c) => {
+  return c.text(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://review-spheres-v1.pages.dev/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://review-spheres-v1.pages.dev/#login</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://review-spheres-v1.pages.dev/#register</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`, 200, {
+    'Content-Type': 'application/xml',
+  });
+});
 
 // API routes
 app.route('/api/auth', auth);
