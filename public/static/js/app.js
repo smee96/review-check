@@ -332,14 +332,15 @@ class ReviewSphere {
 
   // GTM 이벤트 전송 함수
   trackButtonClick(buttonName, linkUrl, buttonLocation) {
-    if (window.dataLayer) {
+    console.log('[GTM Button Click]', { button_name: buttonName, link_url: linkUrl, button_location: buttonLocation });
+    
+    if (typeof window.dataLayer !== 'undefined') {
       window.dataLayer.push({
-        event: 'hero_button_click',
-        button_name: buttonName,
-        link_url: linkUrl,
-        button_location: buttonLocation
+        'event': 'hero_button_click',
+        'button_name': buttonName,
+        'link_url': linkUrl,
+        'button_location': buttonLocation
       });
-      console.log('📊 GTM Event:', { buttonName, linkUrl, buttonLocation });
     }
   }
 
