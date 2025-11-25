@@ -1,0 +1,14 @@
+# robots.txt for 리뷰스피어 (ReviewSphere)
+
+User-agent: *
+Allow: /
+Allow: /static/
+
+# Disallow private pages
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://review-spheres-v1.pages.dev/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 1

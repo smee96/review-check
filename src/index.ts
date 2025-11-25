@@ -38,6 +38,10 @@ app.use('/api/*', cors());
 // Serve static files
 app.use('/static/*', serveStatic({ root: './public' }));
 
+// SEO files
+app.get('/robots.txt', serveStatic({ path: './public/robots.txt' }));
+app.get('/sitemap.xml', serveStatic({ path: './public/sitemap.xml' }));
+
 // API routes
 app.route('/api/auth', auth);
 app.route('/api/campaigns', campaigns);
@@ -64,10 +68,74 @@ app.get('/', (c) => {
         
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>R.SPHERE - 인플루언서 마케팅 플랫폼</title>
+        
+        <!-- SEO Meta Tags -->
+        <title>리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼 | 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰</title>
+        <meta name="description" content="리뷰스피어는 광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼입니다. 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰, 스마트스토어 리뷰 등 다양한 채널에서 진짜 리뷰를 만나보세요. 신규 인플루언서도 환영합니다!">
+        <meta name="keywords" content="리뷰스피어, 리뷰플랫폼, 인플루언서리뷰, 블로그리뷰, 인스타그램리뷰, 유튜브리뷰, 체험단, 리뷰마케팅, 인플루언서마케팅, 제품리뷰, 서비스리뷰, 광고주플랫폼, 인플루언서플랫폼, 협찬, 체험단모집, 리뷰어모집, 블로거체험단, 인스타체험단, 유튜버체험단, 스마트스토어리뷰, 쿠팡리뷰, 네이버쇼핑리뷰, 마케팅플랫폼, 바이럴마케팅, 입소문마케팅, SNS마케팅, 콘텐츠마케팅, 브랜드홍보, 제품홍보, 리뷰작성, 포인트적립, 현금출금, 초보인플루언서, 신규인플루언서, 팔로워적어도가능, 이웃적어도가능">
+        <meta name="author" content="리뷰스피어">
+        <meta name="robots" content="index, follow">
+        <meta name="googlebot" content="index, follow">
+        <link rel="canonical" href="https://review-spheres-v1.pages.dev">
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://review-spheres-v1.pages.dev">
+        <meta property="og:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
+        <meta property="og:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
+        <meta property="og:image" content="https://review-spheres-v1.pages.dev/static/logo.png">
+        <meta property="og:locale" content="ko_KR">
+        <meta property="og:site_name" content="리뷰스피어">
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="https://review-spheres-v1.pages.dev">
+        <meta name="twitter:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
+        <meta name="twitter:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
+        <meta name="twitter:image" content="https://review-spheres-v1.pages.dev/static/logo.png">
+        
+        <!-- Mobile App Meta -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="리뷰스피어">
+        <meta name="application-name" content="리뷰스피어">
+        <meta name="theme-color" content="#9333ea">
+        
         <link rel="icon" type="image/png" href="/static/favicon.png">
+        
         <!-- Google reCAPTCHA v3 -->
         <script src="https://www.google.com/recaptcha/api.js?render=6LfYorkqAAAAAMlA1wsensitSC9vHr-hcMEBTwwUDT"></script>
+        
+        <!-- Structured Data (JSON-LD) for Google -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "리뷰스피어",
+          "alternateName": ["R.SPHERE", "ReviewSphere"],
+          "url": "https://review-spheres-v1.pages.dev",
+          "description": "인플루언서 리뷰 마케팅 플랫폼",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://review-spheres-v1.pages.dev/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "리뷰스피어",
+          "url": "https://review-spheres-v1.pages.dev",
+          "logo": "https://review-spheres-v1.pages.dev/static/logo.png",
+          "description": "광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "KR"
+          }
+        }
+        </script>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <!-- Flatpickr CSS -->
@@ -155,7 +223,7 @@ app.get('/', (c) => {
         <script src="/static/js/pricing-utils.js?v=47"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
         <script src="/static/js/password-reset.js?v=1"></script>
-        <script src="/static/js/app.js?v=83"></script>
+        <script src="/static/js/app.js?v=84"></script>
     </body>
     </html>
   `);
