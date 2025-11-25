@@ -8,7 +8,7 @@ Allow: /static/
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://review-spheres-v1.pages.dev/sitemap.xml
+Sitemap: https://reviews-sphere.com/sitemap.xml
 
 # Crawl-delay (optional)
 Crawl-delay: 1

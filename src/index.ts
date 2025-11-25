@@ -50,7 +50,7 @@ Allow: /static/
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://review-spheres-v1.pages.dev/sitemap.xml
+Sitemap: https://reviews-sphere.com/sitemap.xml
 
 # Crawl-delay (optional)
 Crawl-delay: 1`, 200, {
@@ -62,19 +62,19 @@ app.get('/sitemap.xml', (c) => {
   return c.text(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://review-spheres-v1.pages.dev/</loc>
+    <loc>https://reviews-sphere.com/</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://review-spheres-v1.pages.dev/#login</loc>
+    <loc>https://reviews-sphere.com/#login</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://review-spheres-v1.pages.dev/#register</loc>
+    <loc>https://reviews-sphere.com/#register</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -118,23 +118,23 @@ app.get('/', (c) => {
         <meta name="author" content="리뷰스피어">
         <meta name="robots" content="index, follow">
         <meta name="googlebot" content="index, follow">
-        <link rel="canonical" href="https://review-spheres-v1.pages.dev">
+        <link rel="canonical" href="https://reviews-sphere.com">
         
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://review-spheres-v1.pages.dev">
+        <meta property="og:url" content="https://reviews-sphere.com">
         <meta property="og:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
         <meta property="og:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
-        <meta property="og:image" content="https://review-spheres-v1.pages.dev/static/logo.png">
+        <meta property="og:image" content="https://reviews-sphere.com/static/logo.png">
         <meta property="og:locale" content="ko_KR">
         <meta property="og:site_name" content="리뷰스피어">
         
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:url" content="https://review-spheres-v1.pages.dev">
+        <meta name="twitter:url" content="https://reviews-sphere.com">
         <meta name="twitter:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
         <meta name="twitter:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
-        <meta name="twitter:image" content="https://review-spheres-v1.pages.dev/static/logo.png">
+        <meta name="twitter:image" content="https://reviews-sphere.com/static/logo.png">
         
         <!-- Mobile App Meta -->
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -155,11 +155,11 @@ app.get('/', (c) => {
           "@type": "WebSite",
           "name": "리뷰스피어",
           "alternateName": ["R.SPHERE", "ReviewSphere"],
-          "url": "https://review-spheres-v1.pages.dev",
+          "url": "https://reviews-sphere.com",
           "description": "인플루언서 리뷰 마케팅 플랫폼",
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://review-spheres-v1.pages.dev/?q={search_term_string}",
+            "target": "https://reviews-sphere.com/?q={search_term_string}",
             "query-input": "required name=search_term_string"
           }
         }
@@ -169,8 +169,8 @@ app.get('/', (c) => {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "리뷰스피어",
-          "url": "https://review-spheres-v1.pages.dev",
-          "logo": "https://review-spheres-v1.pages.dev/static/logo.png",
+          "url": "https://reviews-sphere.com",
+          "logo": "https://reviews-sphere.com/static/logo.png",
           "description": "광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼",
           "address": {
             "@type": "PostalAddress",
@@ -265,7 +265,7 @@ app.get('/', (c) => {
         <script src="/static/js/pricing-utils.js?v=47"></script>
         <script src="/static/js/withdrawal-ui.js?v=1"></script>
         <script src="/static/js/password-reset.js?v=1"></script>
-        <script src="/static/js/app.js?v=84"></script>
+        <script src="/static/js/app.js?v=85"></script>
     </body>
     </html>
   `);

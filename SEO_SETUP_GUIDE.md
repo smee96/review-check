@@ -47,7 +47,7 @@
 **단계:**
 1. https://search.google.com/search-console 접속
 2. "속성 추가" 클릭
-3. URL 입력: `https://review-spheres-v1.pages.dev`
+3. URL 입력: `https://reviews-sphere.com`
 4. 소유권 확인:
    
    **방법 A: HTML 파일 업로드**
@@ -63,7 +63,7 @@
    - Google에서 제공하는 메타 태그를 index.ts의 `<head>` 섹션에 추가
    
 5. Sitemap 제출:
-   - URL: `https://review-spheres-v1.pages.dev/sitemap.xml`
+   - URL: `https://reviews-sphere.com/sitemap.xml`
 
 ---
 
@@ -72,7 +72,7 @@
 **단계:**
 1. https://searchadvisor.naver.com 접속
 2. "웹마스터 도구" → "사이트 등록"
-3. URL 입력: `https://review-spheres-v1.pages.dev`
+3. URL 입력: `https://reviews-sphere.com`
 4. 소유권 확인:
    
    **방법 A: HTML 파일 업로드**
@@ -88,7 +88,7 @@
    - Naver에서 제공하는 메타 태그를 index.ts의 `<head>` 섹션에 추가
 
 5. Sitemap 제출:
-   - URL: `https://review-spheres-v1.pages.dev/sitemap.xml`
+   - URL: `https://reviews-sphere.com/sitemap.xml`
 
 ---
 
@@ -197,5 +197,5 @@
 ---
 
 **작성일**: 2025-11-24  
-**버전**: v84  
-**배포 URL**: https://review-spheres-v1.pages.dev
+**버전**: v85  
+**배포 URL**: https://reviews-sphere.com

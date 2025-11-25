@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
-    <loc>https://review-spheres-v1.pages.dev/</loc>
+    <loc>https://reviews-sphere.com/</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -10,7 +10,7 @@
   
   <!-- Login Page -->
   <url>
-    <loc>https://review-spheres-v1.pages.dev/#login</loc>
+    <loc>https://reviews-sphere.com/#login</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -18,7 +18,7 @@
   
   <!-- Register Page -->
   <url>
-    <loc>https://review-spheres-v1.pages.dev/#register</loc>
+    <loc>https://reviews-sphere.com/#register</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
