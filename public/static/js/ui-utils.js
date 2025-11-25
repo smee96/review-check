@@ -24,41 +24,40 @@ const UIUtils = {
       return campaign.status;
     }
     
-    // 한국 시간(KST, UTC+9) 기준으로 현재 시간 계산
+    // 현재 시간을 UTC로 가져옴
     const nowUTC = new Date();
-    const kstOffset = 9 * 60 * 60 * 1000; // 9시간을 밀리초로
-    const nowKST = new Date(nowUTC.getTime() + kstOffset);
     
-    // 날짜 문자열을 한국 시간 기준으로 파싱하는 함수
-    const parseKSTDate = (dateString) => {
+    // 날짜 문자열(YYYY-MM-DD)을 KST 자정(00:00:00)의 밀리초로 변환
+    // 예: '2025-11-26' -> 2025-11-26 00:00:00 KST = 2025-11-25 15:00:00 UTC
+    const parseKSTDateToMillis = (dateString) => {
       if (!dateString) return null;
       const [year, month, day] = dateString.split('-').map(Number);
-      // 한국 시간 00:00:00 기준
-      return new Date(Date.UTC(year, month - 1, day, -9, 0, 0, 0));
+      // KST 자정 = UTC 기준 전날 15시
+      return Date.UTC(year, month - 1, day, -9, 0, 0, 0);
     };
     
-    const applicationEndDate = parseKSTDate(campaign.application_end_date);
-    const resultAnnouncementDate = parseKSTDate(campaign.result_announcement_date);
+    const applicationEndMillis = parseKSTDateToMillis(campaign.application_end_date);
+    const resultAnnouncementMillis = parseKSTDateToMillis(campaign.result_announcement_date);
     
     // 날짜 정보가 없으면 기존 상태 사용
-    if (!applicationEndDate) {
+    if (!applicationEndMillis) {
       return campaign.status;
     }
     
-    // 모집종료일 23:59:59까지는 모집중
-    const applicationEndDateTime = new Date(applicationEndDate);
-    applicationEndDateTime.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+    // 모집종료일 23:59:59 KST = UTC 기준 당일 14:59:59
+    // 예: 2025-11-26 23:59:59 KST = 2025-11-26 14:59:59 UTC
+    const applicationEndDeadline = applicationEndMillis + (15 * 60 * 60 * 1000 - 1); // +14:59:59
     
-    if (nowKST <= applicationEndDateTime) {
+    // 현재 시간이 모집 종료 전이면 모집중
+    if (nowUTC.getTime() <= applicationEndDeadline) {
       return 'recruiting';
     }
     
-    // 결과발표일 23:59:59까지 체크
-    if (resultAnnouncementDate) {
-      const resultAnnouncementDateTime = new Date(resultAnnouncementDate);
-      resultAnnouncementDateTime.setUTCHours(14, 59, 59, 999); // KST 23:59:59
+    // 결과발표일 23:59:59 KST까지 체크
+    if (resultAnnouncementMillis) {
+      const resultAnnouncementDeadline = resultAnnouncementMillis + (15 * 60 * 60 * 1000 - 1);
       
-      if (nowKST > resultAnnouncementDateTime) {
+      if (nowUTC.getTime() > resultAnnouncementDeadline) {
         return 'completed';
       }
     }
