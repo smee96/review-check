@@ -1467,7 +1467,7 @@ class ReviewSphere {
                 비밀번호를 잊으셨나요?
               </button>
               <div class="text-gray-600 text-sm">
-                계정이 없으신가요? <button onclick="app.showRegister(null, false)" class="text-purple-600 hover:underline font-semibold">회원가입</button>
+                계정이 없으신가요? <button onclick="app.trackButtonClick('회원가입', '#register', 'Login_Page'); app.showRegister(null, false)" class="text-purple-600 hover:underline font-semibold">회원가입</button>
               </div>
               <button onclick="window.history.back();" class="text-gray-500 hover:text-gray-700 text-sm">
                 <i class="fas fa-arrow-left mr-1"></i>뒤로가기
