@@ -200,22 +200,26 @@ campaigns.get('/', async (c) => {
       
       return c.json(campaigns.results);
     } else {
-      // 진행중인 캠페인: 모집중(결제 무관) + 승인대기(결제 무관) + 승인완료 캠페인
-      // - 모집중(결제완료): 지원 가능
-      // - 모집중(미결제): 결제 대기 안내 표시
-      // - 승인대기: 관리자 승인 대기 안내 표시
-      // - 승인완료: 지원 가능 (approved 상태도 표시)
+      // 진행중인 캠페인: 모집중, 진행중, 일시중지, 완료됨, 취소됨 순으로 정렬
+      // - 모집중(recruiting): 가장 먼저 표시 ⭐
+      // - 진행중(in_progress): 두 번째
+      // - 일시중지(suspended): 세 번째
+      // - 완료됨(completed): 네 번째
+      // - 취소됨(cancelled): 마지막
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
          FROM campaigns c
-         WHERE c.status IN ('recruiting', 'pending', 'approved')
+         WHERE c.status IN ('recruiting', 'in_progress', 'suspended', 'completed', 'cancelled', 'pending', 'approved')
          ORDER BY 
            CASE 
-             WHEN c.status = 'recruiting' AND c.payment_status = 'paid' THEN 0
-             WHEN c.status = 'approved' THEN 0
-             WHEN c.status = 'recruiting' AND c.payment_status = 'unpaid' THEN 1
-             WHEN c.status = 'pending' THEN 2
+             WHEN c.status = 'recruiting' THEN 0
+             WHEN c.status = 'in_progress' THEN 1
+             WHEN c.status = 'approved' THEN 1
+             WHEN c.status = 'suspended' THEN 2
+             WHEN c.status = 'completed' THEN 3
+             WHEN c.status = 'cancelled' THEN 4
+             WHEN c.status = 'pending' THEN 5
            END,
            c.created_at DESC`
       ).all();
