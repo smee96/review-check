@@ -189,11 +189,14 @@ campaigns.get('/', async (c) => {
     
     if (type === 'best') {
       // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1, 모든 상태 포함)
+      // LEFT JOIN으로 N+1 문제 해결
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
-         (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
+         COALESCE(COUNT(a.id), 0) as application_count
          FROM campaigns c
+         LEFT JOIN applications a ON a.campaign_id = c.id
          WHERE c.is_best = 1
+         GROUP BY c.id
          ORDER BY c.updated_at DESC
          LIMIT 20`
       ).all();
@@ -206,11 +209,14 @@ campaigns.get('/', async (c) => {
       // - 일시중지(suspended): 세 번째
       // - 완료됨(completed): 네 번째
       // - 취소됨(cancelled): 마지막
+      // LEFT JOIN으로 N+1 문제 해결
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
-         (SELECT COUNT(*) FROM applications WHERE campaign_id = c.id) as application_count
+         COALESCE(COUNT(a.id), 0) as application_count
          FROM campaigns c
+         LEFT JOIN applications a ON a.campaign_id = c.id
          WHERE c.status IN ('recruiting', 'in_progress', 'suspended', 'completed', 'cancelled', 'pending', 'approved')
+         GROUP BY c.id
          ORDER BY 
            CASE 
              WHEN c.status = 'recruiting' THEN 0

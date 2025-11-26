@@ -178,7 +178,7 @@ app.get('/', (c) => {
           }
         }
         </script>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="/static/css/tailwind.output.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <!-- Flatpickr CSS -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

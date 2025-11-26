@@ -1,6 +1,56 @@
 // UI Utility Functions
 
 const UIUtils = {
+  // 버튼 중복 클릭 방지 (디바운싱)
+  _buttonClickTimers: {},
+  
+  preventDoubleClick(buttonId, callback, delay = 1000) {
+    // 이미 타이머가 실행 중이면 무시
+    if (this._buttonClickTimers[buttonId]) {
+      console.log(`[Debounce] Button "${buttonId}" click ignored (already processing)`);
+      return;
+    }
+    
+    // 타이머 설정
+    this._buttonClickTimers[buttonId] = true;
+    
+    // 콜백 실행
+    try {
+      callback();
+    } catch (error) {
+      console.error('[Debounce] Callback error:', error);
+    }
+    
+    // 딜레이 후 타이머 해제
+    setTimeout(() => {
+      delete this._buttonClickTimers[buttonId];
+    }, delay);
+  },
+  
+  // 버튼 비활성화/활성화 헬퍼
+  disableButton(button, originalText) {
+    if (!button) return;
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    button.style.cursor = 'not-allowed';
+    if (originalText) {
+      button.setAttribute('data-original-text', button.textContent);
+      button.textContent = originalText;
+    }
+  },
+  
+  enableButton(button) {
+    if (!button) return;
+    button.disabled = false;
+    button.style.opacity = '1';
+    button.style.cursor = 'pointer';
+    const originalText = button.getAttribute('data-original-text');
+    if (originalText) {
+      button.textContent = originalText;
+      button.removeAttribute('data-original-text');
+    }
+  },
+
   // Status badge helpers
   getStatusBadge(status, campaign = null) {
     // campaign 객체가 있으면 날짜 기반으로 실제 상태 계산
