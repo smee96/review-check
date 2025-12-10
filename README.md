@@ -69,8 +69,9 @@ R.SPHERE는 광고주와 인플루언서를 연결하는 혁신적인 마케팅 
 - **Sandbox URL**: https://3000-idu9nocxtg1m76pm1zhg7-de59bda9.sandbox.novita.ai
 
 ### 프로덕션 환경
-- **Production URL**: https://review-spheres-v1.pages.dev
-- **Latest Deployment**: https://3c19e8a0.review-spheres-v1.pages.dev
+- **Production URL**: https://reviews-sphere.com
+- **Cloudflare Pages**: https://review-spheres-v1.pages.dev
+- **Latest Deployment**: https://c6a4582d.review-spheres-v1.pages.dev (v86 - R2 이미지 마이그레이션)
 
 ### API 엔드포인트
 
@@ -205,15 +206,23 @@ npx wrangler d1 execute review-spheres-v1-production --local \
 
 ### R2 스토리지 백업
 
-리뷰 이미지는 Cloudflare R2에 저장되며, 자동 이중화가 적용됩니다:
+**캠페인 썸네일 이미지 및 리뷰 이미지**는 Cloudflare R2에 저장되며, 자동 이중화가 적용됩니다:
 - Cloudflare의 글로벌 네트워크에 자동 복제
 - 내구성: 99.999999999% (11 nines)
 - 별도 백업 불필요 (인프라 수준에서 관리)
+- **R2 마이그레이션 완료** (2025-12-10):
+  - 기존 Base64 썸네일 → R2 이미지로 전환
+  - DB 크기 62% 감소 (16.93MB → 6.43MB)
+  - 썸네일 데이터 99.997% 감소 (12.7MB → 405 bytes)
+  - CDN 캐싱으로 이미지 로딩 속도 향상
 
 필요 시 R2 버킷 전체를 다른 R2 버킷이나 S3로 동기화 가능:
 ```bash
 # R2 객체 목록 조회
-npx wrangler r2 object list review-spheres-images
+npx wrangler r2 object list reviewsphere-images
+
+# R2 이미지 다운로드
+npx wrangler r2 object get reviewsphere-images/13.jpg --file=13.jpg --remote
 
 # rclone 등의 도구로 백업 가능
 ```
