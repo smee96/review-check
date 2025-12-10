@@ -349,6 +349,9 @@ class ReviewSphere {
   // ============================================
 
   async showHome(pushHistory = true) {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     if (pushHistory) {
       this.pushHistory('home');
     }
@@ -1045,6 +1048,9 @@ class ReviewSphere {
 
   // 뒤로가기
   goBack() {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     // 현재 상태 확인
     const currentState = window.history.state;
     
@@ -1421,6 +1427,9 @@ class ReviewSphere {
   }
 
   showLogin(pushHistory = true) {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     if (pushHistory) {
       this.pushHistory('login');
     }
@@ -1482,6 +1491,9 @@ class ReviewSphere {
   }
 
   showRegister(preselectedRole = null, pushHistory = true) {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     if (pushHistory) {
       this.pushHistory('register');
     }
@@ -1595,6 +1607,9 @@ class ReviewSphere {
   }
 
   async viewCampaignDetail(campaignId, pushHistory = true) {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     // 로그인 체크 - 로그인하지 않았으면 리턴 URL 저장 후 바로 로그인 페이지로 이동
     if (!this.token || !this.user) {
       // 현재 캠페인 ID를 저장하여 로그인 후 돌아올 수 있도록 함
@@ -2103,6 +2118,9 @@ class ReviewSphere {
 
   // 마이페이지
   showMyPage(pushHistory = true) {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     if (pushHistory) {
       this.pushHistory('myPage');
     }
@@ -2124,6 +2142,9 @@ class ReviewSphere {
   
   // 하위 호환성을 위해 showDashboard는 showMyPage로 리다이렉트
   showDashboard() {
+    // 스크롤을 맨 위로
+    window.scrollTo(0, 0);
+    
     this.showMyPage();
   }
 
