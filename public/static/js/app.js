@@ -1146,9 +1146,9 @@ class ReviewSphere {
                   ${campaigns.map(c => `
                     <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer">
                       ${c.thumbnail_image ? `
-                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-56 object-cover">
+                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover">
                       ` : `
-                        <div class="w-full h-56 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                        <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
                           <i class="fas fa-image text-white text-6xl opacity-50"></i>
                         </div>
                       `}
@@ -1210,9 +1210,9 @@ class ReviewSphere {
                       </span>
                     </div>
                     ${c.thumbnail_image ? `
-                      <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-56 object-cover">
+                      <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover">
                     ` : `
-                      <div class="w-full h-56 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                      <div class="w-full h-64 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
                         <i class="fas fa-trophy text-white text-6xl opacity-50"></i>
                       </div>
                     `}
@@ -6385,9 +6385,9 @@ class ReviewSphere {
             ${favoriteCampaigns.map(c => `
               <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
                 ${c.thumbnail_image ? `
-                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-56 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
                 ` : `
-                  <div class="w-full h-56 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                  <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
                     <i class="fas fa-image text-white text-6xl opacity-50"></i>
                   </div>
                 `}
@@ -6506,11 +6506,11 @@ class ReviewSphere {
             <div class="border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
               <!-- 썸네일 이미지 -->
               ${c.thumbnail_image ? `
-                <div class="w-full h-56 overflow-hidden bg-gray-100">
+                <div class="w-full h-64 overflow-hidden bg-gray-100">
                   <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
                 </div>
               ` : `
-                <div class="w-full h-56 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
                   <i class="fas fa-image text-white text-6xl opacity-50"></i>
                 </div>
               `}
