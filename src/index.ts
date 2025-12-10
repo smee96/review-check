@@ -20,6 +20,7 @@ import { visitorLogger } from './middleware/visitor';
 
 type Bindings = {
   DB: D1Database;
+  R2: R2Bucket;
   RESEND_API_KEY: string;
 };
 
@@ -82,6 +83,32 @@ app.get('/sitemap.xml', (c) => {
 </urlset>`, 200, {
     'Content-Type': 'application/xml',
   });
+});
+
+// R2 이미지 제공 API
+app.get('/api/images/:filename', async (c) => {
+  try {
+    const filename = c.req.param('filename');
+    
+    // R2에서 이미지 가져오기
+    const object = await c.env.R2.get(filename);
+    
+    if (!object) {
+      return c.notFound();
+    }
+
+    // 이미지를 응답으로 반환 (캐싱 헤더 포함)
+    return new Response(object.body, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
+        'Cache-Control': 'public, max-age=31536000', // 1년 캐싱
+        'ETag': object.etag || '',
+      }
+    });
+  } catch (error) {
+    console.error('R2 image fetch error:', error);
+    return c.json({ error: '이미지를 불러올 수 없습니다' }, 500);
+  }
 });
 
 // API routes
