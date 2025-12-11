@@ -7,6 +7,7 @@ import { authMiddleware, requireRole } from '../middleware/auth';
 
 type Bindings = {
   DB: D1Database;
+  R2: R2Bucket;
 };
 
 type Variables = {
@@ -14,6 +15,33 @@ type Variables = {
 };
 
 const campaigns = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+// Base64 이미지를 R2에 업로드하는 헬퍼 함수
+async function uploadImageToR2(r2: R2Bucket, imageData: string, filename: string): Promise<string> {
+  try {
+    // Base64 데이터 추출
+    if (!imageData.startsWith('data:image')) {
+      // 이미 R2 URL이거나 일반 URL인 경우 그대로 반환
+      return imageData;
+    }
+    
+    const base64Data = imageData.split(',')[1];
+    const buffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    
+    // R2에 업로드
+    await r2.put(filename, buffer, {
+      httpMetadata: {
+        contentType: 'image/jpeg'
+      }
+    });
+    
+    // R2 URL 반환
+    return `/api/images/${filename}`;
+  } catch (error) {
+    console.error('R2 upload error:', error);
+    throw error;
+  }
+}
 
 // 캠페인 등록 (광고주)
 campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin'), async (c) => {
@@ -45,6 +73,20 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
     
     const { env } = c;
     
+    // 임시 캠페인 ID 생성 (현재 타임스탬프 + 랜덤)
+    const tempId = Date.now().toString();
+    
+    // Base64 이미지를 R2에 업로드
+    let finalThumbnailImage = thumbnail_image;
+    if (thumbnail_image && thumbnail_image.startsWith('data:image')) {
+      try {
+        finalThumbnailImage = await uploadImageToR2(env.R2, thumbnail_image, `temp_${tempId}.jpg`);
+      } catch (error) {
+        console.error('R2 upload failed, using Base64 as fallback');
+        // R2 업로드 실패 시 Base64 사용 (fallback)
+      }
+    }
+    
     const result = await env.DB.prepare(
       `INSERT INTO campaigns (
         advertiser_id, title, description, product_name, product_url, requirements, 
@@ -63,7 +105,7 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       budget || null,
       slots || 1,
       point_reward || 0,
-      thumbnail_image || null,
+      finalThumbnailImage || null,
       channel_type,
       instagram_mention_account || null,
       blog_product_url || null,
@@ -86,9 +128,35 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
       getCurrentDateTime()
     ).run();
     
+    const campaignId = result.meta.last_row_id;
+    
+    // R2 파일명을 실제 campaign ID로 변경
+    if (thumbnail_image && thumbnail_image.startsWith('data:image')) {
+      try {
+        const tempFilename = `temp_${tempId}.jpg`;
+        const finalFilename = `${campaignId}.jpg`;
+        
+        // 임시 파일 복사 후 삭제
+        const tempFile = await env.R2.get(tempFilename);
+        if (tempFile) {
+          await env.R2.put(finalFilename, tempFile.body, {
+            httpMetadata: { contentType: 'image/jpeg' }
+          });
+          await env.R2.delete(tempFilename);
+          
+          // DB 업데이트
+          await env.DB.prepare(
+            'UPDATE campaigns SET thumbnail_image = ? WHERE id = ?'
+          ).bind(`/api/images/${finalFilename}`, campaignId).run();
+        }
+      } catch (error) {
+        console.error('R2 file rename failed:', error);
+      }
+    }
+    
     return c.json({ 
       success: true, 
-      campaignId: result.meta.last_row_id,
+      campaignId,
       message: '캠페인이 등록되었습니다. 관리자 승인 후 활성화됩니다.'
     }, 201);
   } catch (error) {
@@ -412,6 +480,16 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
     }
     
+    // Base64 이미지를 R2에 업로드
+    let finalThumbnailImage = thumbnail_image;
+    if (thumbnail_image && thumbnail_image.startsWith('data:image')) {
+      try {
+        finalThumbnailImage = await uploadImageToR2(env.R2, thumbnail_image, `${campaignId}.jpg`);
+      } catch (error) {
+        console.error('R2 upload failed during update, using Base64 as fallback');
+      }
+    }
+    
     // 썸네일 이미지가 새로 제공된 경우만 업데이트
     let updateQuery = `UPDATE campaigns 
        SET title = ?, description = ?, product_name = ?, product_url = ?, requirements = ?, 
@@ -451,9 +529,9 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     ];
     
     // 썸네일 이미지가 제공된 경우 추가
-    if (thumbnail_image) {
+    if (finalThumbnailImage) {
       updateQuery += ', thumbnail_image = ?';
-      params.push(thumbnail_image);
+      params.push(finalThumbnailImage);
     }
     
     // 관리자인 경우에만 결제 상태 업데이트 가능
