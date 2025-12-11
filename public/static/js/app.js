@@ -4749,6 +4749,11 @@ class ReviewSphere {
           });
         }
         
+        // 기존 썸네일 이미지 저장 (수정 시 기존 이미지 유지)
+        if (campaign.thumbnail_image) {
+          this.thumbnailData = campaign.thumbnail_image;
+        }
+        
         // 유의사항
         document.getElementById('campaignNotes').value = campaign.notes || `1. 제공받은 제품은 타인에게 양도 및 판매, 교환이 불가능 하며 적발 시 제품 가격 환불 및 캠페인 참여가 제한됩니다.
 
@@ -5024,6 +5029,11 @@ class ReviewSphere {
           keywords.forEach(keyword => {
             this.addKeyword(keyword);
           });
+        }
+        
+        // 기존 썸네일 이미지 저장 (수정 시 기존 이미지 유지)
+        if (campaign.thumbnail_image) {
+          this.thumbnailData = campaign.thumbnail_image;
         }
         
         // 유의사항
