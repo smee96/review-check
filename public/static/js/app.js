@@ -4749,8 +4749,8 @@ class ReviewSphere {
           });
         }
         
-        // 기존 썸네일 이미지 저장 (수정 시 기존 이미지 유지)
-        if (campaign.thumbnail_image) {
+        // 기존 썸네일 이미지 저장 (새로 업로드하지 않은 경우만)
+        if (campaign.thumbnail_image && !this.thumbnailData) {
           this.thumbnailData = campaign.thumbnail_image;
         }
         
@@ -5031,8 +5031,8 @@ class ReviewSphere {
           });
         }
         
-        // 기존 썸네일 이미지 저장 (수정 시 기존 이미지 유지)
-        if (campaign.thumbnail_image) {
+        // 기존 썸네일 이미지 저장 (새로 업로드하지 않은 경우만)
+        if (campaign.thumbnail_image && !this.thumbnailData) {
           this.thumbnailData = campaign.thumbnail_image;
         }
         
