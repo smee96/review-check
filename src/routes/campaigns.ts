@@ -432,7 +432,7 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     
     // Check ownership and permissions
     const campaign = await env.DB.prepare(
-      'SELECT advertiser_id, status, application_start_date FROM campaigns WHERE id = ?'
+      'SELECT advertiser_id, status, application_start_date, thumbnail_image FROM campaigns WHERE id = ?'
     ).bind(campaignId).first() as any;
     
     if (!campaign) {
@@ -482,11 +482,23 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     
     // Base64 이미지를 R2에 업로드
     let finalThumbnailImage = thumbnail_image;
+    
+    // 새로 업로드된 이미지가 Base64면 R2로 변환
     if (thumbnail_image && thumbnail_image.startsWith('data:image')) {
       try {
         finalThumbnailImage = await uploadImageToR2(env.R2, thumbnail_image, `${campaignId}.jpg`);
       } catch (error) {
         console.error('R2 upload failed during update, using Base64 as fallback');
+      }
+    }
+    // 기존 이미지가 Base64면 자동으로 R2로 변환
+    else if (!thumbnail_image && campaign.thumbnail_image && campaign.thumbnail_image.startsWith('data:image')) {
+      try {
+        finalThumbnailImage = await uploadImageToR2(env.R2, campaign.thumbnail_image, `${campaignId}.jpg`);
+        console.log(`Auto-converted Base64 to R2 for campaign ${campaignId}`);
+      } catch (error) {
+        console.error('R2 auto-conversion failed, keeping Base64');
+        finalThumbnailImage = campaign.thumbnail_image;
       }
     }
     
