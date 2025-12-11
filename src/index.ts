@@ -97,11 +97,11 @@ app.get('/api/images/:filename', async (c) => {
       return c.notFound();
     }
 
-    // 이미지를 응답으로 반환 (캐싱 헤더 포함)
+    // 이미지를 응답으로 반환 (ETag 기반 캐싱)
     return new Response(object.body, {
       headers: {
         'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
-        'Cache-Control': 'public, max-age=31536000', // 1년 캐싱
+        'Cache-Control': 'public, max-age=3600, must-revalidate', // 1시간 캐싱, ETag 재검증 필수
         'ETag': object.etag || '',
       }
     });
