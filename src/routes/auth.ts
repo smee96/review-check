@@ -50,7 +50,7 @@ auth.post('/register', async (c) => {
         const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `secret=6LfYorkqAAAAABhiFSLXzpgPPLxqn39rWVE1z1Lv&response=${recaptchaToken}`
+          body: `secret=6Ldt3nUsAAAAANQDPi3Yy_CAYeinwiKP3I9LauKa&response=${recaptchaToken}`
         });
         const recaptchaResult = await recaptchaResponse.json();
         

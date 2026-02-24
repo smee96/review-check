@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 지원 데이터 생성</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #7c3aed;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #7c3aed;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #6d28d9;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background: #e0e7ff;
+            border: 1px solid #6366f1;
+            color: #3730a3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 테스트 지원 데이터 생성</h1>
+        
+        <div class="info">
+            <strong>📌 사용 방법:</strong><br>
+            1. 관리자 계정으로 로그인하여 토큰을 받습니다<br>
+            2. 아래 입력란에 토큰을 붙여넣습니다<br>
+            3. "지원 데이터 생성" 버튼을 클릭합니다<br><br>
+            <strong>✨ 효과:</strong><br>
+            - 모든 모집중/진행중 캠페인에 테스트 인플루언서들이 지원합니다<br>
+            - 모집인원 10명 → 10~15명 지원<br>
+            - 모집인원 20명 → 20~30명 지원<br>
+            - 모집인원 30명 → 30~45명 지원<br>
+            - 상태: `pending` (승인 대기)
+        </div>
+        
+        <div class="input-group">
+            <label>관리자 토큰 (Admin Token):</label>
+            <input type="text" id="adminToken" placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+            <small style="color: #666;">브라우저 개발자도구 > Application > Local Storage > token 값을 복사하세요</small>
+        </div>
+        
+        <button id="seedBtn" onclick="seedApplications()">🚀 지원 데이터 생성</button>
+        
+        <div class="loading" id="loading">
+            <p>⏳ 데이터 생성 중...</p>
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        async function seedApplications() {
+            const token = document.getElementById('adminToken').value.trim();
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const btn = document.getElementById('seedBtn');
+            
+            if (!token) {
+                resultDiv.className = 'result error';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '❌ 토큰을 입력해주세요';
+                return;
+            }
+            
+            // 시작
+            btn.disabled = true;
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await axios.post(
+                    'https://reviews-sphere.com/api/admin/seed-applications',
+                    {},
+                    {
+                        headers: {
+                            'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                        }
+                    }
+                );
+                
+                resultDiv.className = 'result success';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    ✅ <strong>성공!</strong><br><br>
+                    ${response.data.message}<br>
+                    캠페인 수: ${response.data.campaigns}개<br>
+                    인플루언서 수: ${response.data.influencers}명
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    ❌ <strong>오류 발생</strong><br><br>
+                    ${error.response?.data?.error || error.message}
+                `;
+            } finally {
+                btn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        // Enter 키로도 실행 가능
+        document.getElementById('adminToken').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                seedApplications();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -322,4 +322,75 @@ admin.get('/stats', async (c) => {
   }
 });
 
+// 테스트 인플루언서 지원 데이터 생성
+admin.post('/seed-applications', async (c) => {
+  try {
+    const { env } = c;
+    
+    // 1. 테스트 인플루언서 조회
+    const influencers = await env.DB.prepare(
+      `SELECT id FROM users WHERE email LIKE 'influencer%@test.com' AND role = 'influencer' ORDER BY id`
+    ).all();
+    
+    if (!influencers.results || influencers.results.length === 0) {
+      return c.json({ error: '테스트 인플루언서가 없습니다' }, 404);
+    }
+    
+    // 2. 모집중/진행중 캠페인 조회
+    const campaigns = await env.DB.prepare(
+      `SELECT id, title, slots FROM campaigns WHERE status IN ('recruiting', 'in_progress') ORDER BY id`
+    ).all();
+    
+    if (!campaigns.results || campaigns.results.length === 0) {
+      return c.json({ error: '모집중이거나 진행중인 캠페인이 없습니다' }, 404);
+    }
+    
+    // 3. 기존 테스트 지원 데이터 삭제
+    await env.DB.prepare(
+      `DELETE FROM applications WHERE influencer_id IN (SELECT id FROM users WHERE email LIKE 'influencer%@test.com')`
+    ).run();
+    
+    // 4. 각 캠페인에 대해 지원 데이터 생성
+    const now = getCurrentDateTime();
+    let totalInserted = 0;
+    
+    for (const campaign of campaigns.results as any[]) {
+      const slots = campaign.slots || 10;
+      // 모집인원에 따라 현실적인 지원자 수 계산
+      // 10명 → 10~15명 사이
+      // 20명 → 25~30명 사이
+      // 일반적으로 slots + (slots * 0.25 ~ slots * 0.5) 범위
+      const minApplicants = Math.floor(slots + slots * 0.0);  // 최소: 모집인원과 동일
+      const maxApplicants = Math.floor(slots + slots * 0.5);  // 최대: 모집인원 + 50%
+      const applicantsCount = Math.floor(Math.random() * (maxApplicants - minApplicants + 1)) + minApplicants;
+      
+      // 랜덤하게 인플루언서 선택
+      const shuffled = [...influencers.results].sort(() => Math.random() - 0.5);
+      const selectedInfluencers = shuffled.slice(0, Math.min(applicantsCount, influencers.results.length));
+      
+      for (const influencer of selectedInfluencers) {
+        await env.DB.prepare(
+          `INSERT INTO applications (campaign_id, influencer_id, status, applied_at)
+           VALUES (?, ?, 'pending', ?)`
+        ).bind(
+          campaign.id,
+          (influencer as any).id,
+          now
+        ).run();
+        totalInserted++;
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: `${totalInserted}개의 테스트 지원 데이터가 생성되었습니다`,
+      campaigns: campaigns.results.length,
+      influencers: influencers.results.length
+    });
+  } catch (error) {
+    console.error('Seed applications error:', error);
+    return c.json({ error: '테스트 데이터 생성 중 오류가 발생했습니다' }, 500);
+  }
+});
+
 export default admin;

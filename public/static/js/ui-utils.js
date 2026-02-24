@@ -156,7 +156,7 @@ const UIUtils = {
         <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div class="flex justify-between items-center h-14 sm:h-16">
             <div class="cursor-pointer" onclick="app.showHome()">
-              <img src="/static/logo.png" alt="R.SPHERE" class="h-12 sm:h-14">
+              <img src="/static/checknreview-logo.png" alt="CHECKnREVIEW" class="h-8 sm:h-10">
             </div>
             
             ${user ? `
@@ -356,7 +356,7 @@ const UIUtils = {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <h3 class="text-white text-sm font-semibold mb-2">
-                <i class="fas fa-star mr-1"></i>R.SPHERE (리뷰스피어)
+                <i class="fas fa-star mr-1"></i>체크앤리뷰 CHECKNREVIEW
               </h3>
               <p class="text-xs mb-1">인플루언서 마케팅의 새로운 기준</p>
               <p class="text-xs">
@@ -367,8 +367,9 @@ const UIUtils = {
             
             <div>
               <h4 class="text-white text-sm font-semibold mb-2">회사소개</h4>
-              <p class="text-xs mb-1"><strong>(주)모빈</strong> | 대표이사 이규한 | 개인정보 관리책임자 안중경</p>
-              <p class="text-xs">서울시 구로구 디지털로31길 12, 본관 2층 넥스트데이 2호 (구로동, 티피타워)</p>
+              <p class="text-xs mb-1"><strong>(주)체크앤바이</strong></p>
+              <p class="text-xs mb-1">대표이사 황정현 | 개인정보관리책임자 이규한</p>
+              <p class="text-xs mb-1">서울시 구로구 디지털로31길 38-21, 308호(구로동, 이앤씨벤처드림타워3차)</p>
             </div>
           </div>
           
@@ -377,7 +378,7 @@ const UIUtils = {
               <a href="#" onclick="app.showTerms(); return false;" class="hover:text-white underline">이용약관</a>
               <a href="#" onclick="app.showPrivacy(); return false;" class="hover:text-white underline">개인정보처리방침</a>
             </div>
-            <p class="text-center text-xs">© 2025 리뷰스피어. All rights reserved. Operated by <strong>(주)모빈</strong></p>
+            <p class="text-center text-xs">© 2025 체크앤리뷰. All rights reserved. Operated by <strong>(주)체크앤바이</strong></p>
           </div>
         </div>
       </footer>

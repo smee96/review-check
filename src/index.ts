@@ -41,7 +41,7 @@ app.use('/static/*', serveStatic({ root: './public' }));
 
 // SEO files
 app.get('/robots.txt', (c) => {
-  return c.text(`# robots.txt for 리뷰스피어 (ReviewSphere)
+  return c.text(`# robots.txt for 체크앤리뷰 (CHECKnREVIEW)
 
 User-agent: *
 Allow: /
@@ -97,11 +97,13 @@ app.get('/api/images/:filename', async (c) => {
       return c.notFound();
     }
 
-    // 이미지를 응답으로 반환 (ETag 기반 캐싱)
+    // 이미지를 응답으로 반환 (캐시 없음 - 항상 최신 이미지 제공)
     return new Response(object.body, {
       headers: {
         'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
-        'Cache-Control': 'public, max-age=3600, must-revalidate', // 1시간 캐싱, ETag 재검증 필수
+        'Cache-Control': 'no-cache, no-store, must-revalidate', // 캐시 사용 안함
+        'Pragma': 'no-cache',
+        'Expires': '0',
         'ETag': object.etag || '',
       }
     });
@@ -135,14 +137,33 @@ app.get('/', (c) => {
         })(window,document,'script','dataLayer','GTM-PKDXL8PH');</script>
         <!-- End Google Tag Manager -->
         
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17359556489"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-17359556489');
+        </script>
+        <!-- End Google tag -->
+        
+        <!-- Event snippet for 페이지 조회 conversion page -->
+        <script>
+          gtag('event', 'conversion', {
+              'send_to': 'AW-17359556489/bIntCJj43fEaEImf19VA',
+              'value': 1.0,
+              'currency': 'KRW'
+          });
+        </script>
+        
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <!-- SEO Meta Tags -->
-        <title>리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼 | 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰</title>
-        <meta name="description" content="리뷰스피어는 광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼입니다. 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰, 스마트스토어 리뷰 등 다양한 채널에서 진짜 리뷰를 만나보세요. 신규 인플루언서도 환영합니다!">
-        <meta name="keywords" content="리뷰스피어, 리뷰플랫폼, 인플루언서리뷰, 블로그리뷰, 인스타그램리뷰, 유튜브리뷰, 체험단, 리뷰마케팅, 인플루언서마케팅, 제품리뷰, 서비스리뷰, 광고주플랫폼, 인플루언서플랫폼, 협찬, 체험단모집, 리뷰어모집, 블로거체험단, 인스타체험단, 유튜버체험단, 스마트스토어리뷰, 쿠팡리뷰, 네이버쇼핑리뷰, 마케팅플랫폼, 바이럴마케팅, 입소문마케팅, SNS마케팅, 콘텐츠마케팅, 브랜드홍보, 제품홍보, 리뷰작성, 포인트적립, 현금출금, 초보인플루언서, 신규인플루언서, 팔로워적어도가능, 이웃적어도가능">
-        <meta name="author" content="리뷰스피어">
+        <title>체크앤리뷰 - 인플루언서 리뷰 마케팅 플랫폼 | 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰</title>
+        <meta name="description" content="체크앤리뷰는 광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼입니다. 블로그 리뷰, 인스타그램 리뷰, 유튜브 리뷰, 스마트스토어 리뷰 등 다양한 채널에서 진짜 리뷰를 만나보세요. 신규 인플루언서도 환영합니다!">
+        <meta name="keywords" content="체크앤리뷰, CHECKnREVIEW, 리뷰플랫폼, 인플루언서리뷰, 블로그리뷰, 인스타그램리뷰, 유튜브리뷰, 체험단, 리뷰마케팅, 인플루언서마케팅, 제품리뷰, 서비스리뷰, 광고주플랫폼, 인플루언서플랫폼, 협찬, 체험단모집, 리뷰어모집, 블로거체험단, 인스타체험단, 유튜버체험단, 스마트스토어리뷰, 쿠팡리뷰, 네이버쇼핑리뷰, 마케팅플랫폼, 바이럴마케팅, 입소문마케팅, SNS마케팅, 콘텐츠마케팅, 브랜드홍보, 제품홍보, 리뷰작성, 포인트적립, 현금출금, 초보인플루언서, 신규인플루언서, 팔로워적어도가능, 이웃적어도가능">
+        <meta name="author" content="체크앤리뷰">
         <meta name="robots" content="index, follow">
         <meta name="googlebot" content="index, follow">
         <link rel="canonical" href="https://reviews-sphere.com">
@@ -150,38 +171,39 @@ app.get('/', (c) => {
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://reviews-sphere.com">
-        <meta property="og:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
+        <meta property="og:title" content="체크앤리뷰 - 인플루언서 리뷰 마케팅 플랫폼">
         <meta property="og:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
-        <meta property="og:image" content="https://reviews-sphere.com/static/logo.png">
+        <meta property="og:image" content="https://reviews-sphere.com/static/checknreview-logo.png">
         <meta property="og:locale" content="ko_KR">
-        <meta property="og:site_name" content="리뷰스피어">
+        <meta property="og:site_name" content="체크앤리뷰">
         
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:url" content="https://reviews-sphere.com">
-        <meta name="twitter:title" content="리뷰스피어 - 인플루언서 리뷰 마케팅 플랫폼">
+        <meta name="twitter:title" content="체크앤리뷰 - 인플루언서 리뷰 마케팅 플랫폼">
         <meta name="twitter:description" content="광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼. 블로그, 인스타그램, 유튜브 등 다양한 채널에서 진짜 리뷰를 만나보세요!">
-        <meta name="twitter:image" content="https://reviews-sphere.com/static/logo.png">
+        <meta name="twitter:image" content="https://reviews-sphere.com/static/checknreview-logo.png">
         
         <!-- Mobile App Meta -->
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="리뷰스피어">
-        <meta name="application-name" content="리뷰스피어">
-        <meta name="theme-color" content="#9333ea">
+        <meta name="apple-mobile-web-app-title" content="체크앤리뷰">
+        <meta name="application-name" content="체크앤리뷰">
+        <meta name="theme-color" content="#4FD1C5">
         
         <link rel="icon" type="image/png" href="/static/favicon.png">
         
         <!-- Google reCAPTCHA v3 -->
-        <script src="https://www.google.com/recaptcha/api.js?render=6LfYorkqAAAAAMlA1wsensitSC9vHr-hcMEBTwwUDT"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=6Ldt3nUsAAAAAPAG3UYPPLEQO6LHdA_f-rOf8fs8" 
+                async defer></script>
         
         <!-- Structured Data (JSON-LD) for Google -->
         <script type="application/ld+json">
         {
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "리뷰스피어",
-          "alternateName": ["R.SPHERE", "ReviewSphere"],
+          "name": "체크앤리뷰",
+          "alternateName": ["CHECKnREVIEW", "checknreview"],
           "url": "https://reviews-sphere.com",
           "description": "인플루언서 리뷰 마케팅 플랫폼",
           "potentialAction": {
@@ -195,9 +217,9 @@ app.get('/', (c) => {
         {
           "@context": "https://schema.org",
           "@type": "Organization",
-          "name": "리뷰스피어",
+          "name": "체크앤리뷰",
           "url": "https://reviews-sphere.com",
-          "logo": "https://reviews-sphere.com/static/logo.png",
+          "logo": "https://reviews-sphere.com/static/checknreview-logo.png",
           "description": "광고주와 인플루언서를 연결하는 리뷰 마케팅 플랫폼",
           "address": {
             "@type": "PostalAddress",
@@ -921,12 +943,12 @@ app.post('/api/contact/inquiry', async (c) => {
     const toEmail = 'bensmee96@gmail.com';
     
     const emailPayload = {
-      from: `ReviewSphere <${fromEmail}>`,
+      from: `CHECKnREVIEW <${fromEmail}>`,
       to: [toEmail],
       reply_to: reply_email,
       subject: `[1:1 문의] ${subject}`,
       html: `
-        <h2>리뷰스피어 1:1 문의</h2>
+        <h2>체크앤리뷰 1:1 문의</h2>
         <hr/>
         <p><strong>문의자:</strong> ${user.nickname} (${user.email})</p>
         <p><strong>회신 이메일:</strong> ${reply_email}</p>
@@ -936,7 +958,7 @@ app.post('/api/contact/inquiry', async (c) => {
         <h3>문의 내용:</h3>
         <p style="white-space: pre-wrap;">${message}</p>
         <hr/>
-        <p style="color: #666; font-size: 12px;">이 이메일은 리뷰스피어 1:1 문의 시스템에서 자동 발송되었습니다.</p>
+        <p style="color: #666; font-size: 12px;">이 이메일은 체크앤리뷰 1:1 문의 시스템에서 자동 발송되었습니다.</p>
         <p style="color: #666; font-size: 12px;">답장은 <strong>${reply_email}</strong>로 보내주세요.</p>
       `
     };

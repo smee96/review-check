@@ -36,7 +36,8 @@ async function uploadImageToR2(r2: R2Bucket, imageData: string, filename: string
     });
     
     // R2 URL 반환
-    return `/api/images/${filename}`;
+    const r2Url = `/api/images/${filename}`;
+    return r2Url;
   } catch (error) {
     console.error('R2 upload error:', error);
     throw error;
@@ -145,9 +146,10 @@ campaigns.post('/', authMiddleware, requireRole('advertiser', 'agency', 'rep', '
           await env.R2.delete(tempFilename);
           
           // DB 업데이트
+          const finalUrl = `/api/images/${finalFilename}`;
           await env.DB.prepare(
             'UPDATE campaigns SET thumbnail_image = ? WHERE id = ?'
-          ).bind(`/api/images/${finalFilename}`, campaignId).run();
+          ).bind(finalUrl, campaignId).run();
         }
       } catch (error) {
         console.error('R2 file rename failed:', error);
@@ -430,6 +432,8 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     const user = c.get('user');
     const { env } = c;
     
+    console.log('[캠페인 수정 API] 요청 시작 - campaignId:', campaignId, 'userId:', user.userId, 'role:', user.role);
+    
     // Check ownership and permissions
     const campaign = await env.DB.prepare(
       'SELECT advertiser_id, status, application_start_date, thumbnail_image FROM campaigns WHERE id = ?'
@@ -438,6 +442,13 @@ campaigns.put('/:id', authMiddleware, async (c) => {
     if (!campaign) {
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
+    
+    console.log('[캠페인 수정 API] 기존 캠페인 정보:', {
+      advertiser_id: campaign.advertiser_id,
+      status: campaign.status,
+      has_thumbnail: !!campaign.thumbnail_image,
+      thumbnail_type: campaign.thumbnail_image ? (campaign.thumbnail_image.startsWith('data:image') ? 'Base64' : 'URL') : 'null'
+    });
     
     if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
@@ -467,6 +478,13 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       pricing_type, product_value, sphere_points
     } = data;
     
+    console.log('[캠페인 수정 API] 받은 데이터:', {
+      title,
+      has_thumbnail_image: !!thumbnail_image,
+      thumbnail_length: thumbnail_image ? thumbnail_image.length : 0,
+      thumbnail_type: thumbnail_image ? (thumbnail_image.startsWith('data:image') ? 'Base64' : 'URL') : 'null'
+    });
+    
     if (!title) {
       return c.json({ error: '캠페인 제목을 입력해주세요' }, 400);
     }
@@ -480,26 +498,32 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       return c.json({ error: '유효하지 않은 과금 방식입니다' }, 400);
     }
     
+    console.log('[캠페인 수정 API] 썸네일 이미지 처리 시작');
     // Base64 이미지를 R2에 업로드
     let finalThumbnailImage = thumbnail_image;
     
     // 새로 업로드된 이미지가 Base64면 R2로 변환
     if (thumbnail_image && thumbnail_image.startsWith('data:image')) {
+      console.log('[캠페인 수정 API] 새 Base64 이미지 감지 - R2 업로드 시작');
       try {
         finalThumbnailImage = await uploadImageToR2(env.R2, thumbnail_image, `${campaignId}.jpg`);
+        console.log('[캠페인 수정 API] R2 업로드 성공 - URL:', finalThumbnailImage);
       } catch (error) {
-        console.error('R2 upload failed during update, using Base64 as fallback');
+        console.error('[캠페인 수정 API] R2 upload failed during update, using Base64 as fallback');
       }
     }
     // 기존 이미지가 Base64면 자동으로 R2로 변환
     else if (!thumbnail_image && campaign.thumbnail_image && campaign.thumbnail_image.startsWith('data:image')) {
+      console.log('[캠페인 수정 API] 기존 Base64 이미지 자동 변환 시작');
       try {
         finalThumbnailImage = await uploadImageToR2(env.R2, campaign.thumbnail_image, `${campaignId}.jpg`);
-        console.log(`Auto-converted Base64 to R2 for campaign ${campaignId}`);
+        console.log('[캠페인 수정 API] 자동 변환 성공 - URL:', finalThumbnailImage);
       } catch (error) {
-        console.error('R2 auto-conversion failed, keeping Base64');
+        console.error('[캠페인 수정 API] R2 auto-conversion failed, keeping Base64');
         finalThumbnailImage = campaign.thumbnail_image;
       }
+    } else {
+      console.log('[캠페인 수정 API] 썸네일 이미지 변경 없음 또는 이미 URL');
     }
     
     // 썸네일 이미지가 새로 제공된 경우만 업데이트

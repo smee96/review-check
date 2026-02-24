@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 지원 데이터 추가</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>테스트 지원 데이터 추가 도구</h1>
+    <button onclick="addApplications()">지원 데이터 추가 실행</button>
+    <div id="log" style="margin-top: 20px; white-space: pre-wrap; font-family: monospace;"></div>
+
+    <script>
+    async function addApplications() {
+        const log = document.getElementById('log');
+        log.textContent = '시작중...\n';
+
+        // 관리자 로그인
+        const loginEmail = 'admin@reviewsphere.com';
+        const loginPassword = 'admin123!@#';
+        
+        try {
+            log.textContent += '관리자 로그인 중...\n';
+            const loginRes = await axios.post('/api/auth/login', {
+                email: loginEmail,
+                password: loginPassword
+            });
+            
+            const token = loginRes.data.token;
+            const headers = { Authorization: `Bearer ${token}` };
+            log.textContent += '✓ 로그인 성공\n\n';
+
+            // 캠페인별 지원 설정
+            const campaigns = [
+                { id: 13, title: '치킨 캠페인', influencers: [17,18,19,20,21,22,23,24,25,26,27,28] },
+                { id: 14, title: '오늘은아르기닌', influencers: [17,18,19,20,21,22,23,24,25,26,29] },
+                { id: 16, title: '웨이큰', influencers: [17,18,19,20,21,22,23,24,25,26,27,28,30] },
+                { id: 17, title: '원두커피', influencers: [17,18,19,20,21,22,23,24,25,26,29] },
+                { id: 18, title: '화병', influencers: [17,18,19,20,21,22,23,24,25,26,27,28] }
+            ];
+
+            for (const campaign of campaigns) {
+                log.textContent += `\n📋 캠페인 ${campaign.id} (${campaign.title}) 처리 중...\n`;
+                
+                for (const num of campaign.influencers) {
+                    const email = `influencer${num}@test.com`;
+                    const password = 'Test1234!';
+                    
+                    try {
+                        // 인플루언서로 로그인
+                        const influencerLoginRes = await axios.post('/api/auth/login', {
+                            email: email,
+                            password: password
+                        });
+                        
+                        const influencerToken = influencerLoginRes.data.token;
+                        const influencerHeaders = { Authorization: `Bearer ${influencerToken}` };
+                        
+                        // 캠페인 지원
+                        await axios.post(`/api/campaigns/${campaign.id}/apply`, {}, influencerHeaders);
+                        log.textContent += `  ✓ ${email} 지원 완료\n`;
+                        
+                        // 약간의 딜레이
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (err) {
+                        if (err.response?.data?.error === '이미 지원한 캠페인입니다') {
+                            log.textContent += `  ⊙ ${email} 이미 지원됨\n`;
+                        } else {
+                            log.textContent += `  ✗ ${email} 실패: ${err.response?.data?.error || err.message}\n`;
+                        }
+                    }
+                }
+            }
+
+            log.textContent += '\n\n🎉 모든 작업 완료!\n';
+            log.textContent += '페이지를 새로고침하여 확인하세요.';
+            
+        } catch (error) {
+            log.textContent += '\n❌ 오류 발생: ' + (error.response?.data?.error || error.message);
+        }
+    }
+    </script>
+</body>
+</html>

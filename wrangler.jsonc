@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "review-spheres-v1",
+  "name": "checknreviews-v1",
   "compatibility_date": "2025-11-10",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
@@ -9,8 +9,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "review-spheres-v1-production",
-      "database_id": "907a208c-c1cb-4ca4-a5d7-73d7731f11b9"
+      "database_name": "checknreviews-v1-production",
+      "database_id": "c49d8889-d159-4473-bb01-8ad820e1dd1a"
     }
   ],
   "r2_buckets": [

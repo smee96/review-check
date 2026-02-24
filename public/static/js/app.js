@@ -8,6 +8,14 @@ class ReviewSphere {
     this.init();
   }
 
+  // 이미지 URL에 타임스탬프 추가 (캐시 우회)
+  addTimestampToImageUrl(url) {
+    if (!url) return url;
+    const timestamp = Date.now();
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}t=${timestamp}`;
+  }
+
   init() {
     // History API 이벤트 리스너 등록
     window.addEventListener('popstate', (event) => {
@@ -22,7 +30,7 @@ class ReviewSphere {
     // 로그인 여부와 관계없이 항상 홈 페이지로 시작
     // 초기 히스토리 상태 설정
     const state = { page: 'home', data: {} };
-    window.history.replaceState(state, 'R.SPHERE - 홈', '#home');
+    window.history.replaceState(state, 'CHECKnREVIEW - 홈', '#home');
     this.showHome(false);
   }
 
@@ -243,17 +251,17 @@ class ReviewSphere {
   // 페이지 제목 가져오기
   getPageTitle(page) {
     const titles = {
-      home: 'R.SPHERE - 홈',
-      bestCampaigns: 'R.SPHERE - 베스트 캠페인',
-      bestReviews: 'R.SPHERE - 베스트 리뷰',
-      myPage: 'R.SPHERE - 마이페이지',
-      campaignDetail: 'R.SPHERE - 캠페인 상세',
-      advertiserCampaigns: 'R.SPHERE - 캠페인 관리',
-      advertiserReviews: 'R.SPHERE - 리뷰 관리',
-      login: 'R.SPHERE - 로그인',
-      register: 'R.SPHERE - 회원가입'
+      home: 'CHECKnREVIEW - 홈',
+      bestCampaigns: 'CHECKnREVIEW - 베스트 캠페인',
+      bestReviews: 'CHECKnREVIEW - 베스트 리뷰',
+      myPage: 'CHECKnREVIEW - 마이페이지',
+      campaignDetail: 'CHECKnREVIEW - 캠페인 상세',
+      advertiserCampaigns: 'CHECKnREVIEW - 캠페인 관리',
+      advertiserReviews: 'CHECKnREVIEW - 리뷰 관리',
+      login: 'CHECKnREVIEW - 로그인',
+      register: 'CHECKnREVIEW - 회원가입'
     };
-    return titles[page] || 'R.SPHERE';
+    return titles[page] || 'CHECKnREVIEW';
   }
 
   // ============================================
@@ -391,10 +399,10 @@ class ReviewSphere {
             <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-10 sm:py-14">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3">
-                  진짜 리뷰, 리뷰스피어
+                  진짜 리뷰, 체크앤리뷰
                 </h2>
                 <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
-                  리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
+                  체크앤리뷰의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
@@ -507,7 +515,7 @@ class ReviewSphere {
                 </p>
                 <div class="mb-4">
                   <p class="text-2xl sm:text-3xl font-extrabold">
-                    스피어 포인트 <span class="text-3xl sm:text-4xl">5,000P 지급!</span>
+                    체크 포인트 <span class="text-3xl sm:text-4xl">5,000P 지급!</span>
                   </p>
                 </div>
                 ${this.user && this.user.role === 'influencer' ? `
@@ -592,7 +600,7 @@ class ReviewSphere {
                 <div class="flex items-center justify-center mb-4">
                   <i class="fas fa-rocket text-4xl sm:text-5xl text-white mr-3"></i>
                   <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold">
-                    리뷰스피어가 성장하고 있어요
+                    체크앤리뷰가 성장하고 있어요
                   </h2>
                 </div>
                 <div class="space-y-3 mb-6">
@@ -619,10 +627,10 @@ class ReviewSphere {
             <div class="min-w-full bg-gradient-to-br from-purple-600 to-blue-500 text-white py-10 sm:py-14">
               <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center">
                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3">
-                  진짜 리뷰, 리뷰스피어
+                  진짜 리뷰, 체크앤리뷰
                 </h2>
                 <p class="text-sm sm:text-base lg:text-lg text-purple-100 mb-6">
-                  리뷰스피어의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
+                  체크앤리뷰의 AI 매칭으로<br>광고주와 인플루언서를 직접 연결
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
                   ${this.user ? (
@@ -696,11 +704,11 @@ class ReviewSphere {
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
-                      <div class="w-full h-40 overflow-hidden bg-gray-100">
-                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                      <div class="w-full h-64 overflow-hidden bg-gray-100">
+                        <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-full object-cover">
                       </div>
                     ` : `
-                      <div class="w-full h-40 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
+                      <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
                         <i class="fas fa-image text-white text-5xl opacity-50"></i>
                       </div>
                     `}
@@ -825,8 +833,8 @@ class ReviewSphere {
                   return `
                   <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border-2 border-yellow-200 rounded-xl overflow-hidden hover:shadow-xl transition cursor-pointer flex-shrink-0" style="width: 280px;">
                     ${c.thumbnail_image ? `
-                      <div class="w-full h-40 overflow-hidden bg-gray-100 relative">
-                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                      <div class="w-full h-56 overflow-hidden bg-gray-100 relative">
+                        <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-full object-cover">
                         <div class="absolute top-2 left-2">
                           <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold shadow-md">
                             <i class="fas fa-crown mr-1"></i>Top ${idx + 1}
@@ -834,7 +842,7 @@ class ReviewSphere {
                         </div>
                       </div>
                     ` : `
-                      <div class="w-full h-40 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center relative">
+                      <div class="w-full h-64 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center relative">
                         <i class="fas fa-trophy text-white text-5xl opacity-50"></i>
                         <div class="absolute top-2 left-2">
                           <span class="px-3 py-1 bg-white text-yellow-800 rounded-full text-xs font-semibold shadow-md">
@@ -1146,7 +1154,7 @@ class ReviewSphere {
                   ${campaigns.map(c => `
                     <div onclick="app.viewCampaignDetail(${c.id})" class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer">
                       ${c.thumbnail_image ? `
-                        <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover">
+                        <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-64 object-cover">
                       ` : `
                         <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
                           <i class="fas fa-image text-white text-6xl opacity-50"></i>
@@ -1210,7 +1218,7 @@ class ReviewSphere {
                       </span>
                     </div>
                     ${c.thumbnail_image ? `
-                      <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover">
+                      <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-64 object-cover">
                     ` : `
                       <div class="w-full h-64 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
                         <i class="fas fa-trophy text-white text-6xl opacity-50"></i>
@@ -1366,7 +1374,7 @@ class ReviewSphere {
                       <div class="p-4">
                         <div class="flex items-center gap-2 mb-2">
                           ${review.campaign_thumbnail ? `
-                            <img src="${review.campaign_thumbnail}" alt="캠페인" class="w-8 h-8 rounded-full object-cover">
+                            <img src="${this.addTimestampToImageUrl(review.campaign_thumbnail)}" alt="캠페인" class="w-8 h-8 rounded-full object-cover">
                           ` : ''}
                           <div class="flex-1 min-w-0">
                             <h3 class="font-bold text-sm text-gray-800 truncate">${review.campaign_title}</h3>
@@ -1640,7 +1648,7 @@ class ReviewSphere {
                   <i class="fas fa-arrow-left mr-2"></i>뒤로가기
                 </button>
                 <div class="text-2xl font-bold text-purple-600">
-                  리뷰스피어
+                  체크앤리뷰
                 </div>
               </div>
               
@@ -1648,7 +1656,7 @@ class ReviewSphere {
                 <!-- 썸네일/상세 이미지 -->
                 ${campaign.thumbnail_image ? `
                   <div class="w-full bg-gray-100">
-                    <img src="${campaign.thumbnail_image}" alt="${campaign.title}" class="w-full max-h-[500px] object-contain">
+                    <img src="${this.addTimestampToImageUrl(campaign.thumbnail_image)}" alt="${campaign.title}" class="w-full max-h-[500px] object-contain">
                   </div>
                 ` : `
                   <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
@@ -1884,10 +1892,10 @@ class ReviewSphere {
                         </div>
                       </div>
                       
-                      <!-- 스피어 포인트 지급 정보 -->
+                      <!-- 체크 포인트 지급 정보 -->
                       <div class="bg-purple-50 p-4 rounded-lg mb-4">
                         <h3 class="font-semibold text-purple-900 mb-2 flex items-center">
-                          <i class="fas fa-coins mr-2"></i>스피어 포인트 지급
+                          <i class="fas fa-coins mr-2"></i>체크 포인트 지급
                         </h3>
                         <div class="text-sm text-purple-900 space-y-1">
                           <p class="flex justify-between">
@@ -1919,7 +1927,7 @@ class ReviewSphere {
                           <li><strong>구매후기를 반드시 작성</strong>해야 합니다</li>
                           <li>구매후기 작성 시 사진 또는 영상 필수 포함</li>
                           <li>상단에 <strong>[협찬]</strong> 문구를 표기해주세요 (누락 시 수정 요청)</li>
-                          <li>기간 내 구매후기 작성 완료 시 스피어 포인트가 지급됩니다</li>
+                          <li>기간 내 구매후기 작성 완료 시 체크 포인트가 지급됩니다</li>
                         </ul>
                       </div>
                       
@@ -1995,7 +2003,7 @@ class ReviewSphere {
                   ${(campaign.sphere_points > 0 || campaign.point_reward > 0) ? `
                     <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg mb-8 border-2 border-yellow-300">
                       <h3 class="font-semibold text-orange-900 mb-4 flex items-center text-lg">
-                        <i class="fas fa-coins text-yellow-600 mr-2"></i>스피어포인트 보상
+                        <i class="fas fa-coins text-yellow-600 mr-2"></i>체크포인트 보상
                       </h3>
                       <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -2433,15 +2441,6 @@ class ReviewSphere {
       const campaigns = response.data;
       const container = document.getElementById('adminCampaignsContent');
       
-      console.log('=== 관리자 캠페인 관리 디버깅 ===');
-      console.log('총 캠페인 수:', campaigns.length);
-      if (campaigns.length > 0) {
-        console.log('첫 번째 캠페인 데이터:', campaigns[0]);
-        console.log('is_best 필드:', campaigns[0].is_best);
-        console.log('is_best 타입:', typeof campaigns[0].is_best);
-      }
-      console.log('포인트 수수료율:', pointsFeeRate * 100 + '%');
-
       container.innerHTML = `
         <div class="space-y-3 sm:space-y-4">
           ${campaigns.length === 0 ? '<p class="text-gray-600">등록된 캠페인이 없습니다</p>' : ''}
@@ -3162,7 +3161,7 @@ class ReviewSphere {
                 <!-- 썸네일 이미지 -->
                 ${c.thumbnail_image ? `
                   <div class="w-full sm:w-32 h-32 flex-shrink-0">
-                    <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                    <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-full object-cover">
                   </div>
                 ` : `
                   <div class="w-full sm:w-32 h-32 flex-shrink-0 bg-gray-200 flex items-center justify-center">
@@ -3584,10 +3583,10 @@ class ReviewSphere {
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">모집인원 *</label>
-              <input type="number" id="campaignSlots" value="10" placeholder="10" min="10" required
-                onfocus="this.dataset.prevValue=this.value; this.value=''"
-                onblur="if(this.value=='') {this.value=this.dataset.prevValue||'10'}; if(parseInt(this.value) < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateNewPricingCost()"
-                oninput="if(parseInt(this.value) >= 10) app.calculateNewPricingCost()"
+              <input type="text" id="campaignSlots" value="10" placeholder="10" required
+                oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
+                onfocus="app.clearDefaultZero(this)"
+                onblur="if(this.value=='') {this.value='10'}; const numValue=parseInt(this.value.replace(/,/g,'')); if(numValue < 10) {alert('모집인원은 최소 10명 이상이어야 합니다'); this.value='10'}; app.calculateNewPricingCost()"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
               <p class="text-xs text-gray-500 mt-1">최소 10명부터 모집 가능합니다</p>
             </div>
@@ -3839,7 +3838,7 @@ class ReviewSphere {
                     <i class="fas fa-coins text-orange-600"></i>
                   </div>
                 </div>
-                <p class="text-xs text-gray-600">스피어포인트만 지급</p>
+                <p class="text-xs text-gray-600">체크포인트만 지급</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-orange-600 font-semibold mt-1">✨ 가장 높은 리뷰 퀄리티</p>
               </div>
@@ -3885,7 +3884,7 @@ class ReviewSphere {
                   <span class="font-semibold text-gray-800">상품 + 포인트</span>
                   <i class="fas fa-gift text-blue-600"></i>
                 </div>
-                <p class="text-xs text-gray-600">상품 + 스피어포인트</p>
+                <p class="text-xs text-gray-600">상품 + 체크포인트</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-blue-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
@@ -3916,7 +3915,7 @@ class ReviewSphere {
                   <span class="font-semibold text-gray-800">이용권 + 포인트</span>
                   <i class="fas fa-spa text-teal-600"></i>
                 </div>
-                <p class="text-xs text-gray-600">이용권 + 스피어포인트</p>
+                <p class="text-xs text-gray-600">이용권 + 체크포인트</p>
                 <p class="text-xs text-gray-500 mt-1">건당 10,000원 + 포인트 ${pointsFeeRate}% 수수료</p>
                 <p class="text-xs text-teal-600 font-semibold mt-1">💰 포인트로 리뷰 품질 향상</p>
               </div>
@@ -3936,10 +3935,10 @@ class ReviewSphere {
             <p class="text-xs text-gray-500 mt-1" id="productValueHint">리뷰어에게 제공되는 상품 또는 이용권의 가치를 입력하세요</p>
           </div>
 
-          <!-- 스피어포인트 입력 (포인트 포함 시만 표시) -->
+          <!-- 체크포인트 입력 (포인트 포함 시만 표시) -->
           <div id="spherePointsSection" class="mb-4 hidden">
             <label class="block text-sm font-medium text-gray-700 mb-2" id="spherePointsLabel">
-              스피어포인트 (P) *
+              체크포인트 (P) *
             </label>
             <input type="text" id="campaignSpherePoints" value="0"
               oninput="app.formatNumberInput(this); app.calculateNewPricingCost()"
@@ -3970,6 +3969,14 @@ class ReviewSphere {
       if (slotsInput && !slotsInput.value) {
         slotsInput.value = '10';
       }
+      
+      // 모든 숫자 입력 필드에 콤마 적용
+      const numberInputs = document.querySelectorAll('#campaignSlots, #campaignBudget, #campaignProductValue, #campaignSpherePoints');
+      numberInputs.forEach(input => {
+        if (input && input.value) {
+          this.formatNumberInput(input);
+        }
+      });
       
       this.handlePricingTypeChange(); // 초기 과금 타입에 따른 UI 설정 (내부에서 calculateNewPricingCost 호출)
       this.initializeDatePickers();
@@ -4189,7 +4196,10 @@ class ReviewSphere {
 
   handleThumbnailUpload(event) {
     const file = event.target.files[0];
-    if (!file) return;
+    
+    if (!file) {
+      return;
+    }
 
     // 파일 형식 검증
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp'];
@@ -4235,7 +4245,7 @@ class ReviewSphere {
           event.target.value = '';
           return;
         }
-
+        
         // 검증 통과 - 미리보기 표시
         document.getElementById('thumbnailPreview').style.display = 'block';
         document.getElementById('thumbnailPreviewImage').src = e.target.result;
@@ -4245,8 +4255,20 @@ class ReviewSphere {
         // Base64 데이터 저장
         this.thumbnailData = e.target.result;
       };
+      
+      img.onerror = () => {
+        alert('이미지를 불러올 수 없습니다. 올바른 이미지 파일인지 확인해주세요.');
+        event.target.value = '';
+      };
+      
       img.src = e.target.result;
     };
+    
+    reader.onerror = () => {
+      alert('파일을 읽는 중 오류가 발생했습니다.');
+      event.target.value = '';
+    };
+    
     reader.readAsDataURL(file);
   }
 
@@ -4263,7 +4285,7 @@ class ReviewSphere {
   async handleCreateCampaign() {
     try {
       const channelType = document.getElementById('campaignChannelType').value;
-      const slots = parseInt(document.getElementById('campaignSlots').value || 10);
+      const slots = parseInt(document.getElementById('campaignSlots').value.replace(/,/g, '') || 10);
       
       if (!channelType) {
         alert('캠페인 채널을 선택해주세요');
@@ -4297,7 +4319,7 @@ class ReviewSphere {
       // 포인트만 지급인 경우
       if (pricingType === 'points_only') {
         if (spherePoints < 10000) {
-          alert('스피어포인트는 최소 10,000P 이상이어야 합니다');
+          alert('체크포인트는 최소 10,000P 이상이어야 합니다');
           return;
         }
       }
@@ -4315,7 +4337,7 @@ class ReviewSphere {
           return;
         }
         if (spherePoints < 10000) {
-          alert('스피어포인트는 최소 10,000P 이상이어야 합니다');
+          alert('체크포인트는 최소 10,000P 이상이어야 합니다');
           return;
         }
       }
@@ -4464,7 +4486,7 @@ class ReviewSphere {
         // 기존 데이터 채우기
         document.getElementById('campaignTitle').value = campaign.title || '';
         document.getElementById('campaignDescription').value = campaign.description || '';
-        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        document.getElementById('campaignSlots').value = (campaign.slots || 10).toLocaleString();
         
         // 채널 타입 선택
         const channelTypeSelect = document.getElementById('campaignChannelType');
@@ -4600,9 +4622,9 @@ class ReviewSphere {
             productValueField.value = campaign.product_value.toLocaleString();
           }
           
-          // 스피어포인트
+          // 체크포인트
           const spherePointsField = document.getElementById('campaignSpherePoints');
-          console.log('[editCampaign] 스피어포인트 필드:', spherePointsField, '값:', campaign.sphere_points);
+          console.log('[editCampaign] 체크포인트 필드:', spherePointsField, '값:', campaign.sphere_points);
           if (spherePointsField && campaign.sphere_points) {
             spherePointsField.value = campaign.sphere_points.toLocaleString();
           }
@@ -4662,7 +4684,7 @@ class ReviewSphere {
         // 기존 데이터 채우기 (제목에 "(복사본)" 추가)
         document.getElementById('campaignTitle').value = campaign.title + ' (복사본)';
         document.getElementById('campaignDescription').value = campaign.description || '';
-        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        document.getElementById('campaignSlots').value = (campaign.slots || 10).toLocaleString();
         
         // 채널 타입 선택
         const channelTypeSelect = document.getElementById('campaignChannelType');
@@ -4788,7 +4810,7 @@ class ReviewSphere {
             productValueField.value = campaign.product_value.toLocaleString();
           }
           
-          // 스피어포인트
+          // 체크포인트
           const spherePointsField = document.getElementById('campaignSpherePoints');
           if (spherePointsField && campaign.sphere_points) {
             spherePointsField.value = campaign.sphere_points.toLocaleString();
@@ -4817,8 +4839,15 @@ class ReviewSphere {
   
   async handleUpdateCampaign(campaignId) {
     try {
+      console.log('[캠페인 수정] 시작 - campaignId:', campaignId);
+      console.log('[캠페인 수정] 썸네일 데이터 존재 여부:', !!this.thumbnailData);
+      if (this.thumbnailData) {
+        console.log('[캠페인 수정] 썸네일 데이터 길이:', this.thumbnailData.length);
+        console.log('[캠페인 수정] 썸네일 데이터 타입:', this.thumbnailData.substring(0, 30));
+      }
+      
       const channelType = document.getElementById('campaignChannelType').value;
-      const slots = parseInt(document.getElementById('campaignSlots').value || 10);
+      const slots = parseInt(document.getElementById('campaignSlots').value.replace(/,/g, '') || 10);
       
       if (!channelType) {
         alert('캠페인 채널을 선택해주세요');
@@ -4947,7 +4976,7 @@ class ReviewSphere {
         // 기존 데이터 채우기
         document.getElementById('campaignTitle').value = campaign.title || '';
         document.getElementById('campaignDescription').value = campaign.description || '';
-        document.getElementById('campaignSlots').value = campaign.slots || 10;
+        document.getElementById('campaignSlots').value = (campaign.slots || 10).toLocaleString();
         
         // 채널 타입 선택
         const channelTypeSelect = document.getElementById('campaignChannelType');
@@ -5070,7 +5099,7 @@ class ReviewSphere {
             productValueField.value = campaign.product_value.toLocaleString();
           }
           
-          // 스피어포인트
+          // 체크포인트
           const spherePointsField = document.getElementById('campaignSpherePoints');
           if (spherePointsField && campaign.sphere_points) {
             spherePointsField.value = campaign.sphere_points.toLocaleString();
@@ -5612,7 +5641,7 @@ class ReviewSphere {
             <div class="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-5 sm:p-6 rounded-lg shadow-lg mb-4 sm:mb-6">
               <div class="flex items-center justify-between mb-4">
                 <div>
-                  <p class="text-xs sm:text-sm opacity-90 mb-1">보유 스피어포인트</p>
+                  <p class="text-xs sm:text-sm opacity-90 mb-1">보유 체크포인트</p>
                   <h2 class="text-3xl sm:text-4xl font-bold">${pointsBalance.toLocaleString()} <span class="text-xl">P</span></h2>
                 </div>
                 <div class="text-4xl sm:text-5xl opacity-80">
@@ -5974,7 +6003,7 @@ class ReviewSphere {
             ${favoriteCampaigns.map(c => `
               <div class="border rounded-lg overflow-hidden hover:shadow-md transition">
                 ${c.thumbnail_image ? `
-                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-32 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                  <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-56 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
                 ` : ''}
                 <div class="p-4">
                   <div class="flex items-start justify-between mb-2">
@@ -6091,7 +6120,16 @@ class ReviewSphere {
       `;
     } catch (error) {
       console.error('Failed to load profile:', error);
-      contentDiv.innerHTML = '<div class="p-4 sm:p-6"><p class="text-red-600">데이터를 불러오는데 실패했습니다</p></div>';
+      console.error('Error response:', error.response?.data);
+      const errorDetails = error.response?.data?.details || error.message;
+      const errorStack = error.response?.data?.stack;
+      contentDiv.innerHTML = `
+        <div class="p-4 sm:p-6">
+          <p class="text-red-600 font-bold mb-2">데이터를 불러오는데 실패했습니다</p>
+          <p class="text-sm text-gray-600 mb-2">오류: ${errorDetails}</p>
+          ${errorStack ? `<pre class="text-xs bg-gray-100 p-2 rounded overflow-x-auto">${errorStack}</pre>` : ''}
+        </div>
+      `;
     }
   }
 
@@ -6184,7 +6222,8 @@ class ReviewSphere {
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">팔로워 수</label>
-              <input type="number" id="followerCount" value="${profile.follower_count || 0}"
+              <input type="text" id="followerCount" value="${(profile.follower_count || 0).toLocaleString()}"
+                oninput="app.formatNumberInput(this)"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
             </div>
             <div>
@@ -6400,7 +6439,7 @@ class ReviewSphere {
             ${favoriteCampaigns.map(c => `
               <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
                 ${c.thumbnail_image ? `
-                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-64 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
+                  <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-64 object-cover cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
                 ` : `
                   <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center cursor-pointer" onclick="app.viewCampaignDetail(${c.id})">
                     <i class="fas fa-image text-white text-6xl opacity-50"></i>
@@ -6522,7 +6561,7 @@ class ReviewSphere {
               <!-- 썸네일 이미지 -->
               ${c.thumbnail_image ? `
                 <div class="w-full h-64 overflow-hidden bg-gray-100">
-                  <img src="${c.thumbnail_image}" alt="${c.title}" class="w-full h-full object-cover">
+                  <img src="${this.addTimestampToImageUrl(c.thumbnail_image)}" alt="${c.title}" class="w-full h-full object-cover">
                 </div>
               ` : `
                 <div class="w-full h-64 bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
@@ -7340,6 +7379,30 @@ class ReviewSphere {
 
   async handleUpdateInfluencerProfile() {
     try {
+      // 필수 필드 확인
+      const requiredFields = {
+        'realName': '실명',
+        'birthDate': '생년월일',
+        'gender': '성별',
+        'contactPhone': '연락처',
+        'accountHolderName': '예금주명',
+        'bankName': '은행명',
+        'accountNumber': '계좌번호',
+        'shippingName': '받으시는 분',
+        'shippingPhone': '배송지 연락처',
+        'shippingPostalCode': '우편번호',
+        'shippingAddress': '주소'
+      };
+      
+      for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+        const element = document.getElementById(fieldId);
+        if (!element || !element.value.trim()) {
+          alert(`${fieldName}을(를) 입력해주세요`);
+          element?.focus();
+          return;
+        }
+      }
+      
       const data = {
         // 개인 정보
         real_name: document.getElementById('realName').value,
@@ -7352,7 +7415,7 @@ class ReviewSphere {
         youtube_channel: document.getElementById('youtubeChannel').value,
         blog_url: document.getElementById('blogUrl').value,
         tiktok_handle: document.getElementById('tiktokHandle').value,
-        follower_count: document.getElementById('followerCount').value || 0,
+        follower_count: parseInt(document.getElementById('followerCount').value.replace(/,/g, '') || 0),
         category: document.getElementById('category').value,
         
         // 정산 정보
@@ -7369,10 +7432,10 @@ class ReviewSphere {
         shipping_address_detail: document.getElementById('shippingAddressDetail').value,
         
         // 동의 정보
-        portrait_rights_consent: document.getElementById('portraitRightsConsent').checked,
-        personal_info_consent: document.getElementById('personalInfoConsent').checked,
-        content_usage_consent: document.getElementById('contentUsageConsent').checked,
-        third_party_provision_consent: document.getElementById('thirdPartyProvisionConsent').checked,
+        portrait_rights_consent: document.getElementById('portraitRightsConsent')?.checked || false,
+        personal_info_consent: document.getElementById('personalInfoConsent')?.checked || false,
+        content_usage_consent: document.getElementById('contentUsageConsent')?.checked || false,
+        third_party_provision_consent: document.getElementById('thirdPartyProvisionConsent')?.checked || false,
       };
 
       await axios.put('/api/profile/influencer', data, this.getAuthHeaders());
@@ -7381,6 +7444,7 @@ class ReviewSphere {
       // 마이페이지로 이동 (프로필 완성도 재확인)
       this.showMyPage();
     } catch (error) {
+      console.error('Profile update error:', error);
       alert(error.response?.data?.error || '프로필 업데이트에 실패했습니다');
     }
   }
@@ -7968,13 +8032,17 @@ class ReviewSphere {
     errorElement.classList.add('hidden');
     
     // Get reCAPTCHA token
+    let recaptchaToken = null;
     try {
-      const recaptchaToken = await grecaptcha.execute('6LfYorkqAAAAAMlA1wsensitSC9vHr-hcMEBTwwUDT', { action: 'register' });
-      this.register(email, nickname, password, role, recaptchaToken);
+      if (typeof grecaptcha !== 'undefined') {
+        recaptchaToken = await grecaptcha.execute('6Ldt3nUsAAAAAPAG3UYPPLEQO6LHdA_f-rOf8fs8', { action: 'register' });
+      }
     } catch (error) {
-      alert('보안 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
-      console.error('reCAPTCHA error:', error);
+      console.warn('reCAPTCHA error (proceeding without token):', error);
+      // reCAPTCHA 실패해도 계속 진행
     }
+    
+    this.register(email, nickname, password, role, recaptchaToken);
   }
 
 
@@ -8007,7 +8075,7 @@ class ReviewSphere {
               <div class="prose max-w-none space-y-6 text-sm">
                 <section>
                   <h2 class="text-xl font-bold mb-3">제1조 (목적)</h2>
-                  <p>본 약관은 리뷰스피어(이하 "회사")가 제공하는 인플루언서 마케팅 플랫폼 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                  <p>본 약관은 체크앤리뷰(이하 "회사")가 제공하는 인플루언서 마케팅 플랫폼 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
                 </section>
 
                 <section>
@@ -8378,7 +8446,7 @@ class ReviewSphere {
               <div class="prose max-w-none space-y-6 text-sm">
                 <section>
                   <h2 class="text-xl font-bold mb-3">1. 개인정보의 수집 및 이용 목적</h2>
-                  <p>리뷰스피어((주)모빈)는 다음의 목적을 위하여 개인정보를 처리합니다:</p>
+                  <p>체크앤리뷰((주)모빈)는 다음의 목적을 위하여 개인정보를 처리합니다:</p>
                   <ul class="list-disc pl-5 space-y-2">
                     <li>회원 가입 및 관리: 회원 자격 유지·관리, 본인확인, 부정이용 방지</li>
                     <li>서비스 제공: 캠페인 매칭, 포인트 적립 및 출금, 고객상담</li>
@@ -8722,14 +8790,14 @@ class ReviewSphere {
       productValueInput.required = false;
       // 값은 유지 (계산 시 과금 타입을 보고 조건부로 0 사용)
       
-      // 스피어포인트 입력 표시
+      // 체크포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
       
-      // 스피어포인트 라벨 기본값으로 복원
+      // 체크포인트 라벨 기본값으로 복원
       const spherePointsLabel = document.getElementById('spherePointsLabel');
       const spherePointsHint = document.getElementById('spherePointsHint');
-      if (spherePointsLabel) spherePointsLabel.textContent = '스피어포인트 (P) *';
+      if (spherePointsLabel) spherePointsLabel.textContent = '체크포인트 (P) *';
       if (spherePointsHint) spherePointsHint.textContent = '최소 5,000P 이상 (1포인트 = 1원, 1만P 이상 현금 출금 가능)';
     }
     // 구매+포인트인 경우
@@ -8745,14 +8813,14 @@ class ReviewSphere {
       
       productValueHint.textContent = '1포인트 = 1원 (1만P 이상 현금 출금 가능)';
       
-      // 스피어포인트 입력 표시
+      // 체크포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
       
-      // 스피어포인트(리뷰) 라벨 변경
+      // 체크포인트(리뷰) 라벨 변경
       const spherePointsLabel = document.getElementById('spherePointsLabel');
       const spherePointsHint = document.getElementById('spherePointsHint');
-      if (spherePointsLabel) spherePointsLabel.textContent = '스피어포인트(리뷰) *';
+      if (spherePointsLabel) spherePointsLabel.textContent = '체크포인트(리뷰) *';
       if (spherePointsHint) spherePointsHint.textContent = '최소 5,000P 이상 (1포인트 = 1원, 1만P 이상 현금 출금 가능)';
     }
     // 포인트 포함 타입 (상품+포인트, 이용권+포인트)
@@ -8761,7 +8829,7 @@ class ReviewSphere {
       if (productValueSection) productValueSection.classList.remove('hidden');
       productValueInput.required = true;
       
-      // 스피어포인트 입력 표시
+      // 체크포인트 입력 표시
       spherePointsSection.classList.remove('hidden');
       spherePointsInput.required = true;
       
@@ -8778,10 +8846,10 @@ class ReviewSphere {
       const productValueUnit = document.getElementById('productValueUnit');
       if (productValueUnit) productValueUnit.textContent = '(원)';
       
-      // 스피어포인트 라벨 기본값으로 복원
+      // 체크포인트 라벨 기본값으로 복원
       const spherePointsLabel = document.getElementById('spherePointsLabel');
       const spherePointsHint = document.getElementById('spherePointsHint');
-      if (spherePointsLabel) spherePointsLabel.textContent = '스피어포인트 (P) *';
+      if (spherePointsLabel) spherePointsLabel.textContent = '체크포인트 (P) *';
       if (spherePointsHint) spherePointsHint.textContent = '최소 5,000P 이상 (1포인트 = 1원, 1만P 이상 현금 출금 가능)';
     }
     // 상품만 또는 이용권만
@@ -8790,7 +8858,7 @@ class ReviewSphere {
       if (productValueSection) productValueSection.classList.remove('hidden');
       productValueInput.required = true;
       
-      // 스피어포인트 입력 숨김
+      // 체크포인트 입력 숨김
       spherePointsSection.classList.add('hidden');
       spherePointsInput.required = false;
       // 값은 유지 (계산 시 과금 타입을 보고 조건부로 0 사용)
@@ -8851,19 +8919,19 @@ class ReviewSphere {
     
     // 포인트만 지급인 경우
     if (pricingType === 'points_only' && spherePoints <= 0) {
-      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">스피어포인트를 입력해주세요 (최소 10,000P)</p>';
+      summaryDiv.innerHTML = '<p class="text-sm text-gray-600 text-center">체크포인트를 입력해주세요 (최소 10,000P)</p>';
       return;
     }
     
     // 포인트만 지급인 경우 최소값 체크
     if (pricingType === 'points_only' && spherePoints < 10000) {
-      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 10,000P 이상이어야 합니다</p>';
+      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">체크포인트는 최소 10,000P 이상이어야 합니다</p>';
       return;
     }
     
     // 포인트 포함 타입인 경우 최소값 체크
     if ((pricingType === 'purchase_with_points' || pricingType === 'product_with_points' || pricingType === 'voucher_with_points') && spherePoints > 0 && spherePoints < 10000) {
-      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">스피어포인트는 최소 10,000P 이상이어야 합니다</p>';
+      summaryDiv.innerHTML = '<p class="text-sm text-red-600 text-center">체크포인트는 최소 10,000P 이상이어야 합니다</p>';
       return;
     }
     
@@ -8903,11 +8971,11 @@ class ReviewSphere {
             <!-- 구매+포인트: 비용 계산 상세 -->
             <div class="space-y-2 text-sm mt-3">
               <div class="flex justify-between">
-                <span class="text-gray-700">스피어포인트(페이백):</span>
+                <span class="text-gray-700">체크포인트(페이백):</span>
                 <span class="font-semibold text-orange-600">${pricing.productValue.toLocaleString()}P</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-700">스피어포인트(리뷰):</span>
+                <span class="text-gray-700">체크포인트(리뷰):</span>
                 <span class="font-semibold text-blue-600">${pricing.spherePoints.toLocaleString()}P</span>
               </div>
               <div class="flex justify-between pt-2 border-t border-gray-200">
@@ -8943,12 +9011,12 @@ class ReviewSphere {
               </div>
             </div>
             
-            <!-- 2. 스피어 포인트 카드 (리뷰 댓가만) -->
+            <!-- 2. 체크 포인트 카드 (리뷰 댓가만) -->
             <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="text-gray-800 font-bold">
-                    <i class="fas fa-star mr-1 text-blue-600"></i>스피어 포인트 (${slots}명)
+                    <i class="fas fa-star mr-1 text-blue-600"></i>체크 포인트 (${slots}명)
                   </span>
                   <span class="font-bold text-xl text-blue-600">${(pricing.spherePoints * slots).toLocaleString()}P</span>
                 </div>
@@ -9012,7 +9080,7 @@ class ReviewSphere {
                     <span class="font-semibold">${(pricing.productValue * slots).toLocaleString()}원</span>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">스피어 포인트:</span>
+                    <span class="text-gray-600">체크 포인트:</span>
                     <span class="font-semibold">${(pricing.spherePoints * slots).toLocaleString()}원</span>
                   </div>
                   <div class="flex justify-between text-sm">
@@ -9035,12 +9103,12 @@ class ReviewSphere {
               </div>
             </div>
           ` : `
-            <!-- 일반 과금: 스피어 포인트 -->
+            <!-- 일반 과금: 체크 포인트 -->
             <div class="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
               <div class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="text-gray-800 font-bold">
-                    <i class="fas fa-star mr-1 text-blue-600"></i>스피어 포인트 (${slots}명)
+                    <i class="fas fa-star mr-1 text-blue-600"></i>체크 포인트 (${slots}명)
                   </span>
                   <span class="font-bold text-xl text-blue-600">${(pricing.spherePoints * slots).toLocaleString()}P</span>
                 </div>
@@ -9107,7 +9175,7 @@ class ReviewSphere {
                   ` : ''}
                   ${pricing.spherePoints > 0 ? `
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">스피어 포인트:</span>
+                    <span class="text-gray-600">체크 포인트:</span>
                     <span class="font-semibold">${(pricing.spherePoints * slots).toLocaleString()}원</span>
                   </div>
                   ` : ''}
