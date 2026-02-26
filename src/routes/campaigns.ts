@@ -336,8 +336,8 @@ campaigns.get('/:id', authMiddleware, async (c) => {
       ).bind(campaignId, user.userId).first();
       has_applied = !!application;
       
-      // pending 상태나 미결제 캠페인은 지원 불가
-      if (campaign.status === 'pending' || campaign.payment_status !== 'paid') {
+      // pending 상태는 지원 불가 (승인 대기 중)
+      if (campaign.status === 'pending') {
         can_apply = false;
       }
       
