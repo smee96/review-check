@@ -285,17 +285,15 @@ campaigns.get('/', async (c) => {
          COALESCE(COUNT(a.id), 0) as application_count
          FROM campaigns c
          LEFT JOIN applications a ON a.campaign_id = c.id
-         WHERE c.status IN ('recruiting', 'in_progress', 'suspended', 'completed', 'cancelled', 'pending', 'approved')
+         WHERE c.status IN ('pending', 'approved', 'suspended', 'completed', 'cancelled')
          GROUP BY c.id
          ORDER BY 
            CASE 
-             WHEN c.status = 'recruiting' THEN 0
-             WHEN c.status = 'in_progress' THEN 1
-             WHEN c.status = 'approved' THEN 1
-             WHEN c.status = 'suspended' THEN 2
-             WHEN c.status = 'completed' THEN 3
-             WHEN c.status = 'cancelled' THEN 4
-             WHEN c.status = 'pending' THEN 5
+             WHEN c.status = 'approved' THEN 0
+             WHEN c.status = 'suspended' THEN 1
+             WHEN c.status = 'completed' THEN 2
+             WHEN c.status = 'cancelled' THEN 3
+             WHEN c.status = 'pending' THEN 4
            END,
            c.created_at DESC`
       ).all();
@@ -454,10 +452,18 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
-    // 광고주 권한 체크: 모집 중이거나 진행 중인 캠페인, 또는 신청 시작일 이후면 수정 불가
+    // 광고주 권한 체크: 대기(pending) 상태에서만 수정 가능
+    // 승인(approved), 일시중지(suspended), 완료(completed), 취소(cancelled)는 수정 불가
     if (user.role !== 'admin') {
-      if (campaign.status === 'recruiting' || campaign.status === 'in_progress' || campaign.status === 'suspended') {
-        return c.json({ error: '모집 중이거나 진행 중인 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.' }, 403);
+      const editBlockedStatuses = ['approved', 'suspended', 'completed', 'cancelled'];
+      if (editBlockedStatuses.includes(campaign.status)) {
+        const statusName = {
+          'approved': '승인된',
+          'suspended': '일시 중지된',
+          'completed': '완료된',
+          'cancelled': '취소된'
+        }[campaign.status] || campaign.status;
+        return c.json({ error: `${statusName} 캠페인은 수정할 수 없습니다. 관리자에게 문의해주세요.` }, 403);
       }
       
       const now = new Date();
@@ -605,13 +611,25 @@ campaigns.post('/:id/apply', authMiddleware, requireRole('influencer'), async (c
     } = await c.req.json();
     const { env } = c;
     
-    // Check if campaign exists and is recruiting
+    // Check if campaign exists and is approved (recruiting)
     const campaign = await env.DB.prepare(
       'SELECT * FROM campaigns WHERE id = ? AND status = ?'
-    ).bind(campaignId, 'recruiting').first();
+    ).bind(campaignId, 'approved').first();
     
     if (!campaign) {
-      return c.json({ error: '모집 중인 캠페인을 찾을 수 없습니다' }, 404);
+      return c.json({ error: '승인된 캠페인을 찾을 수 없습니다' }, 404);
+    }
+    
+    // Check if within application period
+    const now = new Date();
+    const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];
+    
+    if (campaign.application_start_date && koreaDate < campaign.application_start_date) {
+      return c.json({ error: '신청 기간이 아직 시작되지 않았습니다' }, 400);
+    }
+    
+    if (campaign.application_end_date && koreaDate > campaign.application_end_date) {
+      return c.json({ error: '신청 기간이 종료되었습니다' }, 400);
     }
     
     // Check if already applied

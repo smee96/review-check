@@ -45,8 +45,14 @@ admin.put('/campaigns/:id/status', async (c) => {
     const campaignId = c.req.param('id');
     const { status } = await c.req.json();
     
-    // 유효한 상태값: pending, recruiting, in_progress, suspended, completed, cancelled
-    if (!['pending', 'recruiting', 'in_progress', 'suspended', 'completed', 'cancelled'].includes(status)) {
+    // 프론트엔드에서 recruiting/in_progress를 보낼 수 있으므로 approved로 변환
+    let dbStatus = status;
+    if (status === 'recruiting' || status === 'in_progress') {
+      dbStatus = 'approved';
+    }
+    
+    // 유효한 상태값: pending, approved, suspended, completed, cancelled
+    if (!['pending', 'approved', 'suspended', 'completed', 'cancelled'].includes(dbStatus)) {
       return c.json({ error: '유효하지 않은 상태입니다' }, 400);
     }
     
@@ -54,7 +60,7 @@ admin.put('/campaigns/:id/status', async (c) => {
     
     await env.DB.prepare(
       'UPDATE campaigns SET status = ?, updated_at = ? WHERE id = ?'
-    ).bind(status, getCurrentDateTime(), campaignId).run();
+    ).bind(dbStatus, getCurrentDateTime(), campaignId).run();
     
     return c.json({ success: true, message: '캠페인 상태가 변경되었습니다' });
   } catch (error) {
@@ -306,9 +312,15 @@ admin.get('/stats', async (c) => {
     // 전체 통계
     const totalUsers = await env.DB.prepare('SELECT COUNT(*) as count FROM users').first();
     const totalCampaigns = await env.DB.prepare('SELECT COUNT(*) as count FROM campaigns').first();
+    // 현재 모집 중인 캠페인 = approved 상태 + 신청기간 내
+    const currentDate = new Date();
+    const koreaDate = new Date(currentDate.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];
     const activeCampaigns = await env.DB.prepare(
-      `SELECT COUNT(*) as count FROM campaigns WHERE status = 'recruiting'`
-    ).first();
+      `SELECT COUNT(*) as count FROM campaigns 
+       WHERE status = 'approved' 
+       AND application_start_date <= ? 
+       AND application_end_date >= ?`
+    ).bind(koreaDate, koreaDate).first();
     
     return c.json({
       todayVisitors,
