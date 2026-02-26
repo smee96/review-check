@@ -2037,7 +2037,7 @@ class ReviewSphere {
                       <p class="text-sm text-orange-600 text-center mt-2">
                         <i class="fas fa-info-circle mr-1"></i>광고주의 결제 완료 후 지원 가능합니다!
                       </p>
-                    ` : campaign.payment_status === 'paid' && (campaign.status === 'recruiting' || campaign.status === 'in_progress') ? `
+                    ` : (campaign.status === 'recruiting' || campaign.status === 'in_progress' || campaign.status === 'approved') ? `
                       ${this.user?.role === 'influencer' ? `
                         ${campaign.has_applied ? `
                           <div class="w-full bg-gray-400 text-white py-4 rounded-lg text-lg font-bold text-center cursor-not-allowed">
