@@ -1,7 +1,7 @@
 // Admin Routes
 
 import { Hono } from 'hono';
-import { getCurrentDateTime } from '../utils';
+import { getCurrentDateTime, hashPassword } from '../utils';
 import { authMiddleware, requireRole } from '../middleware/auth';
 
 type Bindings = {
@@ -402,6 +402,46 @@ admin.post('/seed-applications', async (c) => {
   } catch (error) {
     console.error('Seed applications error:', error);
     return c.json({ error: '테스트 데이터 생성 중 오류가 발생했습니다' }, 500);
+  }
+});
+
+// 관리자 - 사용자 비밀번호 변경
+admin.post('/users/:id/reset-password', async (c) => {
+  try {
+    const userId = c.req.param('id');
+    const { newPassword } = await c.req.json();
+    
+    if (!newPassword || newPassword.length < 8) {
+      return c.json({ error: '비밀번호는 최소 8자 이상이어야 합니다' }, 400);
+    }
+    
+    const { env } = c;
+    
+    // 사용자 존재 확인
+    const user = await env.DB.prepare(
+      'SELECT id, email FROM users WHERE id = ?'
+    ).bind(userId).first();
+    
+    if (!user) {
+      return c.json({ error: '사용자를 찾을 수 없습니다' }, 404);
+    }
+    
+    // 비밀번호 해시 생성
+    const passwordHash = await hashPassword(newPassword);
+    
+    // 비밀번호 업데이트
+    await env.DB.prepare(
+      'UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?'
+    ).bind(passwordHash, getCurrentDateTime(), userId).run();
+    
+    return c.json({ 
+      success: true, 
+      message: '비밀번호가 변경되었습니다',
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return c.json({ error: '비밀번호 변경 중 오류가 발생했습니다' }, 500);
   }
 });
 
