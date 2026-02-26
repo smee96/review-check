@@ -85,25 +85,29 @@ app.get('/sitemap.xml', (c) => {
   });
 });
 
-// R2 이미지 제공 API
-app.get('/api/images/:filename', async (c) => {
+// R2 이미지 제공 API (와일드카드 경로 지원)
+app.get('/api/images/*', async (c) => {
   try {
-    const filename = c.req.param('filename');
+    // /api/images/ 이후의 전체 경로를 가져오기
+    const path = c.req.path.replace('/api/images/', '');
+    
+    if (!path) {
+      return c.notFound();
+    }
     
     // R2에서 이미지 가져오기
-    const object = await c.env.R2.get(filename);
+    const object = await c.env.R2.get(path);
     
     if (!object) {
+      console.error('R2 image not found:', path);
       return c.notFound();
     }
 
-    // 이미지를 응답으로 반환 (캐시 없음 - 항상 최신 이미지 제공)
+    // 이미지를 응답으로 반환 (캐시 활성화)
     return new Response(object.body, {
       headers: {
         'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
-        'Cache-Control': 'no-cache, no-store, must-revalidate', // 캐시 사용 안함
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        'Cache-Control': 'public, max-age=31536000, immutable', // 1년 캐시
         'ETag': object.etag || '',
       }
     });

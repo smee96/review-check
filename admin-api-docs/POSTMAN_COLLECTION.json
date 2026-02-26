@@ -1,0 +1,485 @@
+{
+  "info": {
+    "name": "체크앤리뷰 관리자 API",
+    "description": "체크앤리뷰 플랫폼 관리자 기능 API 컬렉션",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://fa737302.checknreviews-v1.pages.dev",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "인증",
+      "item": [
+        {
+          "name": "로그인",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"your_password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "세션 확인",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "로그아웃",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "캠페인 관리",
+      "item": [
+        {
+          "name": "캠페인 생성 (최소)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"신제품 리뷰 캠페인\",\n  \"channel_type\": \"instagram\",\n  \"pricing_type\": \"product_only\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "campaigns", ""]
+            }
+          }
+        },
+        {
+          "name": "캠페인 생성 (전체)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"히알루론산 수분크림 체험단 모집\",\n  \"description\": \"새로 출시한 스킨케어 제품을 체험하고 솔직한 리뷰를 작성해주세요!\",\n  \"product_name\": \"히알루론산 수분크림\",\n  \"product_url\": \"https://example.com/product/moisturizer\",\n  \"channel_type\": \"instagram\",\n  \"pricing_type\": \"product_with_points\",\n  \"slots\": 10,\n  \"budget\": 500000,\n  \"product_value\": 30000,\n  \"sphere_points\": 5000,\n  \"instagram_mention_account\": \"@checknreview\",\n  \"application_start_date\": \"2024-03-01\",\n  \"application_end_date\": \"2024-03-15\",\n  \"announcement_date\": \"2024-03-20\",\n  \"content_start_date\": \"2024-03-25\",\n  \"content_end_date\": \"2024-04-10\",\n  \"result_announcement_date\": \"2024-04-15\",\n  \"provided_items\": \"- 스킨케어 세트 (3종)\\n- 사용 가이드북\\n- 샘플 키트\",\n  \"mission\": \"1. 제품 사용 후 솔직한 리뷰\\n2. 사진 최소 3장 이상\\n3. 해시태그 필수 포함\",\n  \"keywords\": \"#체크앤리뷰 #신제품 #스킨케어 #리뷰\",\n  \"notes\": \"※ 배송은 선정 후 3일 이내\\n※ 리뷰는 제품 수령 후 7일 이내 작성\",\n  \"requirements\": \"- 팔로워 500명 이상\\n- 최근 3개월 활동 이력\\n- 뷰티 콘텐츠 경험자\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "campaigns", ""]
+            }
+          }
+        },
+        {
+          "name": "전체 캠페인 목록",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/campaigns?status=all&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "campaigns"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "캠페인 상세",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/:campaign_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "campaigns", ":campaign_id"],
+              "variable": [
+                {
+                  "key": "campaign_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "캠페인 상태 변경",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"reason\": \"승인 완료\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/campaigns/:campaign_id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "campaigns", ":campaign_id", "status"],
+              "variable": [
+                {
+                  "key": "campaign_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "캠페인 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/campaigns/:campaign_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "campaigns", ":campaign_id"],
+              "variable": [
+                {
+                  "key": "campaign_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "리뷰 관리",
+      "item": [
+        {
+          "name": "전체 리뷰 목록",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reviews?status=all&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "reviews"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "리뷰 승인",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"comment\": \"승인 완료\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/reviews/:review_id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "reviews", ":review_id", "status"],
+              "variable": [
+                {
+                  "key": "review_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "가입자 관리",
+      "item": [
+        {
+          "name": "전체 사용자 목록",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users?role=all&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "all"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "사용자 상세",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/:user_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", ":user_id"],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "사용자 상태 변경",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/:user_id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", ":user_id", "status"],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "포인트 조정",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000,\n  \"reason\": \"이벤트 참여 보상\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/:user_id/points",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", ":user_id", "points"],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "정산 관리",
+      "item": [
+        {
+          "name": "정산 요청 목록",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/settlements?status=all&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "settlements"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "정산 승인",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"comment\": \"정산 완료\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/settlements/:settlement_id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "settlements", ":settlement_id", "status"],
+              "variable": [
+                {
+                  "key": "settlement_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "시스템 설정",
+      "item": [
+        {
+          "name": "시스템 설정 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "settings"]
+            }
+          }
+        },
+        {
+          "name": "시스템 설정 업데이트",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 35\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/settings/:setting_key",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "settings", ":setting_key"],
+              "variable": [
+                {
+                  "key": "setting_key",
+                  "value": "points_fee_rate"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "통계",
+      "item": [
+        {
+          "name": "대시보드 통계",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
