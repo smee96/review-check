@@ -164,52 +164,6 @@ class ReviewSphere {
             }
           }
         });
-        
-        // 마우스 이벤트 (PC)
-        let isMouseDown = false;
-        
-        slider.addEventListener('mousedown', (e) => {
-          isMouseDown = true;
-          window.touchStartX = e.clientX;
-          slider.style.cursor = 'grabbing';
-        });
-        
-        slider.addEventListener('mousemove', (e) => {
-          if (!isMouseDown) return;
-          window.touchEndX = e.clientX;
-        });
-        
-        slider.addEventListener('mouseup', () => {
-          if (!isMouseDown) return;
-          isMouseDown = false;
-          slider.style.cursor = 'grab';
-          
-          const diff = window.touchStartX - window.touchEndX;
-          const threshold = 50;
-          
-          if (Math.abs(diff) > threshold) {
-            if (diff > 0) {
-              window.heroNext();
-            } else {
-              window.heroPrev();
-            }
-          }
-        });
-        
-        slider.addEventListener('mouseleave', () => {
-          if (isMouseDown) {
-            isMouseDown = false;
-            slider.style.cursor = 'grab';
-          }
-        });
-        
-        // 드래그 기본 동작 방지 (이미지 드래그 등)
-        slider.addEventListener('dragstart', (e) => {
-          e.preventDefault();
-        });
-        
-        // 기본 커서 스타일
-        slider.style.cursor = 'grab';
       }
       
       // 인디케이터 클릭 이벤트
@@ -724,6 +678,14 @@ class ReviewSphere {
             </div>
             
           </div>
+          
+          <!-- 좌우 화살표 버튼 (PC 전용) -->
+          <button onclick="window.heroPrev()" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-30 hover:bg-opacity-50 text-white w-12 h-12 rounded-full items-center justify-center transition-all backdrop-blur-sm shadow-lg group">
+            <i class="fas fa-chevron-left text-xl group-hover:scale-110 transition-transform"></i>
+          </button>
+          <button onclick="window.heroNext()" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white bg-opacity-30 hover:bg-opacity-50 text-white w-12 h-12 rounded-full items-center justify-center transition-all backdrop-blur-sm shadow-lg group">
+            <i class="fas fa-chevron-right text-xl group-hover:scale-110 transition-transform"></i>
+          </button>
           
           <!-- 하단 인디케이터 (점) -->
           <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
