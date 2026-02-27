@@ -704,10 +704,19 @@ class ReviewSphere {
               <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-fire text-orange-500 mr-2"></i>진행중인 캠페인
               </h3>
-              ${ongoingCampaigns.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
+              ${ongoingCampaigns.length > 0 ? '<span class="text-sm text-gray-500 md:hidden">좌우로 스크롤하세요</span>' : ''}
             </div>
-            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
-              <div class="flex space-x-4" style="width: max-content;">
+            <div class="relative">
+              ${ongoingCampaigns.length > 3 ? `
+                <button onclick="document.getElementById('ongoingScroll').scrollBy({left: -300, behavior: 'smooth'})" class="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="document.getElementById('ongoingScroll').scrollBy({left: 300, behavior: 'smooth'})" class="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              ` : ''}
+              <div id="ongoingScroll" class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+                <div class="flex space-x-4" style="width: max-content;">
                 ${ongoingCampaigns.length > 0 ? ongoingCampaigns.map(c => {
                   const channelIcon = UIUtils.getChannelIcon(c.channel_type);
                   return `
@@ -823,6 +832,7 @@ class ReviewSphere {
                 `}
               </div>
             </div>
+            </div>
           </div>
         </div>
 
@@ -833,10 +843,19 @@ class ReviewSphere {
               <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-trophy text-yellow-500 mr-2"></i>베스트 캠페인
               </h3>
-              ${bestCampaigns.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
+              ${bestCampaigns.length > 0 ? '<span class="text-sm text-gray-500 md:hidden">좌우로 스크롤하세요</span>' : ''}
             </div>
-            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
-              <div class="flex space-x-4" style="width: max-content;">
+            <div class="relative">
+              ${bestCampaigns.length > 3 ? `
+                <button onclick="document.getElementById('bestScroll').scrollBy({left: -300, behavior: 'smooth'})" class="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="document.getElementById('bestScroll').scrollBy({left: 300, behavior: 'smooth'})" class="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              ` : ''}
+              <div id="bestScroll" class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+                <div class="flex space-x-4" style="width: max-content;">
                 ${bestCampaigns.length > 0 ? bestCampaigns.map((c, idx) => {
                   const channelIcon = UIUtils.getChannelIcon(c.channel_type);
                   return `
@@ -963,6 +982,7 @@ class ReviewSphere {
                 `}
               </div>
             </div>
+            </div>
           </div>
         </div>
 
@@ -973,10 +993,19 @@ class ReviewSphere {
               <h3 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 <i class="fas fa-heart text-red-500 mr-2"></i>베스트 리뷰
               </h3>
-              ${bestReviews.length > 0 ? '<span class="text-sm text-gray-500">좌우로 스크롤하세요</span>' : ''}
+              ${bestReviews.length > 0 ? '<span class="text-sm text-gray-500 md:hidden">좌우로 스크롤하세요</span>' : ''}
             </div>
-            <div class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
-              <div class="flex space-x-4" style="width: max-content;">
+            <div class="relative">
+              ${bestReviews.length > 3 ? `
+                <button onclick="document.getElementById('reviewsScroll').scrollBy({left: -300, behavior: 'smooth'})" class="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="document.getElementById('reviewsScroll').scrollBy({left: 300, behavior: 'smooth'})" class="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 w-10 h-10 rounded-full items-center justify-center transition shadow-lg border-2 border-gray-200">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              ` : ''}
+              <div id="reviewsScroll" class="overflow-x-auto pb-4 -mx-3 px-3 scrollbar-hide">
+                <div class="flex space-x-4" style="width: max-content;">
                 ${bestReviews.length > 0 ? bestReviews.map((r, idx) => {
                   // 이미지 URL 생성 (API 엔드포인트 사용)
                   const imageUrl = r.image_url ? `/api/applications/review-image/${encodeURIComponent(r.image_url)}` : null;
@@ -1026,6 +1055,7 @@ class ReviewSphere {
                   </div>
                 `}
               </div>
+            </div>
             </div>
           </div>
         </div>
