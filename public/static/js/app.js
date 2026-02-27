@@ -3384,7 +3384,7 @@ class ReviewSphere {
                         <button onclick="app.cancelReviewApproval(${review.id})" class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 text-sm">
                           <i class="fas fa-undo mr-1"></i>승인취소
                         </button>
-                        ${this.user.role === 'admin' ? `
+                        ${(this.user.role === 'admin' || this.user.role === '본사') ? `
                           <button onclick="app.toggleBestReview(${review.id}, ${review.is_best ? 'false' : 'true'})" 
                             class="${review.is_best ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-600 hover:bg-gray-700'} text-white px-4 py-2 rounded text-sm">
                             <i class="fas fa-star mr-1"></i>${review.is_best ? '베스트 해제' : '베스트 설정'}
@@ -3531,7 +3531,7 @@ class ReviewSphere {
           
           <div class="flex-grow pb-20">
             <div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.user.role === 'admin' ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+              <button onclick="(app.user.role === 'admin' || app.user.role === '본사') ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>캠페인관리로
               </button>
               
@@ -4413,7 +4413,7 @@ class ReviewSphere {
       alert('캠페인 등록 신청이 완료되었습니다.\n관리자 승인 후 진행됩니다.');
       
       // 역할에 따라 적절한 페이지로 이동
-      if (this.user.role === 'admin') {
+      if ((this.user.role === 'admin' || this.user.role === '본사')) {
         this.showAdminCampaigns();
       } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
         this.showAdvertiserCampaigns();
@@ -4439,7 +4439,7 @@ class ReviewSphere {
       alert('캠페인이 진행중 상태로 변경되었습니다.');
       
       // 역할에 따라 적절한 페이지로 이동
-      if (this.user.role === 'admin') {
+      if ((this.user.role === 'admin' || this.user.role === '본사')) {
         this.showAdminCampaigns();
       } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
         this.showAdvertiserCampaigns();
@@ -4928,7 +4928,7 @@ class ReviewSphere {
       };
       
       // 관리자인 경우 결제 상태도 함께 전송
-      if (this.user.role === 'admin') {
+      if ((this.user.role === 'admin' || this.user.role === '본사')) {
         const paymentStatusSelect = document.getElementById('campaignPaymentStatus');
         if (paymentStatusSelect) {
           data.payment_status = paymentStatusSelect.value;
@@ -4943,7 +4943,7 @@ class ReviewSphere {
       alert('캠페인이 수정되었습니다.');
       
       // 역할에 따라 적절한 페이지로 이동
-      if (this.user.role === 'admin') {
+      if ((this.user.role === 'admin' || this.user.role === '본사')) {
         this.showAdminCampaigns();
       } else if (this.user.role === 'advertiser' || this.user.role === 'agency' || this.user.role === 'rep') {
         this.showAdvertiserCampaigns();
@@ -5175,7 +5175,7 @@ class ReviewSphere {
           
           <div class="flex-grow pb-20">
             <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
-              <button onclick="app.user.role === 'admin' ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
+              <button onclick="(app.user.role === 'admin' || app.user.role === '본사') ? app.showAdminCampaigns() : (app.user.role === 'advertiser' || app.user.role === 'agency' || app.user.role === 'rep') ? app.showAdvertiserCampaigns() : app.showMyPage()" class="text-purple-600 hover:text-purple-800 mb-4 flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i>캠페인관리로
               </button>
 
@@ -7668,7 +7668,7 @@ class ReviewSphere {
       // 역할별로 분류
       const advertisers = users.filter(u => u.role === 'advertiser' || u.role === 'agency' || u.role === 'rep');
       const influencers = users.filter(u => u.role === 'influencer');
-      const admins = users.filter(u => u.role === 'admin');
+      const admins = users.filter(u => (u.role === 'admin' || u.role === '본사'));
       
       // 페이징 설정
       const itemsPerPage = 20;
@@ -7830,7 +7830,7 @@ class ReviewSphere {
         await this.loadAdminCampaignsPageContent();
       } else {
         // 그 외의 경우 관리자라면 캠페인관리 페이지로 이동
-        if (this.user.role === 'admin') {
+        if ((this.user.role === 'admin' || this.user.role === '본사')) {
           this.showAdminCampaigns();
         } else {
           this.showMyPage();
@@ -7857,7 +7857,7 @@ class ReviewSphere {
         await this.loadAdminCampaignsPageContent();
       } else {
         // 그 외의 경우 관리자라면 캠페인관리 페이지로 이동
-        if (this.user.role === 'admin') {
+        if ((this.user.role === 'admin' || this.user.role === '본사')) {
           this.showAdminCampaigns();
         } else {
           this.showMyPage();
