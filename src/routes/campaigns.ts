@@ -3,6 +3,7 @@
 import { Hono } from 'hono';
 import type { Campaign } from '../types';
 import { getCurrentDateTime, verifyJWT } from '../utils';
+import { getDisplayStatus, getKoreanDate } from '../utils/campaign-status';
 import { authMiddleware, requireRole } from '../middleware/auth';
 
 type Bindings = {
@@ -256,6 +257,7 @@ campaigns.get('/', async (c) => {
   try {
     const { env } = c;
     const type = c.req.query('type'); // 'best' or undefined
+    const today = getKoreanDate(); // 한국 시간 기준 오늘 날짜
     
     if (type === 'best') {
       // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1, 모든 상태 포함)
@@ -271,7 +273,13 @@ campaigns.get('/', async (c) => {
          LIMIT 20`
       ).all();
       
-      return c.json(campaigns.results);
+      // display_status 추가
+      const campaignsWithStatus = campaigns.results.map((campaign: any) => ({
+        ...campaign,
+        display_status: getDisplayStatus(campaign, today)
+      }));
+      
+      return c.json(campaignsWithStatus);
     } else {
       // 진행중인 캠페인: 모집중, 진행중, 일시중지, 완료됨, 취소됨 순으로 정렬
       // - 모집중(recruiting): 가장 먼저 표시 ⭐
@@ -298,7 +306,13 @@ campaigns.get('/', async (c) => {
            c.created_at DESC`
       ).all();
       
-      return c.json(campaigns.results);
+      // display_status 추가
+      const campaignsWithStatus = campaigns.results.map((campaign: any) => ({
+        ...campaign,
+        display_status: getDisplayStatus(campaign, today)
+      }));
+      
+      return c.json(campaignsWithStatus);
     }
   } catch (error) {
     console.error('Get campaigns error:', error);
@@ -312,6 +326,7 @@ campaigns.get('/:id', authMiddleware, async (c) => {
     const campaignId = c.req.param('id');
     const { env } = c;
     const user = c.get('user');
+    const today = getKoreanDate(); // 한국 시간 기준 오늘 날짜
     
     const campaign = await env.DB.prepare(
       'SELECT * FROM campaigns WHERE id = ?'
@@ -339,21 +354,23 @@ campaigns.get('/:id', authMiddleware, async (c) => {
         can_apply = false;
       }
       
-      // 신청 기간 체크 (한국 시간 기준 UTC+9)
-      const now = new Date();
-      const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0]; // YYYY-MM-DD
-      if (campaign.application_start_date && koreaDate < campaign.application_start_date) {
+      // 신청 기간 체크 (한국 시간 기준)
+      if (campaign.application_start_date && today < campaign.application_start_date) {
         can_apply = false; // 신청 시작 전
       }
-      if (campaign.application_end_date && koreaDate > campaign.application_end_date) {
+      if (campaign.application_end_date && today > campaign.application_end_date) {
         can_apply = false; // 신청 마감
       }
     }
     
+    // display_status 추가
+    const display_status = getDisplayStatus(campaign, today);
+    
     return c.json({
       ...campaign,
       has_applied,
-      can_apply
+      can_apply,
+      display_status
     });
   } catch (error) {
     console.error('Get campaign error:', error);
