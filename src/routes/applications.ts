@@ -144,12 +144,12 @@ applications.put('/:id/status', requireRole('advertiser', 'agency', 'rep', 'admi
       return c.json({ error: '지원 내역을 찾을 수 없습니다' }, 404);
     }
     
-    if (user.role !== 'admin' && application.advertiser_id !== user.userId) {
+    if (user.role !== 'admin' && user.role !== '본사' && application.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
     // 선정 취소 제한: 선정일 이후는 취소 불가 (관리자는 예외)
-    if (user.role !== 'admin' && status === 'pending' && application.status === 'approved') {
+    if (user.role !== 'admin' && user.role !== '본사' && status === 'pending' && application.status === 'approved') {
       if (application.announcement_date) {
         const now = new Date();
         const koreaDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0];

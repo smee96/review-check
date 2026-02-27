@@ -389,7 +389,7 @@ campaigns.put('/:id/status', authMiddleware, requireRole('advertiser', 'agency',
     }
     
     // 권한 체크: 관리자 또는 캠페인 소유자만
-    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+    if (user.role !== 'admin' && user.role !== '본사' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
@@ -448,13 +448,13 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       thumbnail_type: campaign.thumbnail_image ? (campaign.thumbnail_image.startsWith('data:image') ? 'Base64' : 'URL') : 'null'
     });
     
-    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+    if (user.role !== 'admin' && user.role !== '본사' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
     // 광고주 권한 체크: 대기(pending) 상태에서만 수정 가능
     // 승인(approved), 일시중지(suspended), 완료(completed), 취소(cancelled)는 수정 불가
-    if (user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== '본사') {
       const editBlockedStatuses = ['approved', 'suspended', 'completed', 'cancelled'];
       if (editBlockedStatuses.includes(campaign.status)) {
         const statusName = {
@@ -576,8 +576,8 @@ campaigns.put('/:id', authMiddleware, async (c) => {
       params.push(finalThumbnailImage);
     }
     
-    // 관리자인 경우에만 결제 상태 업데이트 가능
-    if (user.role === 'admin' && payment_status) {
+    // 관리자 또는 본사인 경우에만 결제 상태 업데이트 가능
+    if (((user.role === 'admin' || user.role === '본사') || user.role === '본사') && payment_status) {
       if (!['unpaid', 'paid'].includes(payment_status)) {
         return c.json({ error: '유효하지 않은 결제 상태입니다' }, 400);
       }
@@ -749,7 +749,7 @@ campaigns.get('/:id/applications', authMiddleware, async (c) => {
     }
     
     // 권한 체크: 관리자 또는 캠페인 소유자만
-    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+    if (user.role !== 'admin' && user.role !== '본사' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     
@@ -804,7 +804,7 @@ campaigns.get('/:id/shipping-info', authMiddleware, requireRole('advertiser', 'a
       return c.json({ error: '캠페인을 찾을 수 없습니다' }, 404);
     }
     
-    if (user.role !== 'admin' && campaign.advertiser_id !== user.userId) {
+    if (user.role !== 'admin' && user.role !== '본사' && campaign.advertiser_id !== user.userId) {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
     

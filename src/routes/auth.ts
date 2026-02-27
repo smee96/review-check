@@ -40,7 +40,7 @@ auth.post('/register', async (c) => {
       return c.json({ error: '비밀번호는 최소 8자 이상이어야 합니다' }, 400);
     }
     
-    if (!['advertiser', 'agency', 'rep', 'influencer', 'admin'].includes(role)) {
+    if (!['advertiser', 'agency', 'rep', 'influencer', 'admin', '본사'].includes(role)) {
       return c.json({ error: '유효하지 않은 역할입니다' }, 400);
     }
     

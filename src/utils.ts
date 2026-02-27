@@ -22,8 +22,18 @@ const JWT_SECRET = 'reviewsphere-secret-key-change-in-production'; // TODO: Use 
 
 export async function signJWT(payload: JWTPayload): Promise<string> {
   const header = { alg: 'HS256', typ: 'JWT' };
-  const encodedHeader = btoa(JSON.stringify(header));
-  const encodedPayload = btoa(JSON.stringify({ ...payload, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 }));
+  
+  // Base64 encoding with UTF-8 support (for Korean characters like '본사')
+  const encodeBase64 = (str: string) => {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(str);
+    let binary = '';
+    bytes.forEach(byte => binary += String.fromCharCode(byte));
+    return btoa(binary);
+  };
+  
+  const encodedHeader = encodeBase64(JSON.stringify(header));
+  const encodedPayload = encodeBase64(JSON.stringify({ ...payload, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60 }));
   
   const message = `${encodedHeader}.${encodedPayload}`;
   const encoder = new TextEncoder();
@@ -74,7 +84,18 @@ export async function verifyJWT(token: string): Promise<JWTPayload | null> {
       return null;
     }
     
-    const payload = JSON.parse(atob(encodedPayload)) as JWTPayload;
+    // Base64 decoding with UTF-8 support (for Korean characters like '본사')
+    const decodeBase64 = (str: string) => {
+      const binary = atob(str);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      const decoder = new TextDecoder();
+      return decoder.decode(bytes);
+    };
+    
+    const payload = JSON.parse(decodeBase64(encodedPayload)) as JWTPayload;
     
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
