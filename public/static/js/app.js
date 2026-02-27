@@ -2143,6 +2143,7 @@ class ReviewSphere {
         this.showInfluencerMyPage();
         break;
       case 'admin':
+      case '본사':
         this.showAdminMyPage();
         break;
     }
