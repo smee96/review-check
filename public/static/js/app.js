@@ -143,6 +143,7 @@ class ReviewSphere {
       // 터치 이벤트
       const slider = document.getElementById('heroSlider');
       if (slider) {
+        // 터치 이벤트 (모바일)
         slider.addEventListener('touchstart', (e) => {
           window.touchStartX = e.touches[0].clientX;
         }, { passive: true });
@@ -163,6 +164,52 @@ class ReviewSphere {
             }
           }
         });
+        
+        // 마우스 이벤트 (PC)
+        let isMouseDown = false;
+        
+        slider.addEventListener('mousedown', (e) => {
+          isMouseDown = true;
+          window.touchStartX = e.clientX;
+          slider.style.cursor = 'grabbing';
+        });
+        
+        slider.addEventListener('mousemove', (e) => {
+          if (!isMouseDown) return;
+          window.touchEndX = e.clientX;
+        });
+        
+        slider.addEventListener('mouseup', () => {
+          if (!isMouseDown) return;
+          isMouseDown = false;
+          slider.style.cursor = 'grab';
+          
+          const diff = window.touchStartX - window.touchEndX;
+          const threshold = 50;
+          
+          if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+              window.heroNext();
+            } else {
+              window.heroPrev();
+            }
+          }
+        });
+        
+        slider.addEventListener('mouseleave', () => {
+          if (isMouseDown) {
+            isMouseDown = false;
+            slider.style.cursor = 'grab';
+          }
+        });
+        
+        // 드래그 기본 동작 방지 (이미지 드래그 등)
+        slider.addEventListener('dragstart', (e) => {
+          e.preventDefault();
+        });
+        
+        // 기본 커서 스타일
+        slider.style.cursor = 'grab';
       }
       
       // 인디케이터 클릭 이벤트
