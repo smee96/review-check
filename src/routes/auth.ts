@@ -72,16 +72,17 @@ auth.post('/register', async (c) => {
     
     const { env } = c;
     
-    // 3️⃣ IP 기반 가입 속도 제한 (1일 1회)
+    // 3️⃣ IP 기반 가입 속도 제한 (24시간 동안 20개까지 허용)
     const clientIP = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     
-    const recentSignup = await env.DB.prepare(
-      'SELECT id FROM users WHERE created_at > ? AND id IN (SELECT user_id FROM user_ips WHERE ip_address = ?)'
-    ).bind(oneDayAgo, clientIP).first();
+    const recentSignupCount = await env.DB.prepare(
+      'SELECT COUNT(*) as count FROM users WHERE created_at > ? AND id IN (SELECT user_id FROM user_ips WHERE ip_address = ?)'
+    ).bind(oneDayAgo, clientIP).first() as { count: number } | null;
     
-    if (recentSignup) {
-      return c.json({ error: '하루에 한 번만 가입할 수 있습니다. 24시간 후 다시 시도해주세요.' }, 429);
+    const signupCount = recentSignupCount?.count || 0;
+    if (signupCount >= 20) {
+      return c.json({ error: '24시간 동안 최대 20개의 계정만 생성할 수 있습니다. 잠시 후 다시 시도해주세요.' }, 429);
     }
     
     // Check if email already exists
