@@ -2752,7 +2752,7 @@ class ReviewSphere {
                     
                     <div class="flex gap-2 mt-4">
                       ${review.approval_status === 'pending' ? `
-                        <button onclick="app.approveReview(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                        <button onclick="app.approveReviewFromAdmin(${review.id})" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
                           <i class="fas fa-check mr-1"></i>승인
                         </button>
                         <button onclick="app.rejectReviewWithReason(${review.id})" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm">
@@ -3459,6 +3459,18 @@ class ReviewSphere {
       await axios.put(`/api/reviews/${reviewId}/approve`, {}, this.getAuthHeaders());
       alert('리뷰가 승인되었습니다');
       await this.loadAdvertiserReviewsPageContent();
+    } catch (error) {
+      alert(error.response?.data?.error || '리뷰 승인에 실패했습니다');
+    }
+  }
+
+  async approveReviewFromAdmin(reviewId) {
+    if (!confirm('이 리뷰를 승인하시겠습니까?')) return;
+    
+    try {
+      await axios.put(`/api/reviews/${reviewId}/approve`, {}, this.getAuthHeaders());
+      alert('리뷰가 승인되었습니다');
+      await this.loadAdminReviewsContent();
     } catch (error) {
       alert(error.response?.data?.error || '리뷰 승인에 실패했습니다');
     }
