@@ -2806,7 +2806,7 @@ class ReviewSphere {
     if (!confirm('이 리뷰의 승인을 취소하시겠습니까?')) return;
     
     try {
-      await axios.put(`/api/reviews/${reviewId}/cancel`, {}, this.getAuthHeaders());
+      await axios.put(`/api/reviews/${reviewId}/cancel-approval`, {}, this.getAuthHeaders());
       alert('승인이 취소되었습니다');
       await this.loadAdminReviewsContent();
     } catch (error) {
