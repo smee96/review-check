@@ -373,16 +373,16 @@ class ReviewSphere {
     let bestReviews = [];
     
     try {
-      // 진행중인 캠페인 (모든 승인된 캠페인)
-      const ongoingResponse = await axios.get('/api/campaigns');
+      // 진행중인 캠페인 (메인 페이지에서는 visible=1만 표시)
+      const ongoingResponse = await axios.get('/api/campaigns?visible=1');
       ongoingCampaigns = ongoingResponse.data || [];
       
-      // 베스트 캠페인 (관리자 선정)
-      const bestResponse = await axios.get('/api/campaigns?type=best');
+      // 베스트 캠페인 (메인 페이지에서는 visible=1만 표시)
+      const bestResponse = await axios.get('/api/campaigns?type=best&visible=1');
       bestCampaigns = bestResponse.data || [];
       
-      // 베스트 리뷰 (관리자 선정)
-      const bestReviewsResponse = await axios.get('/api/campaigns/reviews/best');
+      // 베스트 리뷰 (메인 페이지에서는 visible=1인 캠페인의 리뷰만 표시)
+      const bestReviewsResponse = await axios.get('/api/campaigns/reviews/best?visible=1');
       bestReviews = bestReviewsResponse.data || [];
     } catch (error) {
       console.log('Failed to load data:', error);

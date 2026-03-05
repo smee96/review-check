@@ -257,17 +257,20 @@ campaigns.get('/', async (c) => {
   try {
     const { env } = c;
     const type = c.req.query('type'); // 'best' or undefined
+    const visible = c.req.query('visible'); // '1' for main page filtering
     const today = getKoreanDate(); // 한국 시간 기준 오늘 날짜
     
     if (type === 'best') {
-      // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1, 모든 상태 포함)
+      // 베스트 캠페인: 관리자가 선정한 캠페인 (is_best = 1)
+      // visible 파라미터가 있으면 is_visible = 1만 필터링
       // LEFT JOIN으로 N+1 문제 해결
+      const visibleCondition = visible === '1' ? 'AND c.is_visible = 1' : '';
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          COALESCE(COUNT(a.id), 0) as application_count
          FROM campaigns c
          LEFT JOIN applications a ON a.campaign_id = c.id
-         WHERE c.is_best = 1
+         WHERE c.is_best = 1 ${visibleCondition}
          GROUP BY c.id
          ORDER BY c.updated_at DESC
          LIMIT 20`
@@ -282,18 +285,21 @@ campaigns.get('/', async (c) => {
       return c.json(campaignsWithStatus);
     } else {
       // 진행중인 캠페인: 모집중, 진행중, 일시중지, 완료됨, 취소됨 순으로 정렬
+      // visible 파라미터가 있으면 is_visible = 1만 필터링
       // - 모집중(recruiting): 가장 먼저 표시 ⭐
       // - 진행중(in_progress): 두 번째
       // - 일시중지(suspended): 세 번째
       // - 완료됨(completed): 네 번째
       // - 취소됨(cancelled): 마지막
       // LEFT JOIN으로 N+1 문제 해결
+      const visibleCondition = visible === '1' ? 'AND c.is_visible = 1' : '';
       const campaigns = await env.DB.prepare(
         `SELECT c.*, 
          COALESCE(COUNT(a.id), 0) as application_count
          FROM campaigns c
          LEFT JOIN applications a ON a.campaign_id = c.id
          WHERE c.status IN ('pending', 'approved', 'suspended', 'completed', 'cancelled')
+         ${visibleCondition}
          GROUP BY c.id
          ORDER BY 
            CASE 
@@ -894,6 +900,10 @@ campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency',
 campaigns.get('/reviews/best', async (c) => {
   try {
     const { env } = c;
+    const visible = c.req.query('visible'); // '1' for main page filtering
+    
+    // visible 파라미터가 있으면 is_visible = 1인 캠페인의 리뷰만 표시
+    const visibleCondition = visible === '1' ? 'AND c.is_visible = 1' : '';
     
     const reviews = await env.DB.prepare(
       `SELECT r.id, r.post_url, r.image_url,
@@ -907,6 +917,7 @@ campaigns.get('/reviews/best', async (c) => {
        JOIN campaigns c ON a.campaign_id = c.id
        JOIN users u ON a.influencer_id = u.id
        WHERE COALESCE(r.is_best, 0) = 1 AND r.approval_status = 'approved'
+       ${visibleCondition}
        ORDER BY r.submitted_at DESC
        LIMIT 20`
     ).all();
