@@ -849,7 +849,7 @@ campaigns.get('/:id/shipping-info', authMiddleware, requireRole('advertiser', 'a
 });
 
 // 내 캠페인의 모든 리뷰 조회 (광고주)
-campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency', 'rep'), async (c) => {
+campaigns.get('/my/reviews', authMiddleware, requireRole('advertiser', 'agency', 'rep', 'admin', '본사'), async (c) => {
   try {
     const user = c.get('user');
     const { env } = c;
