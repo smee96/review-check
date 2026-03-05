@@ -749,8 +749,10 @@ app.put('/api/reviews/:id/approve', async (c) => {
       return c.json({ error: '리뷰를 찾을 수 없습니다' }, 404);
     }
 
-    // 광고주 본인의 캠페인 리뷰인지 확인
-    if (review.advertiser_id !== decoded.userId) {
+    // 광고주 본인 OR 관리자(admin, 본사)만 승인 가능
+    if (review.advertiser_id !== decoded.userId && 
+        decoded.role !== 'admin' && 
+        decoded.role !== '본사') {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
@@ -807,8 +809,10 @@ app.put('/api/reviews/:id/reject', async (c) => {
       return c.json({ error: '리뷰를 찾을 수 없습니다' }, 404);
     }
 
-    // 광고주 본인의 캠페인 리뷰인지 확인
-    if (review.advertiser_id !== decoded.userId) {
+    // 광고주 본인 OR 관리자(admin, 본사)만 거절 가능
+    if (review.advertiser_id !== decoded.userId && 
+        decoded.role !== 'admin' && 
+        decoded.role !== '본사') {
       return c.json({ error: '권한이 없습니다' }, 403);
     }
 
